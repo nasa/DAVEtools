@@ -1,0 +1,472 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+Overview of the DAVE utility package
+</head>
+<body bgcolor="white">
+
+This package provides a set of utility functions to manipulate and
+examine DAVE-ML model files. 
+
+<h2>Overview</h2>
+
+<p>The <code>gov.nasa.daveml.DAVE</code> package provides a basic
+utility to parse and evaluate Dynamic Aerospace Vehicle Exchange
+Markup Language (DAVE-ML) files. The package provides some features as
+a stand-alone program, but can be extended by other packages to add
+additional capabilities. </p>
+
+<p><code>gov.nasa.daveml.DAVE</code> itself depends on the
+<code>org.jdom</code> package, a product of the JDOM project, a
+Java-based XML document parser. See {@link <a
+href="http://www.jdom.org" target="_blank">http://www.jdom.org</a>} for more
+information about JDOM.
+
+<p>As currently written, DAVE will parse a DAVE-ML XML file into an
+instantiation of the {@link gov.nasa.daveml.DAVE.Model
+<code>Model</code>} class. It will also generate a description of the
+{@link gov.nasa.daveml.DAVE.Model <code>Model</code>} into a separate
+text file, auto-verify with embedded checkcase data, generate a count
+of elements and parsing details, and perform simple evaluations of
+output values given a fixed set of input values.</p>
+
+<p>The latest version of DAVEtools can be downloaded from {@link <a
+href="http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html" target="_blank">http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html</a>}.</p>
+
+<p>Copyright (c) 2007 United States Government as represented by LAR-17460-1. No copyright is
+claimed in the United States under Title 17, U.S. Code. All Other Rights Reserved.</p>
+
+<h2>Command Syntax</h2>
+
+<pre><code>
+
+  java DAVE [-count] [-debug] [-eval] [-list [Text_output_file]] DAVE_document
+
+</code></pre>
+
+where
+<dl>
+
+<dt><code>-count</code></dt>
+<dd>generates statistics such as # points, functions, signals,
+etc.,</dd>
+
+<dt><code>-debug</code></dt> 
+<dd>indicates descriptive messages are to be emitted,</dd>
+
+<dt><code>-eval</code></dt>
+<dd>indicates outputs are to be evaluated (DAVE will prompt for input
+values),</dd>
+
+<dt><code>-list</code></dt>
+<dd>indicates a listing file is to be produced; this listing file will
+by default be named <code><em>file</em>.txt</code>; a different file
+name can be specified immediately following the <code>-list</code>
+option</dd>
+
+<dt><code>DAVE_document</code></dt>
+<dd>is the name of the DAVE-ML file to parse. This file normally has a
+<code>.xml</code> filetype but that is not required.
+
+</dl>
+
+<h2>Theory of Operation</h2>
+
+<h3>Loading &amp; parsing the DAVE-ML description into a
+<code>Model</code></h3>
+
+<h4>The static <code>DAVE.main()</code> routine</h4>
+
+<code>main()</code> is called with the name of the DAVE-ML file
+(typically ending with .xml) to use. main() calls the {@link
+gov.nasa.daveml.DAVE.DAVE#DAVE(java.lang.String[]) <code>DAVE()</code>}
+constructor and passes all arguments to the constructor.  
+
+<h4>The {@link gov.nasa.daveml.DAVE.DAVE#DAVE(java.lang.String[])} constructor</code></h4>
+
+The {@link gov.nasa.daveml.DAVE.DAVE#DAVE(java.lang.String[]) <code>DAVE()</code>} constructor
+parses the arguments (by private method <code>parseOptions()</code>) and
+emits an error message if it can't understand the arguments.
+
+A new {@link gov.nasa.daveml.DAVE.Model <code>Model</code>} is
+instantiated and saved in the field variable <code>m</code>.
+
+If the <code>-debug</code> flag was specified on the command line, the
+new model is told to be verbose.
+
+<h4>Back to static method <code>DAVE.main()</code></h4>
+
+The {@link gov.nasa.daveml.DAVE.DAVE#parseFile()
+<code>DAVE.parseFile()</code>} method is then called to load the file
+into the model structure. Any uncaught exceptions during parsing
+generate a stack trace.
+
+<h4>The {@link gov.nasa.daveml.DAVE.DAVE#parseFile()} method</h4>
+
+This method takes the supplied DAVE xml file (whose name was stored in
+field <code>inputFileName</code> by <code>parseOptions()</code>), and
+converts the DAVE-ML XML elements contained in that 
+file into <code>ArrayList</code>s of {@link gov.nasa.daveml.DAVE.Signal} and
+{@link gov.nasa.daveml.DAVE.Block} objects, as well as
+<code>Maps</code> of
+{@link gov.nasa.daveml.DAVE.BreakpointSet}, 
+{@link gov.nasa.daveml.DAVE.FuncTable}, and 
+{@link gov.nasa.daveml.DAVE.BlockBP} objects. 
+     
+The procedure is to locate and create objects for each type of DAVE-ML
+element, in sequence:
+
+<ul>
+  <li><code>variableDef</code>s</li>
+  <li><code>breakpointDef</code>s</li>
+  <li><code>griddedTableDef</code>s</li>
+  <li><code>function</code>s</li>
+</ul>
+      
+An interesting quirk about building a model: the <code>function</code>
+elements specify a table, one or more breakpoint sets, and the
+independent variable to be normalized with the particular breakpoint
+set(s). Thus, only when the function definition is read and parsed can
+we construct breakpoint blocks (<code>BlockBP</code>s). So, the
+function table parsing routine (<code>new BlockFuncTable</code>) has
+to do a lot of <code>BlockBP</code> and wiring <code>Signal</code>
+creation. That's why creation of <code>BlockBPs</code> is deferred
+until creation of <code>BlockFuncTable</code>s.
+
+<p>
+The <code>inputFileName</code> string is used to open a
+<code>FileInputStream</code> which is passed into an
+<code>InputStreamReader</code>. If an exception occurs in opening the
+indicated file, an error message is printed and this method returns
+<code>false</code>. 
+
+<p>
+The model's name is taken from the <code>stubName</code> field (set by
+<code>parseOptions()</code> method earlier) and stored in the model by
+calling {@link gov.nasa.daveml.DAVE.Model#setName(java.lang.String)
+<code>Model.setName()</code>}.
+
+<p>
+A new {@link gov.nasa.daveml.DAVE.Signal <code>Signal</code>} object is
+added to the model for every <code>variableDef</code> element
+encountered by a call to {@link
+gov.nasa.daveml.DAVE.DAVE#parseVariableDefs()}. 
+
+<p>
+A new {@link gov.nasa.daveml.DAVE.BreakpointSet} object is
+added to the model for every <code>breakpointDef</code> element
+encountered by a call to {@link
+gov.nasa.daveml.DAVE.DAVE#parseBreakpointDefs()}. 
+
+Each new <code>BreakpointSet</code> registers itself with the model by
+calling {@link gov.nasa.daveml.DAVE.Model#register( BreakpointSet )}
+where the new <code>BreakpointSet</code> is added to the
+<code>Model.breakpointSets</code> <code>Map</code>.
+
+<p>
+A new {@link gov.nasa.daveml.DAVE.FuncTable} object is added to the
+model for every <code>griddedTableDef</code> element encountered in
+the file, by a call to {@link gov.nasa.daveml.DAVE.DAVE#parseTableDefs()}. 
+
+Each new <code>FuncTable</code> object registers itself with the model
+by a call to 
+
+{@link gov.nasa.daveml.DAVE.Model#register(FuncTable)}, 
+
+where the <code>FuncTable</code> object is added to the
+<code>Model.tables</code> <code>Map</code>. 
+
+<p>
+A call is then made to the {@link gov.nasa.daveml.DAVE.DAVE#parseFunctions()}
+method, which is bit more involved. 
+
+<h4>The {@link gov.nasa.daveml.DAVE.DAVE#parseFunctions()} method</h4>
+
+<p>
+For each <code>function</code>
+element discovered in the input file, a new {@link
+gov.nasa.daveml.DAVE.BlockFuncTable} is created. The {@link
+gov.nasa.daveml.DAVE.BlockFuncTable#BlockFuncTable( Element, Model )}
+constructor is called which further parses the <code>function</code>
+subelements. 
+
+<h4>The {@link gov.nasa.daveml.DAVE.BlockFuncTable#BlockFuncTable(
+Element,Model )} method</h4>
+
+<p>
+The approach taken regarding function creation has two options,
+depending on whether the function is simple (with an internal
+description of breakpoints and function values) or complex (with
+references to previously encountered <code>breakpointDefs</code> and
+<code>griddedTableDefs</code>. 
+
+<p>
+In both cases (simple and complex functions) it is necessary for the
+function to create one or more breakpoint blocks ({@link
+gov.nasa.daveml.DAVE.BlockBP}), function interpolation blocks ({@link
+gov.nasa.daveml.DAVE.BlockFuncTable}), and the {@link
+gov.nasa.daveml.DAVE.Signal} objects that join
+the breakpoint blocks with function blocks.
+
+<h5>Simple function - <code>BlockFuncTable.parseSimpleFunction()</code></h5>
+
+In this case (determined if no <code>functionDefn</code> element
+exists), the <code>simple</code> flag is set, and the
+<code>dependentVarPts</code> sub-element is passed to the private
+<code>BlockFuncTable.parseSimpleFunction()</code> 
+method. Errors are reported (but no exceptions thrown, at present) if
+any of these sub-elements are missing.
+
+<p>
+In <code>BlockFuncTable.parseSimpleFunction()</code>, the output
+table (<code>dependentVarPts</code>) is recorded and the independent
+variable points (<code>independentVarPts</code>) are saved to a
+<code>List</code>. A new {@link gov.nasa.daveml.DAVE.FuncTable} is
+created from the output table (which registers itself with the
+<code>Model</code>) and then the <code>BlockFuncTable</code>
+associates itself with that <code>FuncTable</code> by calling the new
+<code>FuncTable</code>'s {@link
+gov.nasa.daveml.DAVE.FuncTable#register( BlockFuncTable )}
+method. The ID associated output variable for the simple table is
+extracted from the <code>dependentVarPts</code> sub-element.
+
+<p>
+Continuing with the simple table case, it is necessary to create
+breakpoint sets associated with the internal table of breakpoint
+values. this is accomplished for each <code>independentVarPts</code>
+encountered: 
+<ol>
+
+  <li>the <code>varID</code> of the associated input signal is
+  recorded</li>
+
+  <li>a unique breakpoint set name is created (e.g.,
+  <code>auto_MACH_1</code>)</li>
+
+  <li>this breakpoint set name is added to the function table input
+  BPID list</li>
+
+  <li>the breakpoint values are parsed into an
+  <code>ArrayList</code></li>
+
+  <li>a new {@link gov.nasa.daveml.DAVE.BreakpointSet} is created by
+  calling the {@link
+  gov.nasa.daveml.DAVE.BreakpointSet#BreakpointSet(String, String,
+  String, String, Model)} constructor</li>
+
+</ol>
+
+<h5>Complex function - continuing in <code>BlockFuncTable()</code>
+constructor</h5>
+
+<p>When a complex function is found, the processing of the new
+function interpolation block is more straightforward:
+
+<ol>
+ 
+  <li>The function's name is retrieved and recorded</li>
+  
+  <li>The <code>function</code> element is examined for one of the
+  following:
+
+   <ul>
+   
+     <li>a <code>griddedTable</code> sub-element (basically an
+     embedded table; these are deprecated and will be unsupported in
+     the future).</li>
+
+     <li>a <code>griddedTableDef</code> sub-element (also an embedded
+     table, but contains a mandatory <code>gtID</code></li>
+
+     <li> a <code>griddedTableRef</code> sub-element, which is a
+     reference to a previously defined (and parsed)
+     <code>griddedTableDef</code></li>
+
+   </ul>
+
+  <li>In the case of a <code>griddedTable</code> or
+  <code>griddedTableDef</code>, where the table values are found
+  inside the <code>function</code> itself, a new {@link
+  gov.nasa.daveml.DAVE.FuncTable} is created from the sub-element, and
+  the new <code>BlockFuncTable</code> registers itself with this new
+  <code>FuncTable</code>.</li>
+
+  <li>In the case of a <code>griddedTableRef</code>, the
+  <code>gtID</code> is recorded.</li>
+
+  <li>The {@link
+  gov.nasa.daveml.DAVE.BlockFuncTable#parseVarIDsFromFunctionElement(
+  Element )} method is called to examine the independent (input)
+  variable IDs and the single dependent (output) variable ID and
+  record pointers to these input &amp; output variables.</li>
+
+</ol>
+
+<h4>Back from either simple or complex function definitions; still in the
+<code>BlockFuncTable()</code> constructor</h4>
+
+<p>
+The {@link gov.nasa.daveml.DAVE.BlockFuncTable#hookUpOutput( Element )} 
+method is called to hook up to the function's output {@link
+gov.nasa.daveml.DAVE.Signal}.
+
+<p>
+The {@link gov.nasa.daveml.DAVE.BlockFuncTable#hookUpInputs()} method is
+called to connect with upstream breakpoint blocks and their input
+signals.
+
+<h4>The {@link gov.nasa.daveml.DAVE.BlockFuncTable#hookUpInputs()}
+method</h4>
+
+<p>For each breakpoint set (identified via one or more stored <code>bpID</code> in the function's associated {@link
+gov.nasa.daveml.DAVE.FuncTable}), perform the following:
+
+<ol>
+  <li>Get the name of the associcated {@link
+  gov.nasa.daveml.DAVE.Signal}</li>
+
+  <li>Construct a descriptive and unique identifier for the breakpoint
+  normalization block's index-and-weight output signal (which connects
+  the breakpoint block to the function table interpolation
+  block). Something like "mach_x_MACH1" where the first word is the
+  independent signal varID and the last word is the bpID.</li>
+
+  <li>Examine the existing signals (recorded by the model) to look for
+  this index-and-weights signal, using {@link
+  gov.nasa.daveml.DAVE.SignalArrayList#findByID( String )
+  <code>SignalArrayList.findByID()</code>} method.</li>
+
+  <li>If the index-and-weights signal doesn't exist, create it by
+  calling {@link
+  gov.nasa.daveml.DAVE.BlockFuncTable#createAndHookUpIWPath( String,
+  String, String, int)
+  <code>BlockFuncTable.createAndHookUpIWPath()</code>} (see below).</li>
+
+ </ol>
+
+<h4>The {@link
+gov.nasa.daveml.DAVE.BlockFuncTable#createAndHookUpIWPath( String,
+String, String, int)
+<code>BlockFuncTable.createAndHookUpIWPath()</code>} method</h4>
+
+<p>
+This method, surprisingly, creates and hooks up index-and-weight
+signals to a given <code>BlockFuncTable</code>, based on independent
+(input) signal ID, breakpoint ID, a given index-and-weights-signal ID,
+and port number to connect:
+
+<ol>
+  <li>Find the independent (input) signal by it's <code>varID</code>
+  using the {@link gov.nasa.daveml.DAVE.SignalArrayList#findByID( String
+  )} method. </li>
+
+  <li>Create a signal name similar to the index-and-weight signal ID
+  by combining the input signal name with the breakpoint set ID</li>
+
+  <li>Create the new signal by calling the <code>Signal()</code>
+  constructor.</li>
+
+  <li>Hook the new index-and-weight <code>Signal</code> to ourself (a
+  <code>BlockFuncTable</code>, remember?) by calling the Signal's
+  <code>addSink()</code> constructor, passing ourself and our port
+  number.  This method calls us back to complete a two-way link, which
+  is the convention for connecting.</li>
+
+</ol>
+
+<p>
+<code>createAndHookUpIWPath()</code> then returns control to
+<code>hookUpInputs()</code> which increments the prot count and
+proceeds to the next input signal. After all input signals are hooked
+up, control is returned to the <code>BlockFuncTable()</code>
+constructor, which returns control to
+<code>DAVE.parseFunctions()</code>, which returns control to
+<code>DAVE.parseFile()</code>.
+
+<h4>Back in <code>DAVE.parseFile()</code> method</h4>
+
+<p>A call is made to {@link gov.nasa.daveml.DAVE.Model#wireBlocks()} to
+complete the internal model wiring.
+
+<p>A call is then made to {@link gov.nasa.daveml.DAVE.Model#hookupI_O()}
+which generates {@link gov.nasa.daveml.DAVE.BlockInput} and {@link
+gov.nasa.daveml.DAVE.BlockOutput} blocks to connect to input and output
+signals.
+
+<p>Finally, a call is made to {@link
+gov.nasa.daveml.DAVE.Model#verify()} which looks at all blocks and, by
+calling their {@link gov.nasa.daveml.DAVE.Block#verifyInputs()} and
+{@link gov.nasa.daveml.DAVE.Block#verifyOutputs()} methods,
+confirms that all input and output ports have been connected. An error
+is generated if this is not the case. <code>Model.verify()</code> then
+looks at all signals and confirms, by calling their {@link
+gov.nasa.daveml.DAVE.Signal#hasSource()} and {@link
+gov.nasa.daveml.DAVE.Signal#hasDest()} methods, that each signal has a
+source and a destination block. An error is generated if this is not
+the case.
+
+<p><code>DAVE.parseFile()</code> then returns control to the static
+method <code>DAVE.main()</code>, which provides a listing and/or
+performs model evaluations as described previously.
+
+<h3>Evaluation of the model</h3>
+
+<p>
+Control is now returned to static method <code>DAVE.main()</code>.
+If parsing was successful, we check to see if a listing is requested;
+if so, the {@link gov.nasa.daveml.DAVE.DAVE#describeSelf()} method is called.
+
+<p>
+If an evaluation was requested, a loop is entered in which the user is
+requested to supply values (or accept default values) for each model
+input and the resulting model outputs are listed. This loop is
+terminated with an end-of-input (<code>^D</code>) character. This loop
+performs the following:
+
+<ul>
+
+  <li>The model's {@link gov.nasa.daveml.DAVE.Model#getInputVector()}
+  method is called; this returns an {@link
+  gov.nasa.daveml.DAVE.VectorInfoArrayList} which is a feeble extension
+  of the standard <code>ArrayList</code> object; the customization
+  ensures the specialized <code>ArrayList</code> returns {@link
+  gov.nasa.daveml.DAVE.VectorInfo} objects. (A {@link
+  gov.nasa.daveml.DAVE.VectorInfo} object describes an input or output
+  vector element with the name, units, source/sink block, and value of
+  the parameter.)</li>
+
+  <li>{@link gov.nasa.daveml.DAVE.DAVE#loadInputs(VectorInfoArrayList)
+  <code>DAVE.loadInputs()</code>} is passed the input vector and
+  requests a floating-point value from the user for each input
+  parameter.  It returns -1 if the user types <code>^D</code>
+  (end-of-line).</li>
+
+  <li>The model's {@link gov.nasa.daveml.DAVE.Model#cycle()} method is
+  called to calculate outputs for this set of inputs.</li>
+
+  <li><code>Model.getOutputVector()</code> is called to retrieve the updated
+  output vector values.</li>
+
+  <li>{@link gov.nasa.daveml.DAVE.DAVE#listOutputs(VectorInfoArrayList)
+  <code>DAVE.listOutputs()</code>} is passed the output vector for
+  display to the user</li>
+
+</ul>
+
+and the cycle repeats.
+
+
+
+
+<h2>Related Documentation</h2>
+
+For overviews, tutorials, examples, guides, and tool documentation, please see:
+<ul>
+  <li><a href="http://daveml.org" target="_blank">
+  The DAVE-ML project website</a>
+</ul>
+
+<!-- Put @see and @since tags down here. -->
+
+</body>
+</html>

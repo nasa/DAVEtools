@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- this now uses the nbbuild.xml script that is created by NetBeans -->
+<project name="DAVE" default="jar" basedir=".">
+  <description>Builds, tests and runs the project DAVE.</description>
+
+  <import file="nbbuild.xml"/>
+
+  <property name="build.dir"      location="bin"/>
+  <property name="dist.dir"       location="dist"/>
+  <property name="build.prod.dir" location="${build.dir}/prod"/>
+  <property name="build.test.dir" location="${build.dir}/test"/>
+  <property name="src.dir"        location="src"/>
+  <property name="test.dir"       location="test"/>
+  <property name="vendor.lib.dir" location="vendor/lib"/>
+  <property name="jar.file"       location="${dist.dir}/${ant.project.name}.jar"/>
+
+  <path id="project.classpath">
+    <pathelement location="${build.prod.dir}"/>
+    <fileset dir="${vendor.lib.dir}">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <path id="test.classpath">
+    <pathelement location="${project.classpath}"/>
+    <pathelement location="${build.test.dir}"/>
+    <fileset dir="${vendor.lib.dir}">
+      <include name="junit/junit*.jar"/>
+      <include name="junit4/junit*.jar"/>
+    </fileset>
+  </path>
+
+
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+    <delete file="${jar.file}"/>
+    <delete file="tempFile.txt"/>
+  </target>
+</project>

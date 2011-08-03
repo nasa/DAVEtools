@@ -1,0 +1,114 @@
+To-do list for DAVE/DAVE2SL
+
+110421 Get rid of setup script by putting data in block's workspace
+       through init commands (per Dave Cox)
+
+110304 Consider allowing setting/getting inputs/outputs using
+       java.util.Vector, or provide utility function to get
+       input/output Arrays, to be more compatible with use in Matlab.
+
+110304 Explore calling Model.initialize() automatically if
+       Model.cycle() is called before initialize() (may already be
+       default behavior - confirm) so single call is required in
+       Matlab. 
+
+070426 May need to fix logic in BlockMath's genInputsFromApply() so
+       that <piecewise> doesn't need to be embedded in <apply>. Verify
+       with DTD that this is required. Workaround is to put every
+       <piecewise> switch inside an immediately higher <apply>.
+
+070416 Add 'root' to BlockMath and BlockMathFunction alongside 'power'
+
+070402 Got ArrayIndexOutOfBoundsException by using -h as first
+       argument to dave2sl command - need to fix.
+
+070223 Resolve Block.myType and BlockMathFunction (and child
+       BlockMathFunctionExtension) have blockType fields (and getter
+       routines with similar names). Do we need special field to
+       differentiate in functions?  maybe call function type? Seems
+       like myType is used to provide english name for block
+       ("arccosine function"), .op is used to provide integer type
+       (ARCCOS)... is this best way?
+
+070223 Resolve means to set number of input blocks (blockmathfunc
+       mixes 1 and 2 inputs, but # input is defaulted to 1 in
+       constructor). See inconsisten tests performed in update()
+       method of BlockMathFunction and BlockMathFunctionExtension
+       classes.
+
+061130 Use Factory Method pattern to decouple SLBLock from each type
+       of SLBlock
+
+061012 Propagate FULL_VER definition from Makefile into DAVE.myVersion
+
+060911 Fix vertical layout problems in DAVE2SL top-level diagram.
+
+060911 Add hard-wired '1' to enable port (if needed).
+
+040819 Need to generate beaucoup unit tests in both tools.
+
+040515 Need to honor the extrapolate attributes in DML
+
+061117 Need to honor interpolate attributes in DML
+
+--- completed ---
+
+110114 Add support for binary <minus> [completed 2011-01-21]
+
+081114 Need to make this work without network - SAXBuilder wants to
+       connect even when validation is false. [Sort of fixed through
+       catalog files 2011-01-21]
+
+070223 Have to run top-level 'make' twice if any DAVE source file
+       other than DAVE.java is modified in order to copy DAVE.jar to
+       top directory. [Abandoned with adoption of ant.]
+
+070226 Noticed that const blocks in resulting SL are duplicative, that
+       is, multiple constant blocks are generated with the same
+       constant value. Should this be removed? Or maybe model can be
+       made so that constant is declared then reused. [Leave alone;
+       this constants do not necessarily represent the same parameter
+       in the model.]
+
+040819  Look at using ant for build system [completed 0.8.1 070827]
+
+070426  Added support for logical (not, and, or, xor)
+
+060911  Removed -v4|5|6 switch in DAVE2SL; no longer honored.
+	[Fixed 0.7.1 060911]
+
+040521  With subsystem at top level of diagram, automatic verify script
+	is broken, requiring user to add input/output ports at top
+	level. Need to add these to the output file, but maybe not the
+	library version?  [Fixed 0.7.0 060907]
+
+060314  Fix so setup script doesn't have directory name/ in front of
+        model name in assignments when DAVE2SL is run from another
+        directory. [Fixed for 0.6.0 060424]
+
+040520  Allow data for tables to be stored in gigantic data structure
+        - will affect _setup files and lookup blocks. [Fixed 0.5.6 051227]
+
+051219  Need to support version 6.2 of Simulink [Fixed 0.5.5 051220]
+
+040312  Add support for trig functions
+	  sin
+	  cos
+	  tan
+	  asin
+	  acos
+	  atan
+	in SLBlock.writeMDLforFunc method. [Fixed some time ago?]
+
+040304  5-way table lookup blocks are not configured properly; I have
+        to go in by hand and set the number of table dimensions to
+        5. Probably true for higher dimensions as well; above 4
+        requires selecting a "More..." item which brings up a slightly
+        different dialog box in Simulink. [Fixed 040312]
+
+040303  HL-20 model doesn't validate, because the order of inputs in
+        Simulink is different than the checkcase order. Need to put
+        logic in to generate validation script with inputs/outputs in
+        order matching the Simulink inports/outports. [040308]
+
+

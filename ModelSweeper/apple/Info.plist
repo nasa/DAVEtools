@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="0.9">
+<dict>
+	<key>CFBundleName</key>
+	<string>ModelSweeper</string>
+	<key>CFBundleIdentifier</key>
+	<string>gov.nasa.daveml.sweeper</string>
+	<key>CFBundleVersion</key>
+	<string>100.0</string>
+	<key>CFBundleAllowMixedLocalizations</key>
+	<string>true</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleIconFile</key>
+	<string>GenericApp.icns</string>
+	<key>Java</key>
+	<dict>
+		<key>MainClass</key>
+		<string>ModelSweeperUI</string>
+		<key>JVMVersion</key>
+		<string>1.5+</string>
+		<key>ClassPath</key>
+			<array>
+			<string>/Users/bjax/Documents/Projects/DAVE/Tools/DAVEtools/DAVE/DAVE.jar</string>
+			<string>/Users/bjax/Documents/Projects/DAVE/Tools/DAVEtools/ModelSweeper/vendor/lib/jmatharray.jar</string>
+			<string>/Users/bjax/Documents/Projects/DAVE/Tools/DAVEtools/ModelSweeper/vendor/lib/jmathplot.jar</string>
+			<string>/Users/bjax/Documents/Projects/DAVE/Tools/DAVEtools/ModelSweeper/vendor/lib/junit-4.5.jar</string>
+			<string>/Users/bjax/Documents/Projects/DAVE/Tools/DAVEtools/ModelSweeper/vendor/lib/swing-layout-1.0.4.jar</string>
+			</array>
+	</dict>
+</dict>
+</plist>

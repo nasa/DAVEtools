@@ -1,0 +1,151 @@
+<?xml version="1.0"?>
+<project name="DAVEtools" default="build" basedir=".">
+  <property name="major_ver"        value="0.9"/>
+  <property name="full_ver"         value="0.9.2 (2011-01-21)"/>
+  <property name="jar.dir"          location="."/>
+  <property name="jar.file"         location="${jar.dir}/${ant.project.name}.jar"/>
+  <property name="DAVE.dir"         location="DAVE"/>
+  <property name="DAVE2SL.dir"      location="DAVE2SL"/>
+  <property name="ModelSweeper.dir" location="ModelSweeper"/>
+  <property name="doc.dir"          location="doc"/>
+  <property name="uml-doc.dir"      location="${doc.dir}/uml"/>
+  <property name="app-test.dir"     location="tests/app-tests"/>
+  <property name="libraries_path"        value="${DAVE.dir}/vendor/lib/jdom-1.1.1.jar:${DAVE.dir}/vendor/lib/resolver-1.2.jar:${DAVE.dir/vendor/lib/xerces-2.9.0.jar:${ModelSweeper.dir}/vendor/lib/jmathplot.jar:${ModelSweeper.dir}/vendor/lib/jmatharray.jar"/>
+
+  <property name="doc_title">
+    DAVE-ML Java Utility DAVEtools ${full_ver}
+  </property>
+  <property name="window_title">
+    DAVEtools ${major_ver}
+  </property>
+  <property name="page_header">
+    DAVEtools&lt;br/&gt;${major_ver}
+  </property>
+  <property name="page_footer"> 
+    DAVE-ML is an evolving open standard
+    for the exchange of aerospace vehicle models. Visit &lt;a
+    href="http://daveml.org"&gt;http://daveml.org&lt;/a&gt;
+  </property>
+
+  <!-- Build (if necessary) and copy the DAVE.jar file into this directory
+       build (if necessary) the DAVE2SL.jar file in DAVE2SL subdirectory; 
+       build (if necessary) the ModelSweeper.jar file in ModelSweeper subdirectory; 
+       add contents of those jars so we have one DAVETools.jar in this directory -->
+
+  <target name="build">
+    <ant dir="${DAVE.dir}"   />
+    <ant dir="${DAVE2SL.dir}"/>
+    <ant dir="${ModelSweeper.dir}"/>
+    <jar destfile="${jar.dir}/DAVEtools.jar">
+      <zipgroupfileset dir="${DAVE2SL.dir}"      includes="dist/DAVE2SL.jar"/>
+      <zipgroupfileset dir="${DAVE.dir}"         includes="dist/DAVE.jar"/>
+      <zipgroupfileset dir="${ModelSweeper.dir}" includes="dist/ModelSweeper.jar"/>
+      <manifest>
+	<attribute name="Main-Class" value="gov.nasa.daveml.dave2sl.DAVE2SL"/>
+	<attribute name="Class-Path" value="lib/jdom-1.1.1.jar lib/xerces-2.9.0.jar lib/resolver-1.2.jar"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="dist" depends="distclean">
+    <exec dir="." executable="make">
+      <arg line="-f dist.make"/>
+    </exec>
+  </target>
+
+  <!-- standard javadoc target -->
+
+  <target name="doc">
+    <javadoc 
+	defaultexcludes  = "yes"
+	use              = "true"
+	overview         = "overview.html"
+	doctitle         = "${doc_title}"
+	windowtitle      = "DAVEtools ${major_ver}"
+	header           = "${page_header}"
+	bottom           = "${page_footer}"
+	sourcepath       = "${DAVE.dir}/src:${DAVE2SL.dir}/src:${ModelSweeper.dir}/src"
+	classpath        = "${libraries_path}"
+	packagenames     = "gov.nasa.daveml.*"
+	destdir          = "${doc.dir}"
+	additionalparam  = "-breakiterator"
+	includenosourcepackages = "true">
+    </javadoc>
+  </target>
+
+  <!-- javadoc with embedded UML graph target; requires umlgraph 4.5 or later (umlgraph.org)
+       and GraphViz (graphviz.org). UMLgraph needs to be in a lib directory -->
+
+  <target name="uml-doc" depends="build" description="generates javadoc and also UML Diagram">
+    <mkdir dir="${uml-doc.dir}"/>
+    <javadoc 
+	defaultexcludes  = "yes"
+	use              = "true"
+	overview         = "overview.html"
+	doctitle         = "${doc_title}"
+	windowtitle      = "${window_title}"
+	header           = "${page_header}"
+	bottom           = "${page_footer}"
+	sourcepath       ="${DAVE.dir}/src:${DAVE2SL.dir}/src:${ModelSweeper.dir}/src"
+	packagenames     = "gov.nasa.daveml.*"
+	destdir          ="${uml-doc.dir}"
+	classpath        = "{libraries_path}">
+
+      <doclet name="org.umlgraph.doclet.UmlGraphDoc"
+	      path="lib/UMLGraph.jar">
+	<param name="-attributes" />
+	<param name="-operations" />
+	<param name="-qualify" />
+	<param name="-types" />
+	<param name="-visibility" />
+      </doclet>
+    </javadoc>
+
+    <apply executable="dot" dest="${uml-doc.dir}" parallel="false">
+      <arg value="-Tpng"/>
+      <arg value="-o"/>
+      <targetfile/>
+      <srcfile/>
+      <fileset dir="${uml-doc.dir}" includes="*.dot"/>
+      <mapper type="glob" from="*.dot" to="*.png"/>
+    </apply>
+  </target>
+
+  <target name="app-test" depends="build">
+    <exec dir="${app-test.dir}" executable="make"/>
+  </target>
+
+  <target name="test">
+    <ant dir="${DAVE.dir}"         target="test"/>
+    <ant dir="${DAVE2SL.dir}"      target="test"/>
+    <ant dir="${ModelSweeper.dir}" target="test"/>
+  </target>
+  
+  <target name="clean">
+    <ant dir="${DAVE.dir}"         target="clean"/>
+    <ant dir="${DAVE2SL.dir}"      target="clean"/>
+    <ant dir="${ModelSweeper.dir}" target="clean"/>
+    <exec dir="${app-test.dir}" executable="make">
+      <arg line="clean"/>
+    </exec>
+    <delete file="tempFile.txt"/>
+    <delete file="{jar.file}"/>
+  </target>
+
+  <target name="realclean" depends="clean">
+    <exec dir="${app-test.dir}" executable="make">
+      <arg line="realclean"/>
+    </exec>
+  </target>
+
+  <target name="distclean" depends="realclean">
+    <delete file="DAVEtools.jar"/>
+    <delete dir="${uml-doc.dir}"/>
+    <delete dir="${doc.dir}"/>
+    <exec dir="${app-test.dir}" executable="make">
+      <arg line="distclean"/>
+    </exec>
+    
+  </target>
+
+</project>

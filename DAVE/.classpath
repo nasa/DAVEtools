@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" output="bin/prod" path="src"/>
+	<classpathentry kind="src" output="bin/test" path="test"/>
+	<classpathentry kind="lib" path="vendor/lib/jdom-1.1.1.jar" sourcepath="/Users/bjax/downloaded_sw/jdom-1.1.1/src/java"/>
+	<classpathentry kind="lib" path="vendor/lib/junit-4.5.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<!-- commented out to prevent network access
+     !DOCTYPE catalog PUBLIC "-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN"
+    "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd" 
+-->
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+  <group prefer="public" xml:base="file:///Users/bjax/xml/">
+    <public publicId="-//AIAA//DTD for Flight Dynamic Models - Functions 2.0//EN"
+            uri="DTDs/DAVE-ML-2.0/DAVEfunc.dtd"/>
+
+    <system systemId="http://www.w3.org/TR/MathML2/dtd/mathml2.dtd"
+            uri="DTDs/mathml2/mathml2.dtd"/>
+
+  </group>
+</catalog>

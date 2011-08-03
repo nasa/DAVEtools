@@ -1,0 +1,47 @@
+#
+#   Makefile for tests/app_tests/dave2sl subdirectory
+#
+
+MODEL_LIST = ./model_list.mk
+
+include ${MODEL_LIST}
+
+SIMULINK_MODELS = $(addsuffix .mdl,$(basename ${MODELS}))
+
+DAVETOOLS = ../../..
+DT        = ${DAVETOOLS}/DAVEtools.jar
+CLASSPATH = ${DT}
+TEST_MODEL_DIR = ../test_models
+
+TMPFILE  := $(shell mktemp -t test_dave2sl)
+
+make  : test
+
+.PHONY: test
+
+# uncomment for debugging creation scripts
+# .PRECIOUS: %_create.m
+
+# test process depends on Simulink model files (.mdl)
+test  : $(SIMULINK_MODELS)
+
+# the .mdl files are generated from creation scripts 
+%.mdl : ${TEST_MODEL_DIR}/%.dml ${DT}
+	@echo "Generating creation and verification script for $*. "
+	@java -Xmx128M -cp $(CLASSPATH) gov.nasa.daveml.dave2sl.DAVE2SL -d $< &> $@_dave2sl_log.txt
+	@echo "Starting MATLAB; running creation and verification script for $*. "
+	@echo $*_create    > $(TMPFILE)
+	@echo bdclose all >> $(TMPFILE)
+	@echo quit        >> $(TMPFILE)
+	@matlab -nodisplay < $(TMPFILE)
+
+clean:
+	-rm *~
+	-rm *_verify.m
+	-rm *_create.m
+	-rm *_setup.m
+	-rm *_dave2sl_log.txt
+
+realclean: clean
+	-rm *.mdl
+

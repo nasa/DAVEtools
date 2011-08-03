@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="DAVE2SL.jar"/>
+	<classpathentry kind="lib" path="vendor/lib/jdom-1.1.1.jar"/>
+	<classpathentry kind="lib" path="vendor/lib/junit-4.5.jar"/>
+	<classpathentry kind="lib" path="vendor/lib/xerces-2.9.0.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/DAVE"/>
+	<classpathentry kind="output" path="bin/prod"/>
+</classpath>

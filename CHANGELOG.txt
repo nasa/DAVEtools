@@ -1,0 +1,106 @@
+CHANGE LOG for DAVEtools
+
+V 0.9.3: Added tally of checkcases to DAVE's statistics summary (when
+	used with the -c option). Added support for UML diagram
+	generation (with two open-source packages) for DAVEtools
+	development. Separated this change log from the readme
+	file. Fixed some annoyances related to missing DTDs and/or
+	network being unavailable. Added support for MathML 'max',
+	'min', 'ceiling', and 'floor' elements.
+
+V 0.9.2: Corrected bug in DAVE that didn't recognize use of binary
+        minus in MathML2 calculations; fixed bug whereby anonymous
+        tables shared the same matlab setup data; corrected sense of
+        return codes from DAVE and DAVE2SL. Improved integration test
+        framework. Corrected bug in ModelSweeper that caused program
+        to crash if no checkcases were defined.
+
+V 0.9.1: Added support for minValue and maxValue attributes of
+        variableDef as allowed in DAVE-ML 2.0 RC 4; fixed error
+        reporting in creation script generation (aborts were returning
+        exit status 0 but now report 1).
+
+V 0.9.0: Changed to support the default DAVE-ML namespace (xmlns);
+	added entity refs to make Eclipse IDE happy; changed for using
+	'build' subdirectories to 'bin' to make Eclipse convention;
+	fleshed out ant build.xml file to rely less on makefiles (but
+	a makefile is still needed to run the app_tests of DAVE2SL).
+
+	Corrected the inability of dave to parse MathML 'piecewise'
+	elements with more than one 'piece.'
+
+ 	Distribution format switched to zip from tar to be more PC
+ 	friendly.
+
+	Build system switched to Ant from Make (but some hybrid make
+	functionality exists, to some version of make is still
+	required).
+
+	Source code management system now uses 'git' instead of
+	Subversion.
+
+	Now producing a single DAVEtools.jar that includes all
+	products for convenience, including dave, dave2sl, modelsweeper,
+	xerces and jdom .jar file contents. Slightly different syntax
+	used to invoke DAVE2SL (default jar entry point) and DAVE.
+
+Summary of changes since DAVEtools v 0.8.0:
+
+V 0.8.1a: Added support for MathML logical operations (not, and, or,
+          xor); switched to ant for build instead of make
+
+Summary of changes since DAVEtools v 0.7.2:
+
+V 0.8.0b: Incorporated NASA open-source license agreement, copyright info
+
+V 0.8.0a: added 'csymbol' element extension support for 'atan2';
+	  now checking input arguments for -c|--count forms in DAVE.
+
+         Added support for an immediate <ci> and <cn> sub-elements in a
+         <math> element; this is valid MathML but was not supported in
+         DAVEtools until now. This allows direct assignment of a
+         variable (in the <variableDef> element to either another
+         variable (using the content identifier, <ci>, element) or a
+         constant numeric value (using the content number, <cn>,
+         element). 
+
+	 Verification tests that fail now gives more details on which
+	 output parameters fail to compare.
+
+Summary of changes since DAVEtools v 0.6.0 (not released):
+
+V 0.7.2: Developed 'dist' makefile target.
+
+V 0.7.1: Moved data into model workspace instead of base workspace.
+
+V 0.7.0: Now generating 'create' script instead of .mdl directly to
+	work around bug in Simulink interpreter regarding order of
+	output ports. (rev 75)
+
+Summary of changes since DAVEtools v 0.5.0:
+
+V 0.6.0: Mostly updates to documentation; no major changes.
+
+V 0.5.7: Breakpoint vectors are now written into the same structure as
+	 function tables, with _pts appended to name of BP block.
+
+V 0.5.6: Table contents are now written into structure via setup
+         script with model-unique name to support multiple models with
+         similar structure.
+
+V 0.5.5: Now writes Simulink 6.2 (R14SP2) models
+
+V 0.5.4: No change; moved to new SVN repository
+
+V 0.5.3: Removed xerces as a necessary separate package, and removed
+JDOM b-9 from the distribution, per legal beagles. This required
+modifying DAVE.java to pass in a base URI for the input file.
+
+V 0.5.2: Wrote Theory of Operation (package.html) for DAVE2SL in
+javadoc. Added switches to DAVE2SL for library, enabled subsystem,
+version 4 or 5 Simulink, and clip warnings on/off. Fixed bug in sum
+block. Some javadoc improvements.
+
+V 0.5.1: Generate Simulink as a subsystem for cleanliness. Corrected
+spacing bug in Simulink diagram; adjusted table lookup blocks so
+multiple input ports have at least 15 pixel spacing.

@@ -1,0 +1,27 @@
+#
+#	Makefile for tests/app_tests subdirectory
+#
+# 060921 Bruce Jackson, NASA Langley Research Center
+#                      <mailto:e.b.jackson@larc.nasa.gov>  
+
+include model_list.mk
+
+MODELS = $(addprefix test_models/,${MODEL_LIST})
+
+make: test
+
+test:  ${MODELS}
+	cd dave && $(MAKE) test
+	cd dave2sl && $(MAKE) test
+
+clean:
+	cd dave && $(MAKE) clean
+	cd dave2sl && $(MAKE) clean
+
+realclean: 
+	cd dave && $(MAKE) realclean
+	cd dave2sl && $(MAKE) realclean
+
+.PHONY: test clean
+
+

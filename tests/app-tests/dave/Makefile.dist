@@ -1,0 +1,35 @@
+#
+#   Makefile for tests/app_tests/dave subdirectory
+#
+
+MODEL_LIST = ./model_list.mk
+
+include ${MODEL_LIST}
+
+SUCCESS_FILES = $(addsuffix _success,$(basename ${MODELS}))
+
+DAVETOOLS      = ../../..
+DT             = ${DAVETOOLS}/DAVEtools.jar
+CLASSPATH      = ${DT}
+TEST_MODEL_DIR = ../test_models
+
+make  : test
+
+.PHONY: test
+
+# test process depends on DAVE-ML example model files (.dml)
+# and resulting log files
+test  : $(SUCCESS_FILES)
+
+# the log files are output from running DAVE in debug/count mode
+%_success : ${TEST_MODEL_DIR}/%.dml
+	@echo "Performing any verification checks for $*. "
+	java -Xmx128M -cp $(CLASSPATH) gov.nasa.daveml.dave.DAVE -d -c $< &> $*_dave_log.txt
+	@touch $*_success
+
+clean:
+	-rm *~
+	-rm *_dave_log.txt
+
+realclean: clean
+	-rm *_success

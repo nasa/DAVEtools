@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>
+      Overview of the DAVEtools utility packages
+    </title>
+  </head>
+  <body bgcolor="white">
+
+    These packages provide Java-based tools to manipulate and transform
+    DAVE-ML source files.
+
+    <h2>Overview</h2>
+
+    <p>There are presently three subpackages in this distribution:</p>
+
+    <ul>
+      <li>The <code>gov.nasa.daveml.DAVE</code> package provides a basic
+      utility to parse and evaluate Dynamic Aerospace Vehicle Exchange
+      Markup Language (DAVE-ML) files. The package provides some features as
+      a stand-alone program, but can be extended by other packages to add
+      additional capabilities.<br/><br/></li>
+
+      <li>The <code>gov.nasa.daveml.DAVE2SL</code> package builds on parsing
+      capabilities provided in the <code>gov.nasa.daveml.DAVE</code> package
+      to provide a utility to convert Dynamic Aerospace Vehicle Exchange
+      Markup Language (DAVE-ML) files into MATLAB&reg; Simulink&reg;
+      <code>.mdl</code> diagrams.<br/><br/></li>
+
+      <li>The <code>gov.nasa.daveml.sweeper</code> package builds on the
+      parsing capabilities provided by
+      the <code>gov.nasa.daveml.DAVE</code> package to provide a
+      visualization tool for a complete model; it shows 3D surface plots
+      of any model output as a function of any two inputs.
+      </li>
+
+    </ul>
+
+    <p>The DAVE2SL package requires the <code>gov.nasa.daveml.DAVE</code>
+    package, which in turn depends on the
+    <code>org.jdom</code> package, a product of the JDOM project, a
+    Java-based XML document parser. See 
+    {@link <a href="http://www.jdom.org" target="_blank">http://www.jdom.org</a>} for more
+    information about JDOM.</p>
+
+    <p>The <b>ant</b> tool produces a single DAVEtools.jar that includes DAVE2SL
+    (default entry point), DAVE, ModelSweeper and the JDom and Xerces .jar contents.</p>
+
+    <p>See {@link <a href="http://daveml.org" target="_blank">http://daveml.org</a>}
+    for more information about the DAVE-ML standard.</p>
+
+    <p>The latest version of DAVEtools can be downloaded from {@link <a
+    href="http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html" target="_blank">http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html</a>}.</p>
+
+    <p>Copyright (c) 2007 United States Government as represented by
+    LAR-17460-1. No copyright is claimed in the United States under Title
+    17, U.S. Code. All Other Rights Reserved.</p>
+
+    <h2>Revision history</h2>
+
+    <h3>Changes since version 0.9.2</h3>
+    <ul>
+      <li>
+	Added support for MathML2's <code>&lt;min&gt;</code>,
+	<code>&lt;max&gt;</code>, <code>&lt;ceiling&gt;</code> and
+	<code>&lt;floor&gt;</code> elements. Added count of checkcases
+	to <code>dave</code>'s statistics summary (when used with the
+	<code>-c</code> option. Added support for UML diagram
+	generation for DAVEtools development. Separated the CHANGELOG
+	from the README files; the README files were rewritten to use
+	<a
+	href="http://www.medhods.co.nz/asciidoc"><code>asciidoc</code></a>.
+      </li>
+    </ul>
+
+    <h3>Changes since version 0.9.1</h3>
+    <ul>
+      <li>
+	Fixed bug: DAVE handles binary <code>&lt;minus&gt;</code> (as
+	well as unary <code>&lt;minus&gt;</code>) apply elements in
+	<code>&lt;variableDef&gt;</code> calculation elements.
+      </li>
+      <li>
+	Fixed bug: DAVE2SL saves function table data using the
+	<code>gtID</code> of the table (mandatory attribute as of
+	DAVE-ML 2.0RC4) instead of the optional <code>name</code>
+	attribute.  Previously, unnamed tables would share the same
+	data array in the setup script, with bad results.
+      </li>
+      <li>
+	Fixed bug: exit codes are now 1 for error and 0 for no error;
+	these used to be non-standard -1 for no error and 0 for
+	error. Confused with VAX/VMS return codes, I think!
+      </li>
+      <li>
+	Fixed bug: ModelSweeper now doesn't bomb when looking at a
+	model that has no defined checkcases.
+      </li>
+    </ul>
+
+    <h3>Changes since version 0.9.0</h3>
+    <ul>
+      <li>
+	Support minValue and maxValue attributes on variableDef
+	(DAVE-ML 2.0RC4)
+      </li>
+    </ul>
+
+    <h3>Changes since version 0.8.1</h3>
+    <ul>
+      <li>
+	Support full use of parsing <code>&lt;piecewise&gt;</code>
+	elements with multiple <code>&lt;piece&gt;</code>s, per MathML
+	DTD. Previously DAVE was limited to a single
+	<code>&lt;piece&gt;</code>/<code>&lt;otherwise&gt;</code>
+	pair.
+      </li>
+      <li>Changed to support default DAVE-ML namespace attribute</li>
+      <li>Moved to Netbeans development environment</li>
+      <li>
+	Added entity definitions to template types <code>ArrayList</code> and
+	<code>Iterator</code>
+      </li>
+      <li>Now including JDOM and Xerces library in DAVEtools.jar file</li>
+      <li>
+	Renamed DAVE2SL.jar to DAVEtools.jar; includes DAVE, jdom, and
+	xerces jar-file contents in a single Jar file for a standalone
+	DAVE to Simulink conversion tool
+      </li>
+      <li>Added <code>ModelSweeper</code> utility program</li>
+    </ul>
+
+    <h3>Changes since version 0.8.0</h3>
+    <ul>
+      <li>Added support for logicals (not, and, or, xor) per MathML
+      DTD</li>
+      <li>Switched to 'ant' from 'make'</li>
+    </ul>
+
+    <h3>Changes since version 0.7</h3>
+
+    <ul>
+      <li>Added capability to extend MathML with known DAVE-ML operator atan2</li>
+      <li>Recognize arguments with either -c or --count (was just -c or
+      -count)</li>
+      <li>Supports immediate &lt;ci&gt; and &lt;cn&gt; subelements in a
+      &lt;math&gt; element, per MathML</li>
+      <li>Failing verification checkcases report miscomparing values</li>
+      <li>Now available under NASA open-source license.</li>
+    </ul>
+
+    <h3>Changes since verision 0.6</h3>
+
+    <ul>
+      <li>DAVE2SL now generates a _create m-script instead of .mdl file</li>
+      <li>Data set is now stored in model workspace instead of base
+      workspace</li>
+      <li>Added both initial unit tests and application test cases </li>
+    </ul>
+
+    <h3>Changes since verison 0.5</h3>
+    <ul>
+      <li>General cleanup of documentation</li>
+    </ul>
+
+    <p>See the individual summaries for how to use these tools.</p>
+
+    <h2>Related Documentation</h2>
+
+    <p>
+      For overviews, tutorials, examples, guides, and tool documentation,
+      please see:
+    </p>
+    <ul>
+      <li><a href="http://daveml.org" target="_blank">
+      The DAVE-ML project website</a></li>
+    </ul>
+
+    <!-- Put @see and @since tags down here. -->
+
+  </body>
+</html>
