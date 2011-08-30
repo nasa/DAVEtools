@@ -26,10 +26,10 @@ import org.jdom.Namespace;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-//import com.sun.org.apache.xerces.internal.util.XMLCatalogResolver;
-
 import java.util.*;
-import org.apache.xerces.util.XMLCatalogResolver;
+//import org.apache.xerces.util.XMLCatalogResolver;
+import com.sun.org.apache.xerces.internal.util.XMLCatalogResolver;
+
 
 /**
  *
