@@ -36,4 +36,15 @@
     <delete file="${jar.file}"/>
     <delete file="tempFile.txt"/>
   </target>
+
+  <!-- from hint found at http://www.coderanch.com/t/419419/vc/there-way-netbeans-include-external -->
+  <target name="-post-jar">
+    <jar jarfile="${dist.jar}" update="true">
+      <zipfileset src="${dist.jar}" includes="**/*.class" />
+      <zipfileset src="${file.reference.jdom-1.1.1.jar}" includes="**/*.class" />
+      <zipfileset src="${file.reference.resolver-1.2.jar}" includes="**/*.class" />
+      <zipfileset src="${file.reference.xerces-2.9.0.jar}" includes="**/*.class" />
+    </jar>
+  </target>
+
 </project>
