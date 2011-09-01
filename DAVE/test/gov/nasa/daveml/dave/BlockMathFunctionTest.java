@@ -189,6 +189,7 @@ public class BlockMathFunctionTest extends TestCase {
         }
 
         _block = null;
+        _model = new Model(1,1);
         try {
                 if ("csymbol".equals(func)) {
                         _block = new BlockMathFunctionExtension( applyElement, _model );

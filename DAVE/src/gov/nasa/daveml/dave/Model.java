@@ -869,6 +869,8 @@ public class Model
 
     public void initialize() throws DAVEException 
     {
+        if (!this.initialized) { // only do this once
+            
 	StringWriter strwriter = null;// used only when verbose, so we can call
 				// describeSelf(writer)
 	if (this.isVerbose()) {
@@ -996,6 +998,8 @@ public class Model
             System.out.println("Model initialized and execution order established.");
             System.out.println("");
         }
+        }
+
     }
 
 
