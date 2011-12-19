@@ -214,8 +214,8 @@ public class DAVE2POST extends DAVE {
         String modelName = file.getName();	// removes path
 
         // script file for now
-        PostTableFileWriter tableWriter = new PostTableFileWriter(this.tableFileName);
-        CEquationsFileWriter equationWriter = new CEquationsFileWriter(this.sourceFileName);
+        PostTableFileWriter tableWriter = new PostTableFileWriter(theModel, this.tableFileName);
+        CEquationsFileWriter equationWriter = new CEquationsFileWriter(theModel, this.sourceFileName);
 
         // Write headers
 //        mdlWriter.writeSLHeader(modelName);
@@ -228,7 +228,10 @@ public class DAVE2POST extends DAVE {
         Iterator<Block> it = blocks.iterator();
         while(it.hasNext()) {
             Block blk = it.next();
-            System.out.println(blk.getType());
+            if (blk instanceof BlockFuncTable) {
+                BlockFuncTable bft = (BlockFuncTable) blk;
+                tableWriter.generateTableDescription( bft );
+            }
         }
         
         // find the function blocks

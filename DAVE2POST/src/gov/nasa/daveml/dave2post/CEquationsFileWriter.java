@@ -4,13 +4,18 @@
  */
 package gov.nasa.daveml.dave2post;
 
+import gov.nasa.daveml.dave.*;
+
 /**
  *
  * @author ebjackso
  */
 class CEquationsFileWriter {
+    
+    Model ourModel;
 
-    public CEquationsFileWriter(String sourceFileName) {
+    public CEquationsFileWriter(Model theModel, String sourceFileName) {
+        ourModel = theModel;
     }
     
 }
