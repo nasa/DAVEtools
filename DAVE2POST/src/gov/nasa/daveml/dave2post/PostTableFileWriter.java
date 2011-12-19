@@ -37,36 +37,64 @@ class PostTableFileWriter {
             System.out.println(", " + tableNumber + ", lin_inp, noxt");
             tableNumber++;
             BreakpointSet bpset = ourModel.getBPSetByID(bpID);
-            this.generate1DTable(bpset.values(), ft.getValues());
+            this.generate1DTable(bpset.values(), ft.getValues(), 0);
         } else { /*  multi-dimensional table */
             // generate first layer of multitable
-            String bpID = ft.getBPID(1);
-            String inVarID = bft.getVarID(1);
+            int dim = 1;
+            String bpID = ft.getBPID(dim);
+            String inVarID = bft.getVarID(dim);
             System.out.print("  " + outVarID + " = " + outVarID + ", multi, " + inVarID );
             System.out.println(", " + tableNumber + ", lin_inp, noxt");
             tableNumber++;
             BreakpointSet bpset = ourModel.getBPSetByID(bpID);
             this.generate1DTableNumbers(bpset.values(), tableNumber);
+            
+            // generate subtables
+            int offset = 0;
+            
+            dim++;
+            for (int i=1; i<=dims[dim-2]; i++) {
+                offset = this.generateSubTables(dims, dim, bft, offset);
+            }
         }
     }
     
-    void generate1DTable(ArrayList<Double> bps, ArrayList<Double> vals) {
-        if (bps.size() != vals.size()) {
-            System.out.println("ERROR - table size of 1D table doesn't match number of breakpoints");
+    private void generate1DTable(ArrayList<Double> bps, ArrayList<Double> vals, int valOffset) {
+        if (bps.size() > (vals.size() - valOffset)) {
+            System.out.println("ERROR - number of remaining values in table " + 
+                    (vals.size() - valOffset) + 
+                    " is less than the number of breakpoints" +
+                    bps.size() );
         } else {
             for (int i = 0; i < bps.size(); i++) {
-                System.out.println("         " + bps.get(i) + ", " + vals.get(i));
+                System.out.println("         " + bps.get(i) + ", " + vals.get(i + valOffset));
             }
         }
     }
     
-        void generate1DTableNumbers(ArrayList<Double> bps, int startTableNumber) {
-            int tabNum = startTableNumber;
-            for (int i = 0; i < bps.size(); i++) {
-                System.out.println("         " + bps.get(i) + ", " + tabNum);
-                tabNum++;
-            }
+    private void generate1DTableNumbers(ArrayList<Double> bps, int startTableNumber) {
+        int tabNum = startTableNumber;
+        for (int i = 0; i < bps.size(); i++) {
+            System.out.println("         " + bps.get(i) + ", " + tabNum);
+            tabNum++;
+        }
     }
+
+    // returns number of points written
+    private int generateSubTables(int[] dims, int dim, BlockFuncTable bft, int valOffset) {
+        FuncTable ft    = bft.getFunctionTableDef();
+        String outVarID = bft.getOutputVarID();
+        String inVarID  = bft.getVarID(dim);
+        String bpID     = ft.getBPID(dim);
+        System.out.print("  " + outVarID + " = " + outVarID + ", multisub, " + inVarID );
+        System.out.println(", " + tableNumber + ", lin_inp, noxt");
+        tableNumber++;
+        BreakpointSet bpset = ourModel.getBPSetByID(bpID);
+        this.generate1DTable(bpset.values(), ft.getValues(), valOffset);
+        return bpset.values().size();
+    }
+    
+
 
     
 }
