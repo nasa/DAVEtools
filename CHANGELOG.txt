@@ -1,5 +1,7 @@
 CHANGE LOG for DAVEtools
 
+V 0.9.4: Added DAVE2POST utility
+
 V 0.9.3: Added tally of checkcases to DAVE's statistics summary (when
 	used with the -c option). Added support for UML diagram
 	generation (with two open-source packages) for DAVEtools

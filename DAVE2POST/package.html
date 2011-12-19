@@ -1,0 +1,353 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+Overview of the DAVE2POST utility package
+</head>
+<body bgcolor="white">
+
+<p>
+This package provides a tool to convert DAVE-ML files into POST II&reg; 
+input (source) files.
+</p>
+
+<h2>Overview</h2>
+
+<p>The <code>gov.nasa.daveml.DAVE2POST</code> package builds on parsing
+capabilities provided in the <code>gov.nasa.daveml.DAVE</code> package
+to provide a utility to convert Dynamic Aerospace Vehicle Exchange
+Markup Language (DAVE-ML) files into POST II source files. See {@link <a
+href="http://daveml.nasa.gov"
+target="_blank">http://daveml.nasa.gov</a>} for more information about
+DAVE-ML.</p>
+
+<p><code>gov.nasa.daveml.DAVE</code> itself depends on the
+<code>org.jdom</code> package, a product of the JDOM project, a
+Java-based XML document parser. See {@link <a
+href="http://www.jdom.org" target="_blank">http://www.jdom.org</a>} for more
+information about JDOM.</p>
+
+<p>DAVE2POST parses a DAVE-ML XML file into an instantiation of the
+{@link gov.nasa.daveml.DAVE.Model <code>Model</code>} class,
+auto-verifying the model with any embedded checkcase data. It then
+creates two files: a POST II; <code>_table.pos2</code> table input
+deck containing data and an associated C-language
+<code>_table.c</code> source file containing the appropriate build-up
+equations.  Command-line options allow for creation of a Simulink&reg;
+library file instead of a model, identification of the model as an
+"enabled" subsystem, and creation of a model file that is compatible
+with Simulink&reg; 4.0.</p>
+
+<p>The latest version of DAVEtools can be downloaded from {@link <a
+href="http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html" target="_blank">http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html</a>}.</p>
+
+<p>Copyright (c) 2007 United States Government as represented by LAR-17460-1. No copyright is
+claimed in the United States under Title 17, U.S. Code. All Other Rights Reserved.</p>
+
+<h2>Command Syntax</h2>
+
+<pre><code>
+
+  java DAVE2POST [-count] [-debug] [-warnruntime] [-lib] [-enabled] DAVE_document
+
+</code></pre>
+
+where
+<dl>
+
+<dt><code>-count</code></dt>
+<dd>generates statistics such as # points, functions, signals,
+etc.,</dd>
+
+<dt><code>-debug</code></dt> 
+<dd>indicates descriptive messages are to be emitted,</dd>
+
+<!--
+<dt><code>-warnruntime</code></dt>
+<dd>causes the created model to emit run-time warnings when breakpoint
+values exceed bounds specified in the DAVE-ML model,</dd>
+
+<dt><code>-lib</code></dt>
+<dd>requests a Simulink&reg; library file is to be produced</dd>
+
+<dt><code>-enabled</code></dt>
+<dd>indicates the resulting subsystem should be an <em>enabled</em>
+subsystem, allowing for conditional execution. Note: such a system
+will generate zero ('reset') on its outputs when not enabled.</dd>
+-->
+
+<dt><code>DAVE_document</code></dt>
+<dd>is the name of the DAVE-ML file to parse. This file normally has a
+<code>.xml</code> filetype but that is not required.
+
+</dl>
+
+<h2>Theory of Operation</h2>
+
+<h3>The static <code>DAVE2POST.main()</code> routine</h3>
+
+<p>
+<code>main()</code> is called with the name of the DAVE-ML file
+(typically ending with <code>.xml</code>) to
+convert. <code>main()</code> calls the {@link
+gov.nasa.daveml.DAVE2POST.DAVE2POST#DAVE2POST(java.lang.String[])
+DAVE2POST()} constructor with the argument string array to create a new
+<code>DAVE2POST</code> object.</p>
+
+<h3>The {@link gov.nasa.daveml.DAVE2POST.DAVE2POST#DAVE2POST(java.lang.String[])} constructor</h3>
+
+<p>
+The {@link gov.nasa.daveml.DAVE2POST.DAVE2POST#DAVE2POST(java.lang.String[])
+DAVE2POST()} constructor initially calls the non-parsing
+version of the utility {@link gov.nasa.daveml.DAVE.DAVE#DAVE()
+DAVE()} constructor to initialize flags and to create a
+{@link gov.nasa.daveml.DAVE.Model} placeholder.
+<code>DAVE2POST</code> then parses the provided arguments (by private
+method <code>parseOptions()</code>) and emits an error message if it
+can't understand the arguments.
+</p>
+
+<p>
+If the <code>-debug</code> flag was specified on the command line, the
+new model is told to be verbose.
+</p>
+
+<p>
+A call is then made to the new <code>DAVE</code> object's {@link
+gov.nasa.daveml.DAVE.DAVE#parseFile() parseFile()} method
+to parse and load the model data contained in the input document; 
+see the <em>Theory of Operation</em> section in the
+{@link gov.nasa.daveml.DAVE} package for information about loading
+and parsing the specified DAVE-ML description file into a
+<code>Model</code>.
+</p>
+
+<p>
+If included, a comparison of embedded checkcase data is run by a call
+to the <code>DAVE</code> object's {@link
+gov.nasa.daveml.DAVE.DAVE#verify() verify()} method. If the
+<code>DAVE</code> package is significantly out of date without the
+<code>verify()</code> method, an error is returned.
+</p>
+
+<p>
+If requested, statistical info on parsing is written to the system
+output.
+</p>
+
+<p>
+The <code>DAVE2POST</code>'s {@link
+gov.nasa.daveml.DAVE2POST.DAVE2POST#createModel() createModel()} method is then
+called to create the Simulink&reg; model-building script and
+data-creation script files.
+</p>
+
+<h3>The {@link gov.nasa.daveml.DAVE2POST.DAVE2POST#createModel() DAVE2POST.createModel()} method</h3>
+
+<p>
+This method converts the previously parsed {@link
+gov.nasa.daveml.DAVE.Model Model} into equivalent Simulink&reg; block- and
+line-building M-file commands.
+</p>
+
+<p>A new {@link gov.nasa.daveml.DAVE2POST.POSTDiagram POSTDiagram} object is
+created by calling its constructor, {@link
+gov.nasa.daveml.DAVE2POST.POSTDiagram#POSTDiagram(gov.nasa.daveml.DAVE.Model)
+POSTDiagram()}, passing in the <code>Model</code> as a parameter. 
+
+<h3>The {@link
+gov.nasa.daveml.DAVE2POST.POSTDiagram#POSTDiagram(gov.nasa.daveml.DAVE.Model)
+POSTDiagram()} constructor</h3>
+
+<p>
+An {@link java.util.ArrayList ArrayList} of blocks
+<em>slblocklist</em> is created long enough to hold pointers to each
+Simulink&reg;-converted {@link gov.nasa.daveml.DAVE2POST.POSTBlock POSTBlock}s
+converted from the provided <code>Model</code>'s normal {@link
+gov.nasa.daveml.DAVE.Block Block}s.
+</p>
+
+<p>
+A new {@link gov.nasa.daveml.DAVE2POST.MDLNameSpace MDLNameSpace} is created
+to hold a unique namespace for the <code>POSTBlocks</code>. This object
+is used to convert <code>Block</code> names into
+Simulink&reg;-compatible names, as well as to ensure each block has a
+unique name. {@link gov.nasa.daveml.DAVE2POST.MDLNameSpace MDLNameSpace}
+is a class derived from the {@link gov.nasa.daveml.DAVE.DAVE} package's
+{@link gov.nasa.daveml.DAVE.NameSpace NameSpace} class to deal with
+Simulink&reg; naming issues.
+</p>
+
+<p>
+An {@link java.util.Iterator Iterator} is created from the
+<code>Model</code>'s {@link gov.nasa.daveml.DAVE.BlockArrayList} and the
+list of blocks is looped through. For each {@link
+gov.nasa.daveml.DAVE.Block Block} found, a corresponding {@link
+gov.nasa.daveml.DAVE2POST.POSTBlock POSTBlock} is created.  The original
+<code>Block</code> is notified of it's Simulink doppelganger by
+calling the <code>Block</code>'s {@link
+gov.nasa.daveml.DAVE.Block#setMask( java.lang.Object ) setMask}
+method. The name of the original <code>Block</code> may be changed
+after calling it's {@link gov.nasa.daveml.DAVE.Block#setNameSpace(
+gov.nasa.daveml.DAVE.NameSpace ) setNameSpace} method. The new {@link
+gov.nasa.daveml.DAVE2POST.POSTBlock POSTBlock} is then added to
+<em>slblocklist</em>.
+</p>
+
+<p>
+The <em>slblocklist</em> is then traversed. Each <code>POSTBlock</code>
+is told to find it's children, by calling it's {@link
+gov.nasa.daveml.DAVE2POST.POSTBlock#findChildren() findChildren} method; this
+searches downstream signals and fills the object's <em>children</em>
+{@link java.util.ArrayList ArrayList}, a list of all immediate
+children blocks. (A nested diagnostic listing is generate at this step
+if <code>-debug</code> mode has been requested.) Each of the children
+is then called to search for their downstream children.  
+</p>
+
+<p>During this traverse, any <code>POSTBlock</code> that masks an
+instance of {@link gov.nasa.daveml.DAVE.BlockInput BlockInput} or {@link
+gov.nasa.daveml.DAVE.BlockMathConstant BlockMathConstant}
+<code>Blocks</code> has it's positions set to column 1 in sequential
+rows. This is done by calling the <code>POSTBlock</code>'s {@link
+gov.nasa.daveml.DAVE2POST.POSTBlock#setPosition( int, int, java.lang.String )
+setPosition} method. This method calls each of that
+<code>POSTBlock</code>'s children's {@link
+gov.nasa.daveml.DAVE2POST.POSTBlock#setPosition( int, int, java.lang.String )
+setPosition} method
+in turn to set their row to the current row and to subsequent
+columns. <code>POSTBlock</code>s with multiple offspring keep track of
+the row depth and put twin children on parallel rows. This method
+returns the maximum row depth used in placing children, so the diagram
+expands as required.
+</p>
+
+<p>
+The list of <code>POSTBlock</code>s is traversed a second time, this
+time to set the high-water mark in terms of deepest row and farthest
+column in the diagram.
+</p>
+
+<p>
+New {@link java.util.ArrayList ArrayList}s for rows, columns, and
+cells are created based on the size of the diagram. These first two {@link
+java.util.ArrayList ArrayList}s are then populated with {@link
+gov.nasa.daveml.DAVE2POST.POSTRowColumnVector POSTRowColumnVector} objects
+which manage blocks and their wiring along the two dimensions of the diagram.
+</p>
+
+<p>
+Another traverse of the <em>slblocklist</em> is conducted, this time
+to encapsulate each {@link gov.nasa.daveml.DAVE2POST.POSTBlock POSTBlock} in a
+newly-minted {@link gov.nasa.daveml.DAVE2POST.POSTCell POSTCell}, and assign
+that <code>POSTCell</code> to the proper pair of row &amp; column
+<code>POSTRowColumnVector</code>. 
+</p>
+
+<p>
+The {@link
+gov.nasa.daveml.DAVE2POST.POSTDiagram#POSTDiagram(gov.nasa.daveml.DAVE.Model)
+POSTDiagram} constructor then returns control to the calling routine,
+<code>DAVE2POST.createModel()</code>.
+</p>
+
+<h3>Back to <code>DAVE2POST.createModel</code></h3>
+
+<p>
+Any run-time arguments are interpreted to set the new
+<code>POSTDiagram</code>'s internal flags. A new {@link java.io.File}
+object is created with the stub name of the input file (thus,
+<em>myfile.xml</em>'s stubname is <em>myfile</em>). The modelname is
+set to this value, and two constructors are called: {@link
+gov.nasa.daveml.DAVE2POST.POSTFileWriter#POSTFileWriter(
+gov.nasa.daveml.DAVE2POST.POSTDiagram, java.lang.String) POSTFileWriter} and
+{@link gov.nasa.daveml.DAVE2POST.MatFileWriter#MatFileWriter(
+gov.nasa.daveml.DAVE2POST.POSTDiagram, java.lang.String) MatFileWriter}. The
+<code>POSTFileWriter</code>'s {@link
+gov.nasa.daveml.DAVE2POST.POSTFileWriter#writePOSTHeader( java.lang.String )
+writePOSTHeader} method is called to write boilerplate header
+information into a new Simulink&reg; model file named
+<em>myfile</em>.mdl. The <code>MatFileWriter</code>'s {@link
+gov.nasa.daveml.DAVE2POST.MatFileWriter#writeDataHeader( java.lang.String
+) writeDataHeader} method is called to write comment lines in a new
+MATLAB&reg; script file called <em>myfile_</em>setup.m. A script to create
+a new Simulink&reg; model file is then generated by calling the
+<code>POSTDiagram</code>'s {@link
+gov.nasa.daveml.DAVE2POST.POSTDiagram#createModel(
+gov.nasa.daveml.DAVE2POST.POSTFileWriter,
+gov.nasa.daveml.DAVE2POST.MatFileWriter) createModel} method.
+</p>
+
+<h3>The {@link gov.nasa.daveml.DAVE2POST.POSTDiagram#createModel(gov.nasa.daveml.DAVE2POST.POSTFileWriter,
+gov.nasa.daveml.DAVE2POST.MatFileWriter) POSTDiagram.createModel} method</h3>
+
+<p>
+The <code>POSTDiagram</code> is scanned by column and row to verify the
+blocks all know their correct row &amp; column number. Each row is
+then asked to find height of the tallest block by calling the
+appropriate row's {@link
+gov.nasa.daveml.DAVE2POST.POSTRowColumnVector#getSize()} method. Columns are
+likewise sized for their widest block. Then each cell in the column is
+asked to retrieve it's associated <code>POSTBlock</code>, and that block
+is asked to generate it's associated M-file block creation statements on the
+<code>POSTFileWriter</code> and then it's associated data statements
+through the <code>MatFileWriter</code> by calling {@link
+gov.nasa.daveml.DAVE2POST.POSTBlock#createM(
+gov.nasa.daveml.DAVE2POST.POSTFileWriter, int, int ) createModel} and {@link
+gov.nasa.daveml.DAVE2POST.POSTBlock#writeMat(
+gov.nasa.daveml.DAVE2POST.MatFileWriter ) writeMat}, respectively.
+</p>
+
+<p>
+Converting {@link gov.nasa.daveml.DAVE.Signal}s into {@link
+gov.nasa.daveml.DAVE2POST.POSTSignal}s comes next: an {@link
+gov.nasa.daveml.DAVE.SignalArrayList} <em>sigs</em> is obtained from the
+<code>Model</code> using {@link gov.nasa.daveml.DAVE.Model#getSignals()}
+method. This list is traversed and each {@link
+gov.nasa.daveml.DAVE.Signal} is converted into a {@link
+gov.nasa.daveml.DAVE2POST.POSTSignal} by calling the {@link
+gov.nasa.daveml.DAVE2POST.POSTSignal#POSTSignal( gov.nasa.daveml.DAVE.Signal,
+gov.nasa.daveml.DAVE2POST.POSTDiagram) POSTSignal} constructor, which returns
+<em>newSig</em>. Then, <em>newSig</em>'s {@link
+gov.nasa.daveml.DAVE2POST.POSTSignal#createAddLine(
+gov.nasa.daveml.DAVE2POST.POSTFileWriter ) POSTSignal.createAddLine} method is called to write the
+<code>add_line</code> creation commands to the model-building script.
+</p>
+
+<h3>Back to <code>DAVE2POST.createModel</code></h3>
+
+<p>
+Back in {@link gov.nasa.daveml.DAVE2POST.DAVE2POST#createModel()}, the {@link
+gov.nasa.daveml.DAVE2POST.POSTFileWriter#writePOSTFooter(String, String)} and {@link
+gov.nasa.daveml.DAVE2POST.MatFileWriter#writeDataFooter()} methods are
+invoked to complete the model and data loading script files,
+respectively. These files are then closed, and control returns to
+<code>DAVE2POST.main()</code>.
+</p>
+
+<h3>Back to <code>DAVE2POST.main</code></h3>
+
+<p>
+If checkcase data was embedded in the original DAVE-ML document, a
+verification script is written by a call to the DAVE2POST object's
+{@link gov.nasa.daveml.DAVE2POST.DAVE2POST#createVerifyScript createVerifyScript} method.
+</p>
+
+<p>
+DAVE2POST then exits with confirmation that the <code>.mdl</code> and
+<code>_setup.m</code> files were successfully written.
+</p>
+
+<h2>Related Documentation</h2>
+
+For overviews, tutorials, examples, guides, and tool documentation, please see:
+<ul>
+  <li><a
+  href="http://daveml.nasa.gov" target="_blank">The
+  DAVE-ML project website</a></li>
+</ul>
+
+<!-- Put @see and @since tags down here. -->
+<!-- @since 0.9.4 -->
+
+</body>
+</html>
