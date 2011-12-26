@@ -361,7 +361,7 @@ public class DAVE2POST extends DAVE {
 //            System.out.println("Verification script written.");
 //        }
 
-        System.out.println("Wrote table source files for "
+        System.out.println("Wrote POST II source files for "
                 + dave2post.getStubName() + ".");
     }
 }

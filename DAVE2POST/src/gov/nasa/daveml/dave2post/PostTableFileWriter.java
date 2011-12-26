@@ -21,10 +21,12 @@ class PostTableFileWriter extends FileWriter {
     
     int tableNumber, tableRefNumber;
     Model ourModel;
+    String indent; // indent for table values
 
     public PostTableFileWriter(Model theModel, String tableFileName) throws IOException {
         super( tableFileName );
         ourModel = theModel;
+        indent = "         ";
     }
     
     /**
@@ -89,7 +91,8 @@ class PostTableFileWriter extends FileWriter {
             Iterator<Double> bpIt  = bps.iterator();
             
             try {
-                writeln(outVarID + " = " + outVarID + ", multi, " + inVarID + ", " + tableNumber++ + ", lin_inp, noxt,");
+                write("  " + outVarID + "t = " + outVarID + "t, multi, " + inVarID);
+                writeln(", " + tableNumber++ + ", lin_inp, noxt,");
             } catch (IOException ex) {
                 Logger.getLogger(PostTableFileWriter.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -97,7 +100,7 @@ class PostTableFileWriter extends FileWriter {
             while (bpIt.hasNext()) {
                 double breakpointVal = bpIt.next();
                 try {
-                    writeln("     " + breakpointVal + ", " + tableRefNumber++ + ",");
+                    writeln(indent + breakpointVal + ", " + tableRefNumber++ + ",");
                 } catch (IOException ex) {
                     Logger.getLogger(PostTableFileWriter.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -120,7 +123,7 @@ class PostTableFileWriter extends FileWriter {
         ArrayList<Double> bps  = ourModel.getBPSetByID(bpID).values();
         ArrayList<Double> vals = ft.getValues();
         try {
-            write("  " + outVarID + " = " + outVarID + ", monovar, " + inVarID );
+            write("  " + outVarID + "t = " + outVarID + "t, monovar, " + inVarID );
             writeln(", " + tableNumber + ", lin_inp, noxt,");
         } catch (IOException ex) {
             Logger.getLogger(PostTableFileWriter.class.getName()).log(Level.SEVERE, null, ex);
@@ -145,7 +148,7 @@ class PostTableFileWriter extends FileWriter {
         } else {
             for (i = 0; i < bps.size(); i++) {
                 try {
-                    writeln("         " + bps.get(i) + ", " + vals.get(i + valOffset) + ",");
+                    writeln(indent + bps.get(i) + ", " + vals.get(i + valOffset) + ",");
                 } catch (IOException ex) {
                     Logger.getLogger(PostTableFileWriter.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -153,30 +156,5 @@ class PostTableFileWriter extends FileWriter {
         }
         return valOffset + i;
     }
-    
-//    private void generate1DTableNumbers(ArrayList<Double> bps, int startTableNumber) {
-//        int tabNum = startTableNumber;
-//        for (int i = 0; i < bps.size(); i++) {
-//            System.out.println("         " + bps.get(i) + ", " + tabNum);
-//            tabNum++;
-//        }
-//    }
-//
-//    // returns number of points written
-//    private int generateSubTables(int[] dims, int dim, BlockFuncTable bft, int valOffset) {
-//        FuncTable ft    = bft.getFunctionTableDef();
-//        String outVarID = bft.getOutputVarID();
-//        String inVarID  = bft.getVarID(dim);
-//        String bpID     = ft.getBPID(dim);
-//        System.out.print("  " + outVarID + " = " + outVarID + ", multisub, " + inVarID );
-//        System.out.println(", " + tableNumber + ", lin_inp, noxt");
-//        tableNumber++;
-//        BreakpointSet bpset = ourModel.getBPSetByID(bpID);
-//        this.generate1DTable(bpset.values(), ft.getValues(), valOffset);
-//        return bpset.values().size();
-//    }
-//    
 
-
-    
 }

@@ -35,7 +35,7 @@ class FEquationsFileWriter extends FileWriter {
     void generateTableCall(BlockFuncTable bft) {
         String outVarID = bft.getOutputVarID();
         try {
-            writeln("      " + outVarID + " = gentab (gs.motbl." + outVarID + "(1))");
+            writeln("      " + outVarID + " = gentab (gs.motbl." + outVarID + "t(1))");
         } catch (IOException ex) {
             Logger.getLogger(FEquationsFileWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
