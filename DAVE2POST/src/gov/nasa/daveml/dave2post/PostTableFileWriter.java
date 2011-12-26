@@ -5,22 +5,45 @@
 package gov.nasa.daveml.dave2post;
 
 import gov.nasa.daveml.dave.*;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
  *
  * @author ebjackso
  */
-class PostTableFileWriter {
+class PostTableFileWriter extends FileWriter {
     
     int tableNumber, tableRefNumber;
     Model ourModel;
 
-    public PostTableFileWriter(Model theModel, String tableFileName) {
+    public PostTableFileWriter(Model theModel, String tableFileName) throws IOException {
+        super( tableFileName );
         ourModel = theModel;
     }
+    
+    /**
+     *
+     * Adds newline to the end of each write.
+     *
+     * @param cbuf String containing text to write
+     *
+     */
+
+    public void writeln( String cbuf ) throws IOException
+    {
+//            int i;
+//            for(i = 0; i< this.indent; i++)
+//                    super.write(" ");
+            super.write( cbuf + "\n" );
+    }
+
+
     
     void generateTableDescription(BlockFuncTable bft) {
         tableNumber     = 0;  // restart table numbering
@@ -31,7 +54,11 @@ class PostTableFileWriter {
         int numDims     = dims.length;
         String gtID     = ft.getGTID();
         
-        System.out.println("C  Table" + "'" + gtID + "', dim = " + numDims + ".");
+        try {
+            writeln("C  Table" + "'" + gtID + "', dim = " + numDims + ".");
+        } catch (IOException ex) {
+            Logger.getLogger(PostTableFileWriter.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         if (numDims == 1) {
              this.writeMonoTable(bft, 0);
@@ -60,12 +87,20 @@ class PostTableFileWriter {
             String bpID     = ft.getBPID(dimLevel+1);
             ArrayList<Double> bps  = ourModel.getBPSetByID(bpID).values();
             Iterator<Double> bpIt  = bps.iterator();
-
-            System.out.println(outVarID + " = " + outVarID + ", multi, " + inVarID + ", " + tableNumber++ + ", lin_inp, noxt,");
+            
+            try {
+                writeln(outVarID + " = " + outVarID + ", multi, " + inVarID + ", " + tableNumber++ + ", lin_inp, noxt,");
+            } catch (IOException ex) {
+                Logger.getLogger(PostTableFileWriter.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
             while (bpIt.hasNext()) {
                 double breakpointVal = bpIt.next();
-                System.out.println("     " + breakpointVal + ", " + tableRefNumber++ + ",");
+                try {
+                    writeln("     " + breakpointVal + ", " + tableRefNumber++ + ",");
+                } catch (IOException ex) {
+                    Logger.getLogger(PostTableFileWriter.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             writeMultiTables(bft, dimLevel+1);
         }
@@ -84,9 +119,12 @@ class PostTableFileWriter {
         
         ArrayList<Double> bps  = ourModel.getBPSetByID(bpID).values();
         ArrayList<Double> vals = ft.getValues();
-           
-        System.out.print("  " + outVarID + " = " + outVarID + ", monovar, " + inVarID );
-        System.out.println(", " + tableNumber + ", lin_inp, noxt,");
+        try {
+            write("  " + outVarID + " = " + outVarID + ", monovar, " + inVarID );
+            writeln(", " + tableNumber + ", lin_inp, noxt,");
+        } catch (IOException ex) {
+            Logger.getLogger(PostTableFileWriter.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         offset = this.generate1DTable(bps, vals, offset);
         
@@ -96,53 +134,21 @@ class PostTableFileWriter {
     }
 
 
-//    void generateTableDescription(BlockFuncTable bft) {
-//        String outVarID = bft.getOutputVarID();
-//
-//        FuncTable ft = bft.getFunctionTableDef();
-//        int[] dims = ft.getDimensions();
-//        int numDims = dims.length;
-//        String gtID = ft.getGTID();
-//        System.out.println("C  Table" + "'" + gtID + "', dim = " + numDims + ".");
-//        if (numDims == 1) {
-//            String bpID = ft.getBPID(numDims);
-//            String inVarID = bft.getVarID(numDims);
-//            System.out.print("  " + outVarID + " = " + outVarID + ", monovar, " + inVarID );
-//            System.out.println(", " + tableNumber + ", lin_inp, noxt");
-//            tableNumber++;
-//            BreakpointSet bpset = ourModel.getBPSetByID(bpID);
-//            this.generate1DTable(bpset.values(), ft.getValues(), 0);
-//        } else { /*  multi-dimensional table */
-//            // generate first layer of multitable
-//            int dim = 1;
-//            String bpID = ft.getBPID(dim);
-//            String inVarID = bft.getVarID(dim);
-//            System.out.print("  " + outVarID + " = " + outVarID + ", multi, " + inVarID );
-//            System.out.println(", " + tableNumber + ", lin_inp, noxt");
-//            tableNumber++;
-//            BreakpointSet bpset = ourModel.getBPSetByID(bpID);
-//            this.generate1DTableNumbers(bpset.values(), tableNumber);
-//            
-//            // generate subtables
-//            int offset = 0;
-//            
-//            dim++;
-//            for (int i=1; i<=dims[dim-2]; i++) {
-//                offset = this.generateSubTables(dims, dim, bft, offset);
-//            }
-//        }
-//    }
-//    
+
     private int generate1DTable(ArrayList<Double> bps, ArrayList<Double> vals, int valOffset) {
         int i = 0;
         if (bps.size() > (vals.size() - valOffset)) {
-            System.out.println("ERROR - number of remaining values in table " + 
+            System.err.println("ERROR - number of remaining values in table " + 
                     (vals.size() - valOffset) + 
                     " is less than the number of breakpoints" +
                     bps.size() );
         } else {
             for (i = 0; i < bps.size(); i++) {
-                System.out.println("         " + bps.get(i) + ", " + vals.get(i + valOffset) + ",");
+                try {
+                    writeln("         " + bps.get(i) + ", " + vals.get(i + valOffset) + ",");
+                } catch (IOException ex) {
+                    Logger.getLogger(PostTableFileWriter.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         }
         return valOffset + i;

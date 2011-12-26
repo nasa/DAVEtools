@@ -16,7 +16,6 @@ package gov.nasa.daveml.dave2post;
 import gov.nasa.daveml.dave.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
@@ -120,7 +119,7 @@ public class DAVE2POST extends DAVE {
     public void setInputFileName(String fn) {
         super.setInputFileName(fn);	// sets stub and file name fields
         this.tableFileName = this.getStubName() + "_table.pos2";
-        this.sourceFileName = this.getStubName() + "_table.c";
+        this.sourceFileName = this.getStubName() + "_table.f";
     }
 
     /**
@@ -129,7 +128,7 @@ public class DAVE2POST extends DAVE {
      *
      **/
     private void parseOptions(String inArgs[]) {
-        String exampleUse = "Usage: java DAVE2POST [-v|--version] | [-c|--count] [-d|--debug] [-w|--warnruntime] [-l|--lib] [-e|--enabled] DAVE_document";
+        String exampleUse = "Usage: java DAVE2POST [-v|--version] | [-c|--count] [-d|--debug] DAVE-ML_document";
         int numArgs = inArgs.length;
 
         // Save arguments into field
@@ -215,7 +214,7 @@ public class DAVE2POST extends DAVE {
 
         // script file for now
         PostTableFileWriter tableWriter = new PostTableFileWriter(theModel, this.tableFileName);
-        CEquationsFileWriter equationWriter = new CEquationsFileWriter(theModel, this.sourceFileName);
+        FEquationsFileWriter equationWriter = new FEquationsFileWriter(theModel, this.sourceFileName);
 
         // Write headers
 //        mdlWriter.writeSLHeader(modelName);
@@ -223,7 +222,7 @@ public class DAVE2POST extends DAVE {
 
         // generate contents
         
-        // get list of all blocks
+        // find the function blocks
         BlockArrayList blocks = theModel.getBlocks();
         Iterator<Block> it = blocks.iterator();
         while(it.hasNext()) {
@@ -231,19 +230,17 @@ public class DAVE2POST extends DAVE {
             if (blk instanceof BlockFuncTable) {
                 BlockFuncTable bft = (BlockFuncTable) blk;
                 tableWriter.generateTableDescription( bft );
+                equationWriter.generateTableCall( bft );
             }
-        }
-        
-        // find the function blocks
-        
+        }   
 
         // Write footers
 //        mdlWriter.writeSLFooter(this.getVersion(), modelName);
 //        matWriter.writeDataFooter();
 
         // Close the files
-//        mdlWriter.close();
-//        matWriter.close();
+        tableWriter.close();
+        equationWriter.close();
 
     }
 
@@ -345,7 +342,7 @@ public class DAVE2POST extends DAVE {
         }
 
         // Create creation and verification m-script files
-        System.out.println("Creating MATLAB/Simulink representation...");
+        System.out.println("Creating POST-II input deck and model source...");
         try {
             dave2post.createModel();
         } catch (IOException e) {
