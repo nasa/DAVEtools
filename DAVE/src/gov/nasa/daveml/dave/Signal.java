@@ -158,7 +158,7 @@ public class Signal
      *  indicates this signal does not correspond to a declared varDef
      */
 
-    boolean automatic = false;
+    private boolean derived = false;
 
     /**
      * lower limit. Default is -Infinity (no lower limit)
@@ -197,6 +197,7 @@ public class Signal
         isStateDeriv = false;
         isOutput = false;
         isStdAIAA = false;
+        derived = false;
         lowerLim = Double.NEGATIVE_INFINITY;
         upperLim = Double.POSITIVE_INFINITY;
     }
@@ -408,7 +409,7 @@ public class Signal
         this.upperLim   = s.upperLim;   // upper limit to output range
         this.isOutput   = s.isOutput;   // flag to indicate this should be an output signal
         // don't copy verboseFlag
-        this.automatic  = s.automatic;  // indicates this does not correspond to varDef
+        this.derived  = s.derived;  // indicates this does not correspond to varDef
         // don't copy ready flag
         // copies list of pointers to downstream blocks
         this.dests      = new BlockArrayList( s.dests.size() );
@@ -561,12 +562,12 @@ public class Signal
      * Sets the indicator flag to show this was automatically generated
      *
      * <p>
-     *  This flag should be set for all 'automatic' signals; i.e. those
+     *  This flag should be set for all 'derived' signals; i.e. those
      *  not corresponding to varDefs in the DAVE-ML source file
      *
      **/
 
-    public void setAutoFlag() { this.automatic = true; }
+    public void setDerivedFlag() { this.derived = true; }
 
 
     /**
@@ -574,12 +575,12 @@ public class Signal
      * Returns the indicator flag to show this was automatically generated
      *
      * <p>
-     *  This flag should be set for all 'automatic' signals; i.e. those
+     *  This flag should be set for all 'derived' signals; i.e. those
      *  not corresponding to varDefs in the DAVE-ML source file
      *
      **/
 
-    public boolean isAutomatic() { return this.automatic; }
+    public boolean isDerived() { return this.derived; }
 
     /**
      * indicates a lower limit is in force

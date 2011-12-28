@@ -421,7 +421,7 @@ public class BlockFuncTable extends Block
 				   + connectorName + "' with a varID of '"
 				   + iwSignalID + "' and units of '" + units + "'");
 	    connector = new Signal( connectorName, iwSignalID, units, 2, ourModel );
-	    connector.setAutoFlag();	// flag as an automatic variable
+	    connector.setDerivedFlag();	// note that we've created this variable
 	    connector.addSink( this, portNum+1 );	// hook up to new signal
 	} else {
 	    // else block - error

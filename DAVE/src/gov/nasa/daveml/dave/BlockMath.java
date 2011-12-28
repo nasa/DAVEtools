@@ -209,7 +209,7 @@ abstract public class BlockMath extends Block
 									// .. and will call our BlockMath.factory() ...
 			if( s!= null )	 {				// .. and creates upstream blocks & signals
 			    s.addSink(this,i);			// hook us up as output of new signal path
-			    s.setAutoFlag();	// flag as an automatic variable
+			    s.setDerivedFlag();	// Note that this is a newly-created signal not part of orig model
 			}
 			else
 			    System.err.println("Null signal returned when creating recursive math element.");

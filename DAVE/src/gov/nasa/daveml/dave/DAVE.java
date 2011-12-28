@@ -20,6 +20,8 @@ import java.io.PrintWriter;
 import java.io.StreamTokenizer;
 import java.io.StringWriter;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -503,7 +505,7 @@ public class DAVE
 
 
     /**
-     * Creates new {@link Signal}s for each definition found.
+     * Creates new {@link Signal} for each variableDef in model.
      **/
 
     @SuppressWarnings("unchecked") // since Element.getChildren() method returns generic List
@@ -755,7 +757,16 @@ public class DAVE
 
         // Sanity check
         boolean result = m.verifyIntegrity();
-
+        
+        // Initialize model
+        // This builds the exection order lists; was happening only for models with checkcases
+        try {
+            m.initialize();
+        } catch (DAVEException ex) {
+            Logger.getLogger(DAVE.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        // report results
         if (this.isVerbose()) {
             System.out.println("");
             System.out.println("File parsing complete; model built.");

@@ -62,7 +62,7 @@ public class SignalTest extends TestCase {
         assertFalse( _ds.isInput() );
         assertFalse( _ds.isOutput() );
         assertFalse( _ds.isStdAIAA() );
-        assertFalse( _ds.isAutomatic() );
+        assertFalse( _ds.isDerived() );
         assertFalse( _ds.hasLowerLimit() );
         assertFalse( _ds.hasUpperLimit() );
         assertFalse( _ds.isLimited() );
@@ -87,7 +87,7 @@ public class SignalTest extends TestCase {
         assertFalse( _fs.isInput() );
         assertFalse( _fs.isOutput() );
         assertFalse( _fs.isStdAIAA() );
-        assertFalse( _fs.isAutomatic() );
+        assertFalse( _fs.isDerived() );
         assertTrue(  _fs.hasLowerLimit() );
         assertTrue(  _fs.hasUpperLimit() );
         assertTrue(  _fs.isLimited() );
@@ -148,7 +148,7 @@ public class SignalTest extends TestCase {
         assertFalse( _ss.isInput() );
         assertFalse( _ss.isOutput() );
         assertFalse( _ss.isStdAIAA() );
-        assertFalse( _ss.isAutomatic() );
+        assertFalse( _ss.isDerived() );
         assertFalse( _ss.hasLowerLimit() );
         assertFalse( _ss.hasUpperLimit() );
         assertFalse( _ss.isLimited() );
@@ -233,7 +233,7 @@ public class SignalTest extends TestCase {
         assertFalse( s2.isInput() );
         assertFalse( s2.isOutput() );
         assertFalse( s2.isStdAIAA() );
-        assertFalse( s2.isAutomatic() );
+        assertFalse( s2.isDerived() );
         assertTrue(  s2.hasLowerLimit() );
         assertTrue(  s2.hasUpperLimit() );
         assertTrue(  s2.isLimited() );
@@ -1105,7 +1105,7 @@ public class SignalTest extends TestCase {
         assertTrue(  _fs.getSourcePort() == 0 );
         assertFalse( _fs.hasSource() );
         assertFalse( _fs.hasDest() );
-        assertFalse( _fs.isAutomatic() );
+        assertFalse( _fs.isDerived() );
     }
 
     private void setFullSignalWithICMinMax( String ICValue, String minValue, String maxValue ) {
@@ -1149,7 +1149,7 @@ public class SignalTest extends TestCase {
         assertTrue(  _fs.getSourcePort() == 0 );
         assertFalse( _fs.hasSource() );
         assertFalse( _fs.hasDest() );
-        assertFalse( _fs.isAutomatic() );
+        assertFalse( _fs.isDerived() );
 
         _m.hookUpIO(); // creates & connects a constant block to an output block
             try { _m.initialize(); }

@@ -110,8 +110,7 @@ abstract public class Block
      */
 
     Object mask;
-
-
+    
     /**
      *
      * Basic constructor
@@ -473,7 +472,7 @@ abstract public class Block
             sig = blk.output;
         } else {
             sig = new Signal( blk.getName(), this.ourModel );
-            sig.setAutoFlag();  // flag as an automatic variable
+            sig.setDerivedFlag();  // flag as a variable we've constructed
             try {
                 blk.addOutput(sig);
             } catch (DAVEException e) {
@@ -498,6 +497,10 @@ abstract public class Block
     {
         Block constBlock = new BlockMathConstant( constantValue, ourModel );
         this.addInput( constBlock, inPort );
+        // mark this new constant signal as 'derived' for code generators
+        // since it doesn't appear as separate varID in source model
+        Signal derivedConst = constBlock.getOutput();
+        derivedConst.setDerivedFlag();
     }
 
 
@@ -856,25 +859,39 @@ abstract public class Block
     {
         Signal s = this.getOutput();
         if (s == null) {        // output not yet filled
-            String outVarID = this.getOutputVarID();
-            if (outVarID == null) // no output to hook up
+            String theOutVarID = this.getOutputVarID();
+            if (theOutVarID == null) // no output to hook up
                 return false;
             else {
-                s = ourModel.getSignals().findByID( outVarID );
+                s = ourModel.getSignals().findByID( theOutVarID );
                 try {
                     this.addOutput(s);
                 } catch (DAVEException e) {
                     System.err.println("Unexpected error in verifyOutputs for block '" 
-                                       + this.getName() + "': unable to add signal named '" + outVarID + "'.");
-                    e.printStackTrace();
+                                       + this.getName() + "': unable to add signal named '" + theOutVarID + "'.");
                     System.exit(0);
                 }
             }
         }
         return (s == null);
     }
+    
+    /**
+     * <p> Generate C-code equivalent of our operation</p>
+     */
+    
+    public String genCcode() {
+        return "// WARNING -- no code generator found for variable \"" + myName;       
+    }
 
 
+    /**
+     * <p> Generate FORTRAN code equivalent of our operation</p>
+     */
+    
+    public String genFcode() {
+        return "C WARNING -- no code generator found for variable \"" + myName;       
+    }
 
     /**
      *

@@ -71,6 +71,13 @@ public class Model
     BlockArrayList executeOrder;
 
     /**
+     * list of variable IDs, sorted in execution order;
+     * excludes input variables
+     */
+    
+    ArrayList<String> sortedVarIDs;
+
+    /**
      *  list of input blocks
      */
 
@@ -87,6 +94,7 @@ public class Model
      */
 
     VectorInfoArrayList inputVec;
+    
     /**
      *  output vector (if null, not yet established)
      */
@@ -117,7 +125,7 @@ public class Model
 
     private static final int exit_success = 0;
     private static final int exit_failure = 1;
-
+    
     /**
      *
      * <p> Constructor for Model </p>
@@ -135,6 +143,7 @@ public class Model
 	this.tables = new HashMap<String, FuncTable>();
 	this.bpBlocks = new HashMap<String, BlockBP>();
 	this.executeOrder = new BlockArrayList(numBlocks);
+        this.sortedVarIDs = new ArrayList<String>(numSignals);
 	this.inputBlocks = new BlockArrayList(numBlocks);
 	this.outputBlocks = new BlockArrayList(numBlocks);
 	this.initialized = false;
@@ -605,8 +614,8 @@ public class Model
 
 
     /**
-     * Creates any missing constant (or input) and output blocks. Also
-     * sets up any necessary limiters on Signals
+     * Creates any missing constant (or input) and output blocks (and any
+     * required connector Signals). Also sets up any necessary limiters on Signals
      **/
 
     public void hookUpIO()
@@ -693,7 +702,7 @@ public class Model
                 // this.add(limitedSignal);     // wait until iteration is done to add new limited signal to model
                 boolean OK = modifiedSignals.add(limitedSignal);
                 assert(OK);
-                limitedSignal.setAutoFlag(); // mark as automatic variable
+                limitedSignal.setDerivedFlag(); // mark as automatically generated variable
 
                 // record original metadata for signal in case of later failure
                 BlockArrayList origDests = (BlockArrayList) theSignal.getDests().clone();
@@ -835,7 +844,7 @@ public class Model
 		    Signal s = (Signal) it.next();
 		    // ignore automatically-generated signals
 		    // should just print out signals from varDefs
-		    if (!s.isAutomatic()) {
+		    if (!s.isDerived()) {
 			out.print("	<signal> <varID>");
 			out.print( s.getVarID());
 			out.print("</varID> <signalValue>");
@@ -937,18 +946,30 @@ public class Model
 	    while (candidates.hasNext()) {
 		b = candidates.next();
 		// check each one to see if ready
-		if (this.verbose)
+		if (this.verbose) {
 		    System.out.print("Checking to see if block '" +
 				     b.getName() + "' is ready...");
+                }
 		if (b.isReady()) {
-		    if (this.verbose)
+		    if (this.verbose) {
 			System.out.println(" yes. Adding to execution list.");
+                    }
 		    // blocks that are ready are added to executeOrder list and taken off this one
 		    executeOrder.add( b );
 		    candidates.remove();	// removes current block
-		} else
+                    // if the outVarID of the ready block matches one of the 
+                    // DAVE-ML file's varIDs, this means the variable is completely
+                    // ready for calculation (this list is used by other DAVEtool components)
+                    Signal readySig = b.getOutput();
+                    if (readySig != null) { // TODO - this shouldn't happen, but does!
+                        if ( !readySig.isDerived() && !readySig.isInput() ) {
+                            sortedVarIDs.add( readySig.getVarID());
+                        }
+                    }
+		} else {
 		    if (this.verbose)
 			System.out.println(" no.");
+                }
 	    }
 
             // Number of not ready blocks should shrink each pass through loop
@@ -1197,4 +1218,30 @@ public class Model
 	System.out.println("                       Number of outputs: " + this.outputBlocks.size());
 
     }
+    
+    /**
+     * Returns the blocks in execution sorted order; available only after call to initialize()
+     * @return BlockArrayList of sorted blocks, in appropriate order of execution
+     */
+    
+    public BlockArrayList getSortedBlocks() throws DAVEException {
+        if (executeOrder == null) {
+            throw new DAVEException("Execution order not yet determined");
+        }
+        return executeOrder;
+    }
+    
+    /**
+     * Returns a list of variableIDs in execution sorted order, corresponding to the varIDs 
+     * in the original model; available only after call to initialize()
+     * @return ArrayList of sorted varIDs, in appropriate order of execution
+     */
+    
+    public ArrayList getSortedVarIDs() throws DAVEException {
+        if (executeOrder == null) {
+            throw new DAVEException("Execution order not yet determined");
+        }
+        return sortedVarIDs;
+    }
+
 }

@@ -86,6 +86,17 @@ public class BlockMathProductTest extends TestCase {
         assertEquals("times", _block.getBlockType());
     }
 
+    public void testGenCcode() {
+        String result = _block.genCcode();
+        assertEquals("// Code for variable \"times_3\":\n  times_3 = PB*BSPAN;\n", result);
+    }
+
+    public void testGenFcode() {
+        String result = _block.genFcode();
+        assertEquals("C Code for variable \"times_3\":\n      times_3 = PB*BSPAN\n", result);
+    }
+
+
     public void testDescribeSelfFileWriter() {
         try {
             _block.describeSelf(_writer);

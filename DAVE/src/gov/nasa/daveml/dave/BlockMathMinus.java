@@ -75,12 +75,86 @@ public class BlockMathMinus extends BlockMath
 
 
     /**
+     * <p> Generate C-code for signal</p>
+     */
+    
+    public String genCodeForSignal( Signal signal ) {
+        String code = "";
+        if (signal.isDerived()) {
+                code = code + "(" + signal.source.genCcode() + ")";
+            } else {
+                code = code + signal.getVarID();
+            }  
+        return code;
+    }
+    
+    
+    /**
+     * <p> Generate C-code equivalent of our operation</p>
+     */
+    
+    @Override
+    public String genCcode() {
+        String code = "";
+        Signal input0, input1;
+        Signal outputSig = this.getOutput();
+        // check to see if we're derived variable (code fragment) or a whole statement
+        // if not derived, need preceding command and the LHS of the equation too
+        if (!outputSig.isDerived()) {
+            code = "// Code for variable \"" + myName + "\":\n";
+            code = code + "  " + myName + " = ";
+        }
+        input0 = inputs.get(0);
+        if (inputs.size() == 1) { // unary minus
+            code = code + "-" + genCodeForSignal(input0);
+        } else { // must be binary minus: input 0 less 1    
+            input1 = inputs.get(1);
+            code = code + genCodeForSignal(input0) + " - " + genCodeForSignal(input1);           
+        }
+        // if not derived, need trailing semicolon and new line
+        if (!outputSig.isDerived())
+            code = code + ";\n";
+        return code;
+    }
+
+
+    /**
+     * <p> Generate FORTRAN code equivalent of our operation</p>
+     */
+    
+    @Override
+    public String genFcode() {
+        String code = "";
+        Signal input0, input1;
+        Signal outputSig = this.getOutput();
+        // check to see if we're derived variable (code fragment) or a whole statement
+        // if not derived, need preceding command and the LHS of the equation too
+        if (!outputSig.isDerived()) {
+            code = "C Code for variable \"" + myName + "\":\n";
+            code = code + "  " + myName + " = ";
+        }
+        input0 = inputs.get(0);
+        if (inputs.size() == 1) { // unary minus
+            code = code + "-" + genCodeForSignal(input0);
+        } else { // must be binary minus: input 0 less 1    
+            input1 = inputs.get(1);
+            code = code + genCodeForSignal(input0) + " - " + genCodeForSignal(input1);           
+        }
+        // if not derived, need new line
+        if (!outputSig.isDerived())
+            code = code + "\n";
+        return code;
+    }
+
+    
+    /**
      *
      * <p> Generates description of self </p>
      *
      * @throws <code>IOException</code>
      **/
 
+    @Override
     public void describeSelf(Writer writer) throws IOException
     {
 	super.describeSelf(writer);
@@ -94,6 +168,7 @@ public class BlockMathMinus extends BlockMath
      *
      **/
 
+    @Override
     public void update() throws DAVEException
     {
 

@@ -73,6 +73,72 @@ public class BlockMathSum extends BlockMath
     }
 
     /**
+     * <p> Generate C-code equivalent of our operation</p>
+     */
+    
+    @Override
+    public String genCcode() {
+        String code = "";
+        Iterator<Signal> inputSig = inputs.iterator();
+        Signal outputSig = this.getOutput();
+        // check to see if we're derived variable (code fragment) or a whole statement
+        // if not derived, need preceding command and the LHS of the equation too
+        if (!outputSig.isDerived()) {
+            code = "// Code for variable \"" + myName + "\":\n";
+            code = code + "  " + myName + " = ";
+        }
+        while (inputSig.hasNext()) {
+            Signal inSig = inputSig.next();
+            if (inSig.isDerived()) { // put recursion results in parens
+                code = code + "(" + inSig.source.genCcode() + ")";
+            } else {
+                code = code + inSig.myVarID;
+            }
+            if (inputSig.hasNext()) {
+                code = code + " + ";
+            }
+        }
+        // if not derived, need trailing semicolon and new line
+        if (!outputSig.isDerived())
+            code = code + ";\n";
+        return code;
+    }
+
+
+    /**
+     * <p> Generate FORTRAN code equivalent of our operation</p>
+     */
+    
+    @Override
+    public String genFcode() {
+        String code = "";
+        Iterator<Signal> inputSig = inputs.iterator();
+        Signal outputSig = this.getOutput();
+        // check to see if we're derived variable (code fragment) or a whole statement
+        // if not derived, need preceding command and the LHS of the equation too
+        if (!outputSig.isDerived()) {
+            code = "C Code for variable \"" + myName + "\":\n";
+            code = code + "      " + myName + " = ";
+        }
+        while (inputSig.hasNext()) {
+            Signal inSig = inputSig.next();
+            if (inSig.isDerived()) { // put recursion results in parens
+                code = code + "(" + inSig.source.genFcode() + ")";
+            } else {
+                code = code + inSig.myVarID;
+            }
+            if (inputSig.hasNext()) {
+                code = code + " + ";
+            }
+        }
+        // if not derived, need newline
+        if (!outputSig.isDerived())
+            code = code + "\n";
+        return code;
+    }
+
+        
+    /**
      *
      * <p> Generates description of self </p>
      *

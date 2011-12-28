@@ -43,7 +43,7 @@ public class BlockMathAbs extends BlockMath
      **/
 
     @SuppressWarnings("unchecked")
-	public BlockMathAbs( Element applyElement, Model m )
+    public BlockMathAbs( Element applyElement, Model m )
     {
 	// Initialize superblock elements
 	super("pending", "absolute value", m);
@@ -57,19 +57,16 @@ public class BlockMathAbs extends BlockMath
 	this.setName( first.getName() + "_" + m.getNumBlocks());
 	
 	// take appropriate action based on type
-	if(!first.getName().equals("abs"))
-	    {
-		System.err.println("Error - BlockMathAbs constructor called with" +
-				   " wrong type element.");
-	    }
-	else
-	    {
-		// look for single input
-		if(kids.size() > 2)
-		    System.err.println("Error - <apply><abs/> only handles single arguments, not " + (kids.size()-1));
-		else
-		    this.genInputsFromApply(ikid, 1);
-	    }
+	if(!first.getName().equals("abs")) {
+            System.err.println("Error - BlockMathAbs constructor called with" +
+                               " wrong type element.");
+        } else {
+            // look for single input
+            if(kids.size() > 2)
+                System.err.println("Error - <apply><abs/> only handles single arguments, not " + (kids.size()-1));
+            else
+                this.genInputsFromApply(ikid, 1);
+        }
 
 //System.out.println("    BlockMathAbs constructor: " + myName + " created.");
     }

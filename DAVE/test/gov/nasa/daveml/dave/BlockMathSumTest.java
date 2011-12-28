@@ -79,33 +79,42 @@ public class BlockMathSumTest extends TestCase {
 			_model.initialize();
 		} catch (DAVEException e) {
 			fail("problem initializing model in " + routineName);
-			e.printStackTrace();
 		}
     }
+    
+    public void testGenCcode() {
+        String result = _block.genCcode();
+        assertEquals("// Code for variable \"plus_3\":\n  plus_3 = PB + BSPAN;\n", result);
+    }
 
-	public void testDescribeSelfWriter() {
-		try {
-			_block.describeSelf(_writer);
-		} catch (IOException e) {
-			fail("testDescribeSelfWriter of TestBlockMathSum threw unexpected exception: " 
-					+ e.getMessage() );
-		}
-		assertEquals( "Block \"plus_3\" has two inputs (PB, BSPAN)," +
-				" one output (outputSignal), value [-1.5] and is a Sum math block.", 
-				_writer.toString() );
-	}
+    public void testGenFcode() {
+        String result = _block.genFcode();
+        assertEquals("C Code for variable \"plus_3\":\n      plus_3 = PB + BSPAN\n", result);
+    }
 
-	public void testGetValue() {
-		assertEquals( -1.5, _block.getValue(), EPS );
-	}
+    public void testDescribeSelfWriter() {
+        try {
+                _block.describeSelf(_writer);
+        } catch (IOException e) {
+                fail("testDescribeSelfWriter of TestBlockMathSum threw unexpected exception: " 
+                                + e.getMessage() );
+        }
+        assertEquals( "Block \"plus_3\" has two inputs (PB, BSPAN)," +
+                        " one output (outputSignal), value [-1.5] and is a Sum math block.", 
+                        _writer.toString() );
+    }
 
-	public void testIsReady() {
-		assertTrue( _block.isReady() );
-	}
+    public void testGetValue() {
+            assertEquals( -1.5, _block.getValue(), EPS );
+    }
 
-	public void testAllInputsReady() {
-		assertTrue( _block.allInputsReady() );
-	}
+    public void testIsReady() {
+            assertTrue( _block.isReady() );
+    }
+
+    public void testAllInputsReady() {
+            assertTrue( _block.allInputsReady() );
+    }
 
     public void testMakeVerbose() {
         assertFalse( _block.isVerbose() );
