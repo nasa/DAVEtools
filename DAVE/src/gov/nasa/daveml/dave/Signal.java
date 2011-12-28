@@ -892,6 +892,40 @@ public class Signal
 
     public boolean isStdAIAA() { return this.isStdAIAA; }
     
+    
+    /**
+     * <p> Generate C-code for signal</p>
+     */
+    
+    public String genCcode( ) {
+        String code = "";
+        if (this.isDerived()) {
+            if (this.source != null) {
+                code = code + "(" + this.source.genCcode() + ")";
+            }
+        } else {
+            code = code + this.getVarID();
+        }  
+        return code;
+    }
+
+
+    /**
+     * <p> Generate FORTRAN code for signal</p>
+     */
+    
+    public String genFcode( ) {
+        String code = "";
+        if (this.isDerived()) {
+            if (this.source != null) {
+                code = code + "(" + this.source.genFcode() + ")";
+            }
+        } else {
+            code = code + this.getVarID();
+        }  
+        return code;
+    }
+
 
     /**
      *

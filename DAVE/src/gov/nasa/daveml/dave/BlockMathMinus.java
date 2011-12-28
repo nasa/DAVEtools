@@ -72,21 +72,6 @@ public class BlockMathMinus extends BlockMath
 	} else
 	    genInputsFromApply( ikid, 1 );
     }
-
-
-    /**
-     * <p> Generate C-code for signal</p>
-     */
-    
-    public String genCodeForSignal( Signal signal ) {
-        String code = "";
-        if (signal.isDerived()) {
-                code = code + "(" + signal.source.genCcode() + ")";
-            } else {
-                code = code + signal.getVarID();
-            }  
-        return code;
-    }
     
     
     /**
@@ -106,10 +91,10 @@ public class BlockMathMinus extends BlockMath
         }
         input0 = inputs.get(0);
         if (inputs.size() == 1) { // unary minus
-            code = code + "-" + genCodeForSignal(input0);
+            code = code + "-" + input0.genCcode();
         } else { // must be binary minus: input 0 less 1    
             input1 = inputs.get(1);
-            code = code + genCodeForSignal(input0) + " - " + genCodeForSignal(input1);           
+            code = code + input0.genCcode() + " - " + input1.genCcode();           
         }
         // if not derived, need trailing semicolon and new line
         if (!outputSig.isDerived())
@@ -135,10 +120,10 @@ public class BlockMathMinus extends BlockMath
         }
         input0 = inputs.get(0);
         if (inputs.size() == 1) { // unary minus
-            code = code + "-" + genCodeForSignal(input0);
+            code = code + "-" + input0.genFcode();
         } else { // must be binary minus: input 0 less 1    
             input1 = inputs.get(1);
-            code = code + genCodeForSignal(input0) + " - " + genCodeForSignal(input1);           
+            code = code + input0.genCcode() + " - " + input1.genFcode();           
         }
         // if not derived, need new line
         if (!outputSig.isDerived())
