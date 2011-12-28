@@ -89,11 +89,7 @@ public class BlockMathSum extends BlockMath
         }
         while (inputSig.hasNext()) {
             Signal inSig = inputSig.next();
-            if (inSig.isDerived()) { // put recursion results in parens
-                code = code + "(" + inSig.source.genCcode() + ")";
-            } else {
-                code = code + inSig.myVarID;
-            }
+            code = code + inSig.genCcode();
             if (inputSig.hasNext()) {
                 code = code + " + ";
             }
@@ -122,11 +118,7 @@ public class BlockMathSum extends BlockMath
         }
         while (inputSig.hasNext()) {
             Signal inSig = inputSig.next();
-            if (inSig.isDerived()) { // put recursion results in parens
-                code = code + "(" + inSig.source.genFcode() + ")";
-            } else {
-                code = code + inSig.myVarID;
-            }
+            code = code + inSig.genFcode();
             if (inputSig.hasNext()) {
                 code = code + " + ";
             }
