@@ -1244,4 +1244,21 @@ public class Model
         return sortedVarIDs;
     }
 
+    /**
+     * Return the block that represents the final math operation for the indicated
+     * variable.
+     * @param theVarID identifies the variable whose source block is sought
+     * @return the source block, or null if not found
+     */
+    public Block getBlockByOutputVarID(String theVarID) {
+        // easiest way is to find single with proper ID, then
+        // find source block.
+        Block theBlock = null;
+        Signal theSignal = signals.findByID(theVarID);
+        if (theSignal != null) {
+            theBlock = theSignal.getSource();
+        }
+        return theBlock;
+    }
+
 }

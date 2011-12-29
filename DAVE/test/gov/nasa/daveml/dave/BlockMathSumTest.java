@@ -84,12 +84,12 @@ public class BlockMathSumTest extends TestCase {
     
     public void testGenCcode() {
         String result = _block.genCcode();
-        assertEquals("// Code for variable \"plus_3\":\n  plus_3 = PB + BSPAN;\n", result);
+        assertEquals("// Code for variable \"outputSignal\":\n  outputSignal = PB + BSPAN;\n", result);
     }
 
     public void testGenFcode() {
         String result = _block.genFcode();
-        assertEquals("C Code for variable \"plus_3\":\n      plus_3 = PB + BSPAN\n", result);
+        assertEquals("C Code for variable \"outputSignal\":\n      outputSignal = PB + BSPAN\n", result);
     }
 
     public void testDescribeSelfWriter() {

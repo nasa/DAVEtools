@@ -84,8 +84,8 @@ public class BlockMathSum extends BlockMath
         // check to see if we're derived variable (code fragment) or a whole statement
         // if not derived, need preceding command and the LHS of the equation too
         if (!outputSig.isDerived()) {
-            code = "// Code for variable \"" + myName + "\":\n";
-            code = code + "  " + myName + " = ";
+            code = "// Code for variable \"" + outVarID + "\":\n";
+            code = code + "  " + outVarID + " = ";
         }
         while (inputSig.hasNext()) {
             Signal inSig = inputSig.next();
@@ -113,8 +113,8 @@ public class BlockMathSum extends BlockMath
         // check to see if we're derived variable (code fragment) or a whole statement
         // if not derived, need preceding command and the LHS of the equation too
         if (!outputSig.isDerived()) {
-            code = "C Code for variable \"" + myName + "\":\n";
-            code = code + "      " + myName + " = ";
+            code = "C Code for variable \"" + outVarID + "\":\n";
+            code = code + "      " + outVarID + " = ";
         }
         while (inputSig.hasNext()) {
             Signal inSig = inputSig.next();

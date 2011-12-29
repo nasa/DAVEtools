@@ -45,7 +45,12 @@ class FEquationsFileWriter extends FileWriter {
                System.err.println("Warning: Order of exection could not be determined (sorted varID list empty).");
            Iterator<String> varID = sortedVarIDs.iterator();
            while (varID.hasNext()) {
-               writeln("C" + indent +  varID.next());
+               String theVarID = varID.next();
+               Block blk = ourModel.getBlockByOutputVarID(theVarID);
+               if (blk == null)
+                   writeln("C Warning: can't find block with output ID \"" + theVarID + "\"");
+               else
+                   writeln(blk.genFcode());
            }
        } catch (DAVEException ex) {
            System.err.println("Warning: Order of exection could not be determined (sorted varID list null).");
