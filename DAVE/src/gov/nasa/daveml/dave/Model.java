@@ -71,13 +71,6 @@ public class Model
     BlockArrayList executeOrder;
 
     /**
-     * list of variable IDs, sorted in execution order;
-     * excludes input variables
-     */
-    
-    ArrayList<String> sortedVarIDs;
-
-    /**
      *  list of input blocks
      */
 
@@ -143,7 +136,6 @@ public class Model
 	this.tables = new HashMap<String, FuncTable>();
 	this.bpBlocks = new HashMap<String, BlockBP>();
 	this.executeOrder = new BlockArrayList(numBlocks);
-        this.sortedVarIDs = new ArrayList<String>(numSignals);
 	this.inputBlocks = new BlockArrayList(numBlocks);
 	this.outputBlocks = new BlockArrayList(numBlocks);
 	this.initialized = false;
@@ -957,15 +949,6 @@ public class Model
 		    // blocks that are ready are added to executeOrder list and taken off this one
 		    executeOrder.add( b );
 		    candidates.remove();	// removes current block
-                    // if the outVarID of the ready block matches one of the 
-                    // DAVE-ML file's varIDs, this means the variable is completely
-                    // ready for calculation (this list is used by other DAVEtool components)
-                    Signal readySig = b.getOutput();
-                    if (readySig != null) { // TODO - this shouldn't happen, but does!
-                        if ( !readySig.isDerived() && !readySig.isInput() ) {
-                            sortedVarIDs.add( readySig.getVarID());
-                        }
-                    }
 		} else {
 		    if (this.verbose)
 			System.out.println(" no.");
@@ -1231,19 +1214,6 @@ public class Model
         return executeOrder;
     }
     
-    /**
-     * Returns a list of variableIDs in execution sorted order, corresponding to the varIDs 
-     * in the original model; available only after call to initialize()
-     * @return ArrayList of sorted varIDs, in appropriate order of execution
-     */
-    
-    public ArrayList getSortedVarIDs() throws DAVEException {
-        if (executeOrder == null) {
-            throw new DAVEException("Execution order not yet determined");
-        }
-        return sortedVarIDs;
-    }
-
     /**
      * Return the block that represents the final math operation for the indicated
      * variable.

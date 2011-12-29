@@ -182,14 +182,14 @@ public class BlockLimiter extends Block {
         if (this.hasLowerLimit()) {
             code = code + "\n";
             code = code + indent + "if ( " + outVarID + " .LT. " + lowerLim.toString() + " ) then\n";
-            code = code + indent + indent + outVarID + " = " + lowerLim.toString() + "\n";
+            code = code + indent + "  " + outVarID + " = " + lowerLim.toString() + "\n";
             code = code + indent + "endif\n";
         }
         if (this.hasUpperLimit()) {
             if (!this.hasLowerLimit())
                 code = code + "\n";
             code = code + indent + "if ( " + outVarID + " .GT. " + upperLim.toString() + " ) then\n";
-            code = code + indent + indent + outVarID + " = " + upperLim.toString() + "\n";
+            code = code + indent + "  " + outVarID + " = " + upperLim.toString() + "\n";
             code = code + indent + "endif\n";
         }
         // if not derived, need new line if no limits
