@@ -569,6 +569,13 @@ public class Signal
 
     public void setDerivedFlag() { this.derived = true; }
 
+    
+    /**
+     * Clears the derived flag
+     */
+    
+    public void clearDerivedFlag() { this.derived = false; }
+
 
     /**
      *
@@ -978,4 +985,5 @@ public class Signal
                     }
             }
     }
+
 }

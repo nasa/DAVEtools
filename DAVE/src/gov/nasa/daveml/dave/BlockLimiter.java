@@ -167,7 +167,7 @@ public class BlockLimiter extends Block {
     @Override
     public String genFcode() {
         String code = "";
-        String indent = "  ";
+        String indent = "       ";
         Signal input;
         Signal outputSig = this.getOutput();
         // check to see if we're derived variable (code fragment) or a whole statement

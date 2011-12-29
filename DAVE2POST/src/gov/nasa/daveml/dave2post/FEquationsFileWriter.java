@@ -38,34 +38,60 @@ class FEquationsFileWriter extends FileWriter {
     
     
     public void writeEquations() throws IOException {
-        ArrayList<String> sortedVarIDs;
+        BlockArrayList sortedBlocks;
         try {
-            sortedVarIDs = ourModel.getSortedVarIDs();
-            if (sortedVarIDs.isEmpty()) {
-                System.err.println("Warning: Order of exection could not be determined (sorted varID list empty).");
+            sortedBlocks = ourModel.getSortedBlocks();
+            if (sortedBlocks.isEmpty()) {
+                System.err.println(
+                        "Warning: Order of execution could not be determined" +
+                        " (sorted block execution list empty).");
             }
-            Iterator<String> varID = sortedVarIDs.iterator();
-            while (varID.hasNext()) {
-                String theVarID = varID.next();
-                Block blk = ourModel.getBlockByOutputVarID(theVarID);
-                if (blk == null) {
-                    writeln("C Warning: can't find block with output ID \"" + theVarID + "\"");
-                } else {
-                    // if source block is a BlockFuncTable, generate the table call
-                    if (blk instanceof BlockFuncTable) {
-                        this.generateTableCall((BlockFuncTable) blk);
-                    } else { // otherwise generate equation code
-                        write(blk.genFcode());
+            Iterator<Block> blkIt = sortedBlocks.iterator();
+            while (blkIt.hasNext()) {
+                Block blk = blkIt.next();
+                boolean skip = false;
+                
+                // debugging section
+                String id = blk.getOutputVarID();
+                if (id != null)
+                    if (id.equals("VRW")) {
+                        System.out.println("Found " + id);
+                        blk.getOutput().clearDerivedFlag();
                     }
+
+                // If we output a 'derived' signal, don't generate code;
+                // such a signal-generating block was inserted for Simulink
+                // realization
+                
+                Signal outSig = blk.getOutput();
+                if (outSig != null)
+                    if (outSig.isDerived())
+                        skip = true;// don't emit code at this point
+               
+                if (blk instanceof BlockInput            // ignore these blocks
+                        || blk instanceof BlockOutput
+                        || blk instanceof BlockBP) {
+                    // skip code generation
+                // if source block is a BlockFuncTable, generate the table call
+                } else if (blk instanceof BlockFuncTable) {
+                    this.generateTableCall( (BlockFuncTable) blk);
+
+                } else { // otherwise generate equation code
+                    String code = blk.genFcode();
+//                    System.out.println(code);
+                    if (!skip) 
+                        write(code);
                 }
-            }
+                    
+            } // end of while (blkIt.hasNext()) loop
+        
         } catch (DAVEException ex) {
             System.err.println("Warning: Order of exection could not be determined (sorted varID list null).");
         }
     }
 
 
-    void generateTableCall(BlockFuncTable bft) {
+    private void generateTableCall(BlockFuncTable bft) {
         String outVarID = bft.getOutputVarID();
         try {
             writeln(indent + outVarID + " = gentab (gs.motbl." + outVarID + "t(1))");
