@@ -51,18 +51,18 @@ public class BlockMathConstantTest extends TestCase {
     }
 
     public void testUpdate() {
-            _block.setValue( 4.56 );
-            try {
-                    _model.getInputVector();
-            } catch (DAVEException e1) {
-                    fail("error when trying to obtain VectorInfoArrayList in TestBlockMathAbs::testUpdate()");
-            }
-            try {
-                    _model.cycle();
-            } catch (DAVEException e) {
-                    fail("error when trying to cycle model in TestBlockMathAbs::testUpdate()");
-            }
-            assertEquals( 4.56, _block.getValue(), 0.000001 );
+        _block.setValue( 4.56 );
+        try {
+                _model.getInputVector();
+        } catch (DAVEException e1) {
+                fail("error when trying to obtain VectorInfoArrayList in TestBlockMathAbs::testUpdate()");
+        }
+        try {
+                _model.cycle();
+        } catch (DAVEException e) {
+                fail("error when trying to cycle model in TestBlockMathAbs::testUpdate()");
+        }
+        assertEquals( 4.56, _block.getValue(), 0.000001 );
     }
 
     public void testGenCcode() {

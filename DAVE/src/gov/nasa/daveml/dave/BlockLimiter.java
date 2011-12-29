@@ -119,6 +119,46 @@ public class BlockLimiter extends Block {
 
     public String getUnits() { return this.units; }
 
+    /**
+     * <p> Generates C algorithm to limit input to output</p>
+     */
+    
+    @Override
+    public String genCcode() {
+        String code = "";
+        String indent = "  ";
+        Signal input;
+        Signal outputSig = this.getOutput();
+        // check to see if we're derived variable (code fragment) or a whole statement
+        // if not derived, need preceding command and the LHS of the equation too
+        if (outputSig != null)
+            if (!outputSig.isDerived()) {
+                code = "// Code for variable \"" + outVarID + "\":\n";
+                code = code + indent + outVarID + " = ";
+            }
+        input = inputs.get(0);
+        code = code + input.genCcode();
+        if (this.hasLowerLimit()) {
+            code = code + ";\n";
+            code = code + indent + "if ( " + outVarID + " < " + lowerLim.toString() + ") {\n";
+            code = code + indent + indent + outVarID + " = " + lowerLim.toString() + ";\n";
+            code = code + indent + "}\n";
+        }
+        if (this.hasUpperLimit()) {
+            if (!this.hasLowerLimit())
+                code = code + ";\n";
+            code = code + indent + "if ( " + outVarID + " > " + upperLim.toString() + ") {\n";
+            code = code + indent + indent + outVarID + " = " + upperLim.toString() + ";\n";
+            code = code + indent + "}\n";
+        }
+        // if not derived, need trailing semicolon and new line if no limits
+        if (outputSig != null)
+            if (!outputSig.isDerived())
+                if (!this.hasLowerLimit() && !this.hasUpperLimit() )
+                    code = code + ";\n";
+        return code;
+        
+    }
 
     /**
      *

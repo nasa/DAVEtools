@@ -881,7 +881,7 @@ abstract public class Block
      */
     
     public String genCcode() {
-        return "// WARNING -- no code generator found for variable \"" + myName;       
+        return "// WARNING -- code generator not available for variable \"" + outVarID + "\"";       
     }
 
 
@@ -890,7 +890,7 @@ abstract public class Block
      */
     
     public String genFcode() {
-        return "C WARNING -- no code generator found for variable \"" + myName;       
+        return "C WARNING -- code generator not available for variable \"" + outVarID + "\"";       
     }
 
     /**

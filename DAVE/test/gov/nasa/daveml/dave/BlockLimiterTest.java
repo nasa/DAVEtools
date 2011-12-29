@@ -22,11 +22,12 @@ public class BlockLimiterTest extends TestCase {
     private BlockLimiter loLimBlk;
     private BlockLimiter noLimBlk;
     private BlockLimiter swapLimBlk;
-    private Signal signal;
+    private Signal symOut, hiOut, loOut, noOut, swapOut;
+    private Signal inputSignal;
     private StringWriter _writer;
     private BlockLimiter blockArray[];
     private VectorInfoArrayList inputVector;
-//    private VectorInfoArrayList outputVector;
+    private VectorInfoArrayList outputVector;
     private VectorInfo input;
     final private double eps = 1e-6;
     private double inputValue[] = {-1000.0, 0.0, 1000.0};
@@ -50,29 +51,53 @@ public class BlockLimiterTest extends TestCase {
         
         model = new Model(3,3);
         assert(model != null);
-
-        signal = new Signal("unlimited signal", model);
-        assert(signal != null);
-        signal.setUnits("furlongs");
-
-        inputBlk = new BlockInput(signal, model);
+        
+        // create single input signal
+        inputSignal = new Signal("unlimited signal", "input", "furlongs", 3, model);
+        assert(inputSignal != null);
+        
+        // create and hook up input block to signal
+        inputBlk = new BlockInput(inputSignal, model);
         assert(inputBlk != null);
 
-        symLimBlk = new BlockLimiter(signal, model, -2.0, 2.0);
+        // create five output signals; one for each limiter block being tested
+        symOut = new Signal("symmetric limiter output", "symLim", "furlongs", 1, model);
+        assert(symOut != null);
+        
+        hiOut  = new Signal("upper limiter output", "hiLim", "furlongs", 1, model);
+        assert(hiOut != null);
+        
+        loOut  = new Signal("lower limiter output", "loLim", "furlongs", 1, model);
+        assert(loOut != null);
+        
+        noOut  = new Signal("no limiter output", "noLim", "furlongs", 1, model);
+        assert(noOut != null);
+        
+        swapOut  = new Signal("swapped limiter output", "swapLim", "furlongs", 1, model);
+        assert(swapOut != null);
+        
+        // now create the five limiters to test and hook up to output signals
+        symLimBlk = new BlockLimiter(inputSignal, model, -2.0, 2.0);
         assert(symLimBlk != null);
+        symLimBlk.addOutput(symOut);
 
-        hiLimBlk = new BlockLimiter(signal, model, Double.NEGATIVE_INFINITY, 2.0);
+        hiLimBlk = new BlockLimiter(inputSignal, model, Double.NEGATIVE_INFINITY, 2.0);
         assert(hiLimBlk != null);
+        hiLimBlk.addOutput(hiOut);
 
-        loLimBlk = new BlockLimiter(signal, model, -2.0, Double.POSITIVE_INFINITY);
+        loLimBlk = new BlockLimiter(inputSignal, model, -2.0, Double.POSITIVE_INFINITY);
         assert(loLimBlk != null);
+        loLimBlk.addOutput(loOut);
 
-        noLimBlk = new BlockLimiter(signal, model, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
+        noLimBlk = new BlockLimiter(inputSignal, model, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
         assert(noLimBlk != null);
+        noLimBlk.addOutput(noOut);
 
-        swapLimBlk = new BlockLimiter(signal, model, +2.0, -2.0);
+        swapLimBlk = new BlockLimiter(inputSignal, model, +2.0, -2.0);
         assert(swapLimBlk != null);
+        swapLimBlk.addOutput(swapOut);
 
+        // put tested limiters in an array for convenience
         blockArray = new BlockLimiter[5];
         blockArray[0] = symLimBlk;
         blockArray[1] = hiLimBlk;
@@ -80,6 +105,7 @@ public class BlockLimiterTest extends TestCase {
         blockArray[3] = noLimBlk;
         blockArray[4] = swapLimBlk;
 
+        // get the input vector; confirm we have a single input
         inputVector = model.getInputVector();
         assert(inputVector != null);
         assertEquals(1, inputVector.size());
@@ -87,12 +113,16 @@ public class BlockLimiterTest extends TestCase {
         input = inputVector.get(0);
         assert(input != null);
 
+        // generate the output blocks
         model.hookUpIO();
+        
+        // sort the model
+        model.initialize();
 
-//        outputVector = model.getOutputVector();
-//        assert(outputVector != null);
-//        assertEquals(5, outputVector.size());
-
+        // get the output vector; confirm there are five
+        outputVector = model.getOutputVector();
+        assert(outputVector != null);
+        assertEquals(5, outputVector.size());
 
 }
 
@@ -105,7 +135,6 @@ public class BlockLimiterTest extends TestCase {
      * Test of getValue method, of class BlockLimiter.
      */
     public void testGetValue() {
-        BlockLimiter blk;
         for( int i=0; i < 3; i++ ) { // cycle through input values
             input.setValue(inputValue[i]);
             try {
@@ -113,9 +142,8 @@ public class BlockLimiterTest extends TestCase {
             } catch( DAVEException e) {
                 String msg = e.getMessage();
             }
-            for( int j=0; j < blockArray.length; j++) {
-                blk = blockArray[j];
-                double value = blk.getValue();
+            for( int j=0; j < outputVector.size(); j++) {
+                double value = outputVector.get(j).getValue();
                 assertEquals( expectedValue[i][j], value, eps);
             }
         }
@@ -131,6 +159,112 @@ public class BlockLimiterTest extends TestCase {
             assertEquals( "furlongs", blk.getUnits());
         }
     }
+    
+    /** 
+     * Test code generator
+     */
+    
+    public void testGenCcode() {
+        BlockLimiter blk;
+        String result;
+        
+        // check symmetric limiter code
+        blk = blockArray[0];
+        result = blk.genCcode();
+        assertEquals("// Code for variable \"symLim\":\n  symLim = input;\n" +
+                "  if ( symLim < -2.0) {\n" +
+                "    symLim = -2.0;\n" +
+                "  }\n" +
+                "  if ( symLim > 2.0) {\n" +
+                "    symLim = 2.0;\n" +
+                "  }\n", result);
+        
+        // check upper limiter code
+        blk = blockArray[1];
+        result = blk.genCcode();
+        assertEquals("// Code for variable \"hiLim\":\n  hiLim = input;\n" +
+                "  if ( hiLim > 2.0) {\n" +
+                "    hiLim = 2.0;\n" +
+                "  }\n", result);
+        
+        // check lower limiter code
+        blk = blockArray[2];
+        result = blk.genCcode();
+        assertEquals("// Code for variable \"loLim\":\n  loLim = input;\n" +
+                "  if ( loLim < -2.0) {\n" +
+                "    loLim = -2.0;\n" +
+                "  }\n", result);
+        
+        // check no limiter code
+        blk = blockArray[3];
+        result = blk.genCcode();
+        assertEquals("// Code for variable \"noLim\":\n  noLim = input;\n", result);
+        
+        // check swapped limits limiter code
+        blk = blockArray[4];
+        result = blk.genCcode();
+        assertEquals("// Code for variable \"swapLim\":\n  swapLim = input;\n" +
+                "  if ( swapLim < -2.0) {\n" +
+                "    swapLim = -2.0;\n" +
+                "  }\n" +
+                "  if ( swapLim > 2.0) {\n" +
+                "    swapLim = 2.0;\n" +
+                "  }\n", result);
+        
+     }
+
+
+
+    public void testGenFcode() {
+        BlockLimiter blk;
+        String result;
+        
+        // check symmetric limiter code
+        blk = blockArray[0];
+        result = blk.genFcode();
+        assertEquals("// Code for variable \"symLim\":\n  symLim = input;\n" +
+                "  if ( symLim < -2.0) {\n" +
+                "    symLim = -2.0;\n" +
+                "  }\n" +
+                "  if ( symLim > 2.0) {\n" +
+                "    symLim = 2.0;\n" +
+                "  }\n", result);
+        
+        // check upper limiter code
+        blk = blockArray[1];
+        result = blk.genFcode();
+        assertEquals("// Code for variable \"hiLim\":\n  hiLim = input;\n" +
+                "  if ( hiLim > 2.0) {\n" +
+                "    hiLim = 2.0;\n" +
+                "  }\n", result);
+        
+        // check lower limiter code
+        blk = blockArray[2];
+        result = blk.genFcode();
+        assertEquals("// Code for variable \"loLim\":\n  loLim = input;\n" +
+                "  if ( loLim < -2.0) {\n" +
+                "    loLim = -2.0;\n" +
+                "  }\n", result);
+        
+        // check no limiter code
+        blk = blockArray[3];
+        result = blk.genFcode();
+        assertEquals("// Code for variable \"noLim\":\n  noLim = input;\n", result);
+        
+        // check swapped limits limiter code
+        blk = blockArray[4];
+        result = blk.genFcode();
+        assertEquals("// Code for variable \"swapLim\":\n  swapLim = input;\n" +
+                "  if ( swapLim < -2.0) {\n" +
+                "    swapLim = -2.0;\n" +
+                "  }\n" +
+                "  if ( swapLim > 2.0) {\n" +
+                "    swapLim = 2.0;\n" +
+                "  }\n", result);
+        
+     }
+
+
 
     /**
      * Test of describeSelf method, of class BlockLimiter.
@@ -146,7 +280,8 @@ public class BlockLimiterTest extends TestCase {
             } catch (IOException e) {
                 assertTrue(false);
             }
-            assertEquals( "Block \"unlimited signal limiter\" has one input (unlimited signal), NO OUTPUTS," +
+            assertEquals( "Block \"unlimited signal limiter\" has one input (unlimited signal), one output (" +
+                        blk.getOutput().getName() + ")," +
                         " value [NaN] (furlongs) and is a limiter block with a lower limit of " +
                         Double.toString( blk.getLowerLimit() ) + " and an upper limit of " +
                         Double.toString( blk.getUpperLimit() ) + ".",
