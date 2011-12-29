@@ -25,7 +25,7 @@ class FEquationsFileWriter extends FileWriter {
     public FEquationsFileWriter(Model theModel, String sourceFileName) throws IOException {
         super( sourceFileName );
         ourModel = theModel;
-        indent = "      ";
+        indent = "       ";
     }
     
     public void writeln( String cbuf ) throws IOException
@@ -37,25 +37,32 @@ class FEquationsFileWriter extends FileWriter {
     }
     
     
-   public void writeEquations() throws IOException {
-       ArrayList<String> sortedVarIDs;
-       try {
-           sortedVarIDs = ourModel.getSortedVarIDs();
-           if (sortedVarIDs.isEmpty())
-               System.err.println("Warning: Order of exection could not be determined (sorted varID list empty).");
-           Iterator<String> varID = sortedVarIDs.iterator();
-           while (varID.hasNext()) {
-               String theVarID = varID.next();
-               Block blk = ourModel.getBlockByOutputVarID(theVarID);
-               if (blk == null)
-                   writeln("C Warning: can't find block with output ID \"" + theVarID + "\"");
-               else
-                   writeln(blk.genFcode());
-           }
-       } catch (DAVEException ex) {
-           System.err.println("Warning: Order of exection could not be determined (sorted varID list null).");
-       }
-   }
+    public void writeEquations() throws IOException {
+        ArrayList<String> sortedVarIDs;
+        try {
+            sortedVarIDs = ourModel.getSortedVarIDs();
+            if (sortedVarIDs.isEmpty()) {
+                System.err.println("Warning: Order of exection could not be determined (sorted varID list empty).");
+            }
+            Iterator<String> varID = sortedVarIDs.iterator();
+            while (varID.hasNext()) {
+                String theVarID = varID.next();
+                Block blk = ourModel.getBlockByOutputVarID(theVarID);
+                if (blk == null) {
+                    writeln("C Warning: can't find block with output ID \"" + theVarID + "\"");
+                } else {
+                    // if source block is a BlockFuncTable, generate the table call
+                    if (blk instanceof BlockFuncTable) {
+                        this.generateTableCall((BlockFuncTable) blk);
+                    } else { // otherwise generate equation code
+                        write(blk.genFcode());
+                    }
+                }
+            }
+        } catch (DAVEException ex) {
+            System.err.println("Warning: Order of exection could not be determined (sorted varID list null).");
+        }
+    }
 
 
     void generateTableCall(BlockFuncTable bft) {

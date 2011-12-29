@@ -67,12 +67,12 @@ public class BlockMathConstantTest extends TestCase {
 
     public void testGenCcode() {
         String result = _block.genCcode();
-        assertEquals("// Code for variable \"constantOutput\":\n  constantOutput = -3.45;\n", result);
+        assertEquals("  constantOutput = -3.45;\n", result);
     }
 
     public void testGenFcode() {
         String result = _block.genFcode();
-        assertEquals("C Code for variable \"constantOutput\":\n       constantOutput = -3.45\n", result);
+        assertEquals("       constantOutput = -3.45\n", result);
     }
 
     public void testDescribeSelf() {

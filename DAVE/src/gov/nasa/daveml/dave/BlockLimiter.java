@@ -133,7 +133,7 @@ public class BlockLimiter extends Block {
         // if not derived, need preceding command and the LHS of the equation too
         if (outputSig != null)
             if (!outputSig.isDerived()) {
-                code = "// Code for variable \"" + outVarID + "\":\n";
+//                code = "// Code for variable \"" + outVarID + "\":\n";
                 code = code + indent + outVarID + " = ";
             }
         input = inputs.get(0);
@@ -174,7 +174,7 @@ public class BlockLimiter extends Block {
         // if not derived, need preceding command and the LHS of the equation too
         if (outputSig != null)
             if (!outputSig.isDerived()) {
-                code = "* Code for variable \"" + outVarID + "\":\n";
+//                code = "* Code for variable \"" + outVarID + "\":\n";
                 code = code + indent + outVarID + " = ";
             }
         input = inputs.get(0);

@@ -88,12 +88,12 @@ public class BlockMathProductTest extends TestCase {
 
     public void testGenCcode() {
         String result = _block.genCcode();
-        assertEquals("// Code for variable \"outputSignal\":\n  outputSignal = PB*BSPAN;\n", result);
+        assertEquals("  outputSignal = PB*BSPAN;\n", result);
     }
 
     public void testGenFcode() {
         String result = _block.genFcode();
-        assertEquals("C Code for variable \"outputSignal\":\n      outputSignal = PB*BSPAN\n", result);
+        assertEquals("       outputSignal = PB*BSPAN\n", result);
     }
 
 

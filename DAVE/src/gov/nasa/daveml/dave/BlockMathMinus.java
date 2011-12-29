@@ -86,7 +86,7 @@ public class BlockMathMinus extends BlockMath
         // check to see if we're derived variable (code fragment) or a whole statement
         // if not derived, need preceding command and the LHS of the equation too
         if (!outputSig.isDerived()) {
-            code = "// Code for variable \"" + outVarID + "\":\n";
+//            code = "// Code for variable \"" + outVarID + "\":\n";
             code = code + "  " + outVarID + " = ";
         }
         input0 = inputs.get(0);
@@ -110,13 +110,14 @@ public class BlockMathMinus extends BlockMath
     @Override
     public String genFcode() {
         String code = "";
+        String indent = "       ";
         Signal input0, input1;
         Signal outputSig = this.getOutput();
         // check to see if we're derived variable (code fragment) or a whole statement
         // if not derived, need preceding command and the LHS of the equation too
         if (!outputSig.isDerived()) {
-            code = "C Code for variable \"" + outVarID + "\":\n";
-            code = code + "  " + outVarID + " = ";
+//            code = "C Code for variable \"" + outVarID + "\":\n";
+            code = code + indent + outVarID + " = ";
         }
         input0 = inputs.get(0);
         if (inputs.size() == 1) { // unary minus

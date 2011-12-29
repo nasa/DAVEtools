@@ -116,7 +116,7 @@ public class BlockMathProduct extends BlockMath
         // check to see if we're derived variable (code fragment) or a whole statement
         // if not derived, need preceding command and the LHS of the equation too
         if (!outputSig.isDerived()) {
-            code = "// Code for variable \"" + outVarID + "\":\n";
+//            code = "// Code for variable \"" + outVarID + "\":\n";
             code = code + "  " + outVarID + " = ";
         }
         while (inputSig.hasNext()) {
@@ -140,20 +140,18 @@ public class BlockMathProduct extends BlockMath
     @Override
     public String genFcode() {
         String code = "";
+        String indent = "       ";
         Iterator<Signal> inputSig = inputs.iterator();
         Signal outputSig = this.getOutput();
         // check to see if we're derived variable (code fragment) or a whole statement
         // if not derived, need preceding command and the LHS of the equation too
-        if (!outputSig.isDerived()) {
-            code = "C Code for variable \"" + outVarID + "\":\n";
-            code = code + "      " + outVarID + " = ";
-        }
+        if (!outputSig.isDerived())
+            code = code + indent + outVarID + " = ";
         while (inputSig.hasNext()) {
             Signal inSig = inputSig.next();
             code = code + inSig.genFcode();
-            if (inputSig.hasNext()) {
+            if (inputSig.hasNext())
                 code = code + "*";
-            }
         }
         // if not derived, need newline
         if (!outputSig.isDerived())

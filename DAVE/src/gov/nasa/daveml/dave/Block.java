@@ -881,7 +881,8 @@ abstract public class Block
      */
     
     public String genCcode() {
-        return "// WARNING -- code generator not available for variable \"" + outVarID + "\"";       
+        return "// WARNING -- code generator not available for variable \"" + 
+                outVarID + "\" whose type is \"" + this.myType + "\"\n";       
     }
 
 
@@ -890,7 +891,8 @@ abstract public class Block
      */
     
     public String genFcode() {
-        return "C WARNING -- code generator not available for variable \"" + outVarID + "\"";       
+        return "**** WARNING -- code generator not available for variable \"" + 
+                outVarID + "\" whose type is \"" + this.myType + "\"\n";       
     }
 
     /**

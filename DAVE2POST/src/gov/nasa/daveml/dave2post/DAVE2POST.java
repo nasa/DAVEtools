@@ -232,7 +232,6 @@ public class DAVE2POST extends DAVE {
             if (blk instanceof BlockFuncTable) {
                 BlockFuncTable bft = (BlockFuncTable) blk;
                 tableWriter.generateTableDescription( bft );
-                equationWriter.generateTableCall( bft );
             }
         }   
 

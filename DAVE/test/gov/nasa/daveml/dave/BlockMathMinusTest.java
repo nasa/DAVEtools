@@ -116,16 +116,16 @@ public class BlockMathMinusTest extends TestCase {
 
     public void testGenCcode() {
         String result1 = _unaryMinusBlock.genCcode();
-        assertEquals("// Code for variable \"minusAlpha\":\n  minusAlpha = -(-3.45);\n", result1);
+        assertEquals("  minusAlpha = -(-3.45);\n", result1);
         String result2 = _binaryMinusBlock.genCcode();
-        assertEquals("// Code for variable \"alphaMinusBeta\":\n  alphaMinusBeta = (-3.45) - (+3.45);\n", result2);
+        assertEquals("  alphaMinusBeta = (-3.45) - (+3.45);\n", result2);
     }
 
     public void testGenFcode() {
         String result1 = _unaryMinusBlock.genFcode();
-        assertEquals("C Code for variable \"minusAlpha\":\n  minusAlpha = -(-3.45)\n", result1);
+        assertEquals("       minusAlpha = -(-3.45)\n", result1);
         String result2 = _binaryMinusBlock.genFcode();
-        assertEquals("C Code for variable \"alphaMinusBeta\":\n  alphaMinusBeta = (-3.45) - (+3.45)\n", result2);
+        assertEquals("       alphaMinusBeta = (-3.45) - (+3.45)\n", result2);
     }
 
     public void testDescribeSelf() {

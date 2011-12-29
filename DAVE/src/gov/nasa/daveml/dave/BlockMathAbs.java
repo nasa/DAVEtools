@@ -79,6 +79,7 @@ public class BlockMathAbs extends BlockMath
      *
      **/
 
+    @Override
     public void update() throws DAVEException
     {
 	if (isVerbose()) {
@@ -114,12 +115,66 @@ public class BlockMathAbs extends BlockMath
     }
 
     /**
+     * <p> Generate C-code equivalent of our operation</p>
+     */
+    
+    @Override
+    public String genCcode() {
+        String code = "";
+        Signal input;
+        Signal outputSig = this.getOutput();
+        // check to see if we're derived variable (code fragment) or a whole statement
+        // if not derived, need preceding command and the LHS of the equation too
+        if (!outputSig.isDerived()) {
+//            code = "// Code for variable \"" + outVarID + "\":\n";
+            code = code + "  " + outVarID + " = ";
+        }
+        input = inputs.get(0);
+        
+        code = code + "fabs( " + input.genCcode() + " )";
+        
+        // if not derived, need trailing semicolon and new line
+        if (!outputSig.isDerived())
+            code = code + ";\n";
+        return code;
+    }
+
+
+    /**
+     * <p> Generate FORTRAN code equivalent of our operation</p>
+     */
+    
+    @Override
+    public String genFcode() {
+        String code = "";
+        String indent = "       ";
+        Signal input;
+        Signal outputSig = this.getOutput();
+        // check to see if we're derived variable (code fragment) or a whole statement
+        // if not derived, need preceding command and the LHS of the equation too
+        if (!outputSig.isDerived()) {
+//            code = "* Code for variable \"" + outVarID + "\":\n";
+            code = code + indent + outVarID + " = ";
+        }
+        input = inputs.get(0);
+        
+        code = code + "abs( " + input.genFcode() + " )";
+        
+        // if not derived, need new line
+        if (!outputSig.isDerived())
+            code = code + "\n";
+        return code;
+    }
+
+
+    /**
      *
      * <p> Generates description of self </p>
      *
      * @throws <code>IOException</code>
      **/
 
+    @Override
     public void describeSelf(Writer writer) throws IOException
     {
 	super.describeSelf(writer);

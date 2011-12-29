@@ -171,7 +171,7 @@ public class BlockLimiterTest extends TestCase {
         // check symmetric limiter code
         blk = blockArray[0];
         result = blk.genCcode();
-        assertEquals("// Code for variable \"symLim\":\n  symLim = input;\n" +
+        assertEquals("  symLim = input;\n" +
                 "  if ( symLim < -2.0 ) {\n" +
                 "    symLim = -2.0;\n" +
                 "  }\n" +
@@ -182,7 +182,7 @@ public class BlockLimiterTest extends TestCase {
         // check upper limiter code
         blk = blockArray[1];
         result = blk.genCcode();
-        assertEquals("// Code for variable \"hiLim\":\n  hiLim = input;\n" +
+        assertEquals("  hiLim = input;\n" +
                 "  if ( hiLim > 2.0 ) {\n" +
                 "    hiLim = 2.0;\n" +
                 "  }\n", result);
@@ -190,7 +190,7 @@ public class BlockLimiterTest extends TestCase {
         // check lower limiter code
         blk = blockArray[2];
         result = blk.genCcode();
-        assertEquals("// Code for variable \"loLim\":\n  loLim = input;\n" +
+        assertEquals("  loLim = input;\n" +
                 "  if ( loLim < -2.0 ) {\n" +
                 "    loLim = -2.0;\n" +
                 "  }\n", result);
@@ -198,12 +198,12 @@ public class BlockLimiterTest extends TestCase {
         // check no limiter code
         blk = blockArray[3];
         result = blk.genCcode();
-        assertEquals("// Code for variable \"noLim\":\n  noLim = input;\n", result);
+        assertEquals("  noLim = input;\n", result);
         
         // check swapped limits limiter code
         blk = blockArray[4];
         result = blk.genCcode();
-        assertEquals("// Code for variable \"swapLim\":\n  swapLim = input;\n" +
+        assertEquals("  swapLim = input;\n" +
                 "  if ( swapLim < -2.0 ) {\n" +
                 "    swapLim = -2.0;\n" +
                 "  }\n" +
@@ -221,7 +221,7 @@ public class BlockLimiterTest extends TestCase {
         // check symmetric limiter code
         blk = blockArray[0];
         result = blk.genFcode();
-        assertEquals("* Code for variable \"symLim\":\n  symLim = input\n" +
+        assertEquals("  symLim = input\n" +
                 "  if ( symLim .LT. -2.0 ) then\n" +
                 "    symLim = -2.0\n" +
                 "  endif\n" +
@@ -232,7 +232,7 @@ public class BlockLimiterTest extends TestCase {
         // check upper limiter code
         blk = blockArray[1];
         result = blk.genFcode();
-        assertEquals("* Code for variable \"hiLim\":\n  hiLim = input\n" +
+        assertEquals("  hiLim = input\n" +
                 "  if ( hiLim .GT. 2.0 ) then\n" +
                 "    hiLim = 2.0\n" +
                 "  endif\n", result);
@@ -240,7 +240,7 @@ public class BlockLimiterTest extends TestCase {
         // check lower limiter code
         blk = blockArray[2];
         result = blk.genFcode();
-        assertEquals("* Code for variable \"loLim\":\n  loLim = input\n" +
+        assertEquals("  loLim = input\n" +
                 "  if ( loLim .LT. -2.0 ) then\n" +
                 "    loLim = -2.0\n" +
                 "  endif\n", result);
@@ -248,12 +248,12 @@ public class BlockLimiterTest extends TestCase {
         // check no limiter code
         blk = blockArray[3];
         result = blk.genFcode();
-        assertEquals("* Code for variable \"noLim\":\n  noLim = input\n", result);
+        assertEquals("  noLim = input\n", result);
         
         // check swapped limits limiter code
         blk = blockArray[4];
         result = blk.genFcode();
-        assertEquals("* Code for variable \"swapLim\":\n  swapLim = input\n" +
+        assertEquals("  swapLim = input\n" +
                 "  if ( swapLim .LT. -2.0 ) then\n" +
                 "    swapLim = -2.0\n" +
                 "  endif\n" +
