@@ -89,6 +89,45 @@ public class BlockOutput extends Block
         return outputs.indexOf( this ) + 1;
     }
 
+    /**
+     * <p> Generate C-code comment about inputs </p>
+     * @return string containing C comment description of output
+     */
+    @Override
+    public String genCcode() {
+        return "// " + this.genCode();
+    }
+
+    /**
+     * <p> Generate FORTRAN code comment about inputs </p>
+     * @return string containing FORTRAN comment description of output
+     */
+    @Override
+    public String genFcode() {
+        return "* " + this.genCode();
+    }
+    
+    /**
+     * Common output documentation scheme for all code types
+     * @return string with description of input signal
+     */
+    private String genCode() {
+        String code = "";
+        Signal theSignal = this.getInput(0);
+        String inVarID = theSignal.getVarID();
+        if (theSignal != null) {
+            code = code + inVarID;
+            if (theSignal.isStdAIAA()) 
+                code = code + " (" + theSignal.getName() + ")";
+            code = code + " is a model output";
+            if (units.equalsIgnoreCase("nd"))
+                code = code + " and is non-dimensional.\n";
+            else
+                code = code + " with units \'" + units + "\'\n";
+        }
+        return code;
+    }
+
 
     /**
      *

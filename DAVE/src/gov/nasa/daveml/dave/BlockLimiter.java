@@ -109,6 +109,7 @@ public class BlockLimiter extends Block {
      *
      **/
 
+    @Override
     public double getValue()    { return this.value; }
 
 
@@ -224,6 +225,7 @@ public class BlockLimiter extends Block {
      *
      **/
 
+    @Override
     public void update() throws DAVEException
     {
         if (isVerbose()) {

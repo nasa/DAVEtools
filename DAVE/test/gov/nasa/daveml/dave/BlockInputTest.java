@@ -78,6 +78,16 @@ public class BlockInputTest extends TestCase {
 	public void testGetOutputVarID() {
 		assertEquals( "fulsig", _bi.getOutputVarID() );
 	}
+        
+        public void testGenCcode() {
+            String code = _bi.genCcode();
+            assertEquals("// fulsig is a model input with units 'deg'\n", code);
+        }
+
+        public void testGenFcode() {
+            String code = _bi.genFcode();
+            assertEquals("* fulsig is a model input with units 'deg'\n", code);
+        }
 	
 	public void testDescribeSelf() {
 		try {

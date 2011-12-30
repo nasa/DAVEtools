@@ -73,6 +73,16 @@ public class BlockOutputTest extends TestCase {
 			assertEquals( -999.345, _block.getValue(), EPS );
 		}
 	}
+        
+        public void testGenCcode() {
+            String code = _block.genCcode();
+            assertEquals("// outputValue is a model output with units 'unkn'\n", code);
+        }
+
+        public void testGenFcode() {
+            String code = _block.genFcode();
+            assertEquals("* outputValue is a model output with units 'unkn'\n", code);
+        }
 
 	public void testGetUnits() {
 		assertEquals("unkn", _block.getUnits() );

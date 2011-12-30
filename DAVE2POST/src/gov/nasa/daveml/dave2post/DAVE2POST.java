@@ -222,7 +222,7 @@ public class DAVE2POST extends DAVE {
 
         // generate contents
         
-        equationWriter.writeEquations();
+        equationWriter.writeFcode();
         
         // find the function blocks
         BlockArrayList blocks = theModel.getBlocks();

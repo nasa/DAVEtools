@@ -37,8 +37,11 @@ class FEquationsFileWriter extends FileWriter {
     }
     
     
-    public void writeEquations() throws IOException {
+    public void writeFcode() throws IOException {
         BlockArrayList sortedBlocks;
+        BlockArrayList outputBlocks = new BlockArrayList(10);
+        Iterator<Block> blkIt;
+        Block blk;
         try {
             sortedBlocks = ourModel.getSortedBlocks();
             if (sortedBlocks.isEmpty()) {
@@ -46,18 +49,28 @@ class FEquationsFileWriter extends FileWriter {
                         "Warning: Order of execution could not be determined" +
                         " (sorted block execution list empty).");
             }
-            Iterator<Block> blkIt = sortedBlocks.iterator();
+            blkIt = sortedBlocks.iterator();
             while (blkIt.hasNext()) {
-                Block blk = blkIt.next();
+                blk = blkIt.next();
                 boolean skip = false;
                 
-                // debugging section
-                String id = blk.getOutputVarID();
-                if (id != null)
-                    if (id.equals("VRW")) {
-                        System.out.println("Found " + id);
-                        blk.getOutput().clearDerivedFlag();
-                    }
+                // Mark 'derived' limiter blocks as 'underived'
+                // These limiters were inserted during parsing a <variableDef>
+                // element and in essence create a new variable, previously undefined.
+                // They are marked as 'derived' because they don't appear in the original MathML
+                // We need to treat them as an original ('underived') variable
+                // so the logic gets expressed as separate lines, not within 
+                // a parenthetical expression.
+                
+                if (blk instanceof BlockLimiter)
+                    blk.getOutput().clearDerivedFlag();
+                
+//                // debugging section
+//                String id = blk.getOutputVarID();
+//                if (id != null)
+//                    if (id.equals("VRW")) {
+//                        System.out.println("Found " + id);
+//                    }
 
                 // If we output a 'derived' signal, don't generate code;
                 // such a signal-generating block was inserted for Simulink
@@ -68,10 +81,10 @@ class FEquationsFileWriter extends FileWriter {
                     if (outSig.isDerived())
                         skip = true;// don't emit code at this point
                
-                if (blk instanceof BlockInput            // ignore these blocks
-                        || blk instanceof BlockOutput
-                        || blk instanceof BlockBP) {
+                if (blk instanceof BlockBP ) {          // ignore this block
                     // skip code generation
+                } else if (blk instanceof BlockOutput) { // collect for end
+                    outputBlocks.add(blk);
                 // if source block is a BlockFuncTable, generate the table call
                 } else if (blk instanceof BlockFuncTable) {
                     this.generateTableCall( (BlockFuncTable) blk);
@@ -84,6 +97,12 @@ class FEquationsFileWriter extends FileWriter {
                 }
                     
             } // end of while (blkIt.hasNext()) loop
+            
+            // write information about model outputs
+            blkIt = outputBlocks.iterator();
+            while (blkIt.hasNext()) {
+                write( blkIt.next().genFcode() );
+            }
         
         } catch (DAVEException ex) {
             System.err.println("Warning: Order of exection could not be determined (sorted varID list null).");
