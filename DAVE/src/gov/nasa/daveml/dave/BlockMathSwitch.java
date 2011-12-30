@@ -24,9 +24,69 @@ import java.util.Iterator;
 
 /**
  *
- * <p>  This Math block represents a switch function </p>
+ * <p>  This Block represents a simple two-position switch function.</p>
+ * 
+ * <p>
+ * A switch has a minimum of three inputs: A, A_case, and B for a two-position switch.
+ * These correspond to the following MathML snippet:
+ * 
+<pre>
+
+    &lt;piecewise&gt;
+      &lt;piece&gt;
+        &lt;ci&gt;A&lt;/ci&gt;
+        &lt;ci&gt;A_case&lt;/ci&gt;
+      &lt;/piece&gt;
+      &lt;otherwise&gt;
+        &lt;ci&gt;B&lt;/ci&gt;
+      &lt;/otherwise&gt;
+    &lt;/piecewise&gt;
+
+</pre>
+ * 
+ * which emits input signal A if A_case is true (non-zero); otherwise B.
+ * </p>
+ * <p>
+ * To implement a switch with more than two positions, such as the three-position
+ * switch described in this MathML snippet:
  *
+<pre>
+
+    &lt;piecewise&gt;
+      &lt;piece&gt;
+        &lt;ci&gt;A&lt;/ci&gt;
+        &lt;ci&gt;A_case&lt;/ci&gt;
+      &lt;/piece&gt;
+      &lt;piece&gt;
+        &lt;ci&gt;B&lt;/ci&gt;
+        &lt;ci&gt;B_case&lt;/ci&gt;
+      &lt;/piece&gt;
+      &lt;otherwise&gt;
+        &lt;ci&gt;C&lt;/ci&gt;
+      &lt;/otherwise&gt;
+    &lt;/piecewise&gt;
+
+</pre>
+ *
+ * then the problem has five inputs: A, A_case, B, B_case, and C. 
+ * The output should be the first input pair whose case is true (non-zero); if no 
+ * input is true, the otherwise input (C) should be chosen.
+ * </p>
+ * <p>
+ * This is implemented in our Model by cascading BlockMathSwitches, one per input pair;
+ * the final downstream block deals with A and A_case; the 'otherwise' input
+ * is the output from an upstream block that deals with B and B_case with C as 
+ * its otherwise block.
+ * </p>
+ * <p>
+ * The multiple case switch is implemented this way as it is the lowest common
+ * denominator way of several potential software implementations 
+ * (not all languages have a switch/case statement).
+ * </p>
+ * 
+ * 
  **/
+
 public class BlockMathSwitch extends BlockMath {
 
     /**
@@ -116,10 +176,11 @@ public class BlockMathSwitch extends BlockMath {
                 } else {
                     // if not, then recurse after removing the first <piece> element
                     boolean childRemoved = this.removeFirstPiece(piecewise);
-                    if (!childRemoved)
+                    if (!childRemoved) {
                         throw new AssertionError(
-                            "Unable to remove first child from <piecewise> "
+                                "Unable to remove first child from <piecewise> "
                                 + "while trying to build an upstream switch for " + this.getName());
+                    }
                     BlockMathSwitch bms = new BlockMathSwitch(applyElement, m);
                     this.addInput(bms, 3);
                 }
@@ -128,6 +189,36 @@ public class BlockMathSwitch extends BlockMath {
 
         //System.out.println("    BlockMathSwitch constructor: " + myName + " created.");
     }
+    
+    
+    /**
+     * <p> Generate FORTRAN code equivalent of a two-position switch (if-then-else)</p>
+     */
+    
+    @Override
+    public String genFcode() {
+        String code = "";
+        String indent = "       ";
+        Iterator<Signal> inputSig = inputs.iterator();
+        Signal outputSig = this.getOutput();
+        
+        if (inputs == null) {
+            return "* ERROR: Encountered null input list in BlockMathSwitch genFcode";
+        }
+        
+        if (inputs.size() < 3) {
+            return "* ERROR: in BlockMathSwitch genFcode(): encountered input list" +
+                    " with less than the expected three elements.";
+        }
+        
+        // Must generate several lines of code
+        code = code + indent + outVarID + " = " + inputs.get(2).genFcode() + "\n";
+        code = code + indent + "if(" + inputs.get(1).genFcode() + ") then\n";
+        code = code + indent + "  " + outVarID + " = " + inputs.get(0).genFcode() + "\n";
+        code = code + indent + "endif\n";
+        return code;
+    }
+
 
     /**
      *
@@ -135,6 +226,7 @@ public class BlockMathSwitch extends BlockMath {
      *
      * @throws <code>IOException</code>
      **/
+    @Override
     public void describeSelf(Writer writer) throws IOException {
         super.describeSelf(writer);
         writer.write(" and is a Switch math block.");
@@ -147,6 +239,7 @@ public class BlockMathSwitch extends BlockMath {
      * @throws DAVEException
      *
      **/
+    @Override
     public void update() throws DAVEException {
         int numInputs;
         Iterator<Signal> theInputs;

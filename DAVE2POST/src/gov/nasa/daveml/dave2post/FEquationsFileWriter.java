@@ -54,15 +54,15 @@ class FEquationsFileWriter extends FileWriter {
                 blk = blkIt.next();
                 boolean skip = false;
                 
-                // Mark 'derived' limiter blocks as 'underived'
-                // These limiters were inserted during parsing a <variableDef>
+                // Mark 'derived' limiter and switch blocks as 'underived'
+                // These blocks were inserted during parsing a <variableDef>
                 // element and in essence create a new variable, previously undefined.
                 // They are marked as 'derived' because they don't appear in the original MathML
                 // We need to treat them as an original ('underived') variable
                 // so the logic gets expressed as separate lines, not within 
                 // a parenthetical expression.
                 
-                if (blk instanceof BlockLimiter)
+                if (blk instanceof BlockLimiter || blk instanceof BlockMathSwitch )
                     blk.getOutput().clearDerivedFlag();
                 
 //                // debugging section

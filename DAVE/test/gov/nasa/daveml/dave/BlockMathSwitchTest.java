@@ -83,6 +83,11 @@ public class BlockMathSwitchTest extends TestCase {
         // check result
         return _block.getValue();
     }
+    
+    public void testGenFcode() {
+        String code = "";
+        assertEquals(code, _block.genFcode());
+    }
 
     public void testDescribeSelfWriter() {
         try {
