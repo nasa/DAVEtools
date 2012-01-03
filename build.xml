@@ -6,11 +6,13 @@
   <property name="jar.file"         location="${jar.dir}/${ant.project.name}.jar"/>
   <property name="DAVE.dir"         location="DAVE"/>
   <property name="DAVE2SL.dir"      location="DAVE2SL"/>
+  <property name="DAVE2POST.dir"    location="DAVE2POST"/>
   <property name="ModelSweeper.dir" location="ModelSweeper"/>
   <property name="doc.dir"          location="doc"/>
   <property name="uml-doc.dir"      location="${doc.dir}/uml"/>
   <property name="app-test.dir"     location="tests/app-tests"/>
-  <property name="libraries_path"        value="${DAVE.dir}/vendor/lib/jdom-1.1.1.jar:${DAVE.dir}/vendor/lib/resolver-1.2.jar:${DAVE.dir/vendor/lib/xerces-2.9.0.jar:${ModelSweeper.dir}/vendor/lib/jmathplot.jar:${ModelSweeper.dir}/vendor/lib/jmatharray.jar"/>
+  <property name="source_path"      value="${DAVE.dir}/src:${DAVE2SL.dir}/src:${DAVE2POST.dir}/src:${ModelSweeper.dir}/src"/>
+  <property name="libraries_path"   value="${DAVE.dir}/vendor/lib/jdom-1.1.1.jar:${DAVE.dir}/vendor/lib/resolver-1.2.jar:${DAVE.dir/vendor/lib/xerces-2.9.0.jar:${ModelSweeper.dir}/vendor/lib/jmathplot.jar:${ModelSweeper.dir}/vendor/lib/jmatharray.jar"/>
 
   <property name="doc_title">
     DAVE-ML Java Utility DAVEtools ${full_ver}
@@ -29,14 +31,17 @@
 
   <!-- Build (if necessary) and copy the DAVE.jar file into this directory
        build (if necessary) the DAVE2SL.jar file in DAVE2SL subdirectory; 
+       build (if necessary) the DAVE2POST.jar file in DAVE2POST subdirectory; 
        build (if necessary) the ModelSweeper.jar file in ModelSweeper subdirectory; 
        add contents of those jars so we have one DAVETools.jar in this directory -->
 
   <target name="build">
     <ant dir="${DAVE.dir}"   />
     <ant dir="${DAVE2SL.dir}"/>
+    <ant dir="${DAVE2POST.dir}"/>
     <ant dir="${ModelSweeper.dir}"/>
     <jar destfile="${jar.dir}/DAVEtools.jar">
+      <zipgroupfileset dir="${DAVE2POST.dir}"    includes="dist/DAVE2POST.jar"/>
       <zipgroupfileset dir="${DAVE2SL.dir}"      includes="dist/DAVE2SL.jar"/>
       <zipgroupfileset dir="${DAVE.dir}"         includes="dist/DAVE.jar"/>
       <zipgroupfileset dir="${ModelSweeper.dir}" includes="dist/ModelSweeper.jar"/>
@@ -64,7 +69,7 @@
 	windowtitle      = "DAVEtools ${major_ver}"
 	header           = "${page_header}"
 	bottom           = "${page_footer}"
-	sourcepath       = "${DAVE.dir}/src:${DAVE2SL.dir}/src:${ModelSweeper.dir}/src"
+	sourcepath       = "${source_path}"
 	classpath        = "${libraries_path}"
 	packagenames     = "gov.nasa.daveml.*"
 	destdir          = "${doc.dir}"
@@ -86,9 +91,9 @@
 	windowtitle      = "${window_title}"
 	header           = "${page_header}"
 	bottom           = "${page_footer}"
-	sourcepath       ="${DAVE.dir}/src:${DAVE2SL.dir}/src:${ModelSweeper.dir}/src"
+	sourcepath       = "${source_path}"
 	packagenames     = "gov.nasa.daveml.*"
-	destdir          ="${uml-doc.dir}"
+	destdir          = "${uml-doc.dir}"
 	classpath        = "{libraries_path}">
 
       <doclet name="org.umlgraph.doclet.UmlGraphDoc"
@@ -117,12 +122,14 @@
 
   <target name="test">
     <ant dir="${DAVE.dir}"         target="test"/>
+    <ant dir="${DAVE2POST.dir}"    target="test"/>
     <ant dir="${DAVE2SL.dir}"      target="test"/>
     <ant dir="${ModelSweeper.dir}" target="test"/>
   </target>
   
   <target name="clean">
     <ant dir="${DAVE.dir}"         target="clean"/>
+    <ant dir="${DAVE2POST.dir}"    target="test"/>
     <ant dir="${DAVE2SL.dir}"      target="clean"/>
     <ant dir="${ModelSweeper.dir}" target="clean"/>
     <exec dir="${app-test.dir}" executable="make">
