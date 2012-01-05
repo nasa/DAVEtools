@@ -84,8 +84,23 @@ public class BlockMathSwitchTest extends TestCase {
         return _block.getValue();
     }
     
+    public void testGenCcode() {
+        String code = "";
+        String indent = "    ";
+        code = code + indent + "outputSignal = (1);\n";
+        code = code + indent + "if((switchVal < (0))) {\n";
+        code = code + indent + indent + "outputSignal = (-1);\n";
+        code = code + indent + "}\n";
+        assertEquals(code, _block.genCcode());
+    }
+    
     public void testGenFcode() {
         String code = "";
+        String indent = "       ";
+        code = code + indent + "outputSignal = (1)\n";
+        code = code + indent + "if((switchVal .LT. (0))) then\n";
+        code = code + indent + "  outputSignal = (-1)\n";
+        code = code + indent + "endif\n";
         assertEquals(code, _block.genFcode());
     }
 
@@ -101,7 +116,7 @@ public class BlockMathSwitchTest extends TestCase {
                 _writer.toString());
     }
 
-    public static BlockMathSwitch generateSampleSwitch(Model model) {
+    private BlockMathSwitch generateSampleSwitch(Model model) {
 
         // Generate a BlockMathSwitch block (and associated wiring) for
         // a switch that outputs -1 if switchVal is less than 0 and +1 otherwise
@@ -121,7 +136,7 @@ public class BlockMathSwitchTest extends TestCase {
         //          </piecewise>
         //        </apply>
 
-        Block swValueBlock;
+        Block  swValueBlock;
         String swValueSignalID;
         Signal swValueSignal;
         Signal outputSignal;
@@ -158,24 +173,24 @@ public class BlockMathSwitchTest extends TestCase {
         //     </apply>
 
         Element minusOne = new Element("cn");
-        minusOne.addContent("-1");                //     <cn>-1</cn>
+        minusOne.addContent("-1");                  //     <cn>-1</cn>
 
-        Element piece = new Element("piece");    //   <piece>
-        piece.addContent(minusOne);               //     <cn>-1</cn>
-        piece.addContent(innerApply);             //     <apply>
-        //       <lt/>
-        //       <ci>switchVal</ci>
-        //       <cn>0</cn>
-        //     </apply>
-        //   </piece>
+        Element piece = new Element("piece");       //   <piece>
+        piece.addContent(minusOne);                 //     <cn>-1</cn>
+        piece.addContent(innerApply);               //     <apply>
+                                                    //       <lt/>
+                                                    //       <ci>switchVal</ci>
+                                                    //       <cn>0</cn>
+                                                    //     </apply>
+                                                    //   </piece>
 
         Element one = new Element("cn");
-        one.addContent("1");                      //     <cn>1</cn>
+        one.addContent("1");                        //     <cn>1</cn>
 
         Element otherwise = new Element("otherwise");
-        otherwise.addContent(one);                //   <otherwise>
-        //     <cn>1</cn>
-        //   </otherwise>
+        otherwise.addContent(one);                  //   <otherwise>
+                                                    //     <cn>1</cn>
+                                                    //   </otherwise>
 
         Element piecewise = new Element("piecewise");
         piecewise.addContent(piece);
@@ -187,8 +202,9 @@ public class BlockMathSwitchTest extends TestCase {
 
         BlockMathSwitch bms = null;
         bms = new BlockMathSwitch(outerApply, model);
-        try {
+        try { // hook up inputs and outputs to the switch
             bms.addOutput(outputSignal);
+            _model.wireBlocks();
         } catch (DAVEException e) {
             fail("Unexpected exception in hooking up output signal "
                     + "in TestBlockMathSwitch.generateSampleSwitch: " + e.getMessage());

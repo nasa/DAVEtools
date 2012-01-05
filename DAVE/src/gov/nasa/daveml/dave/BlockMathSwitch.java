@@ -192,6 +192,35 @@ public class BlockMathSwitch extends BlockMath {
     
     
     /**
+     * <p> Generate C-code equivalent of a two-position switch (if-then-else)</p>
+     */
+    
+    @Override
+    public String genCcode() {
+        String code = "";
+        String indent = "    ";
+        Iterator<Signal> inputSig = inputs.iterator();
+        Signal outputSig = this.getOutput();
+        
+        if (inputs == null) {
+            return "* ERROR: Encountered null input list in BlockMathSwitch genFcode";
+        }
+        
+        if (inputs.size() < 3) {
+            return "* ERROR: in BlockMathSwitch genFcode(): encountered input list" +
+                    " with less than the expected three elements.";
+        }
+        
+        // Must generate several lines of code
+        code = code + indent + outVarID + " = " + inputs.get(2).genCcode() + ";\n";
+        code = code + indent + "if(" + inputs.get(1).genCcode() + ") {\n";
+        code = code + indent + indent + outVarID + " = " + inputs.get(0).genCcode() + ";\n";
+        code = code + indent + "}\n";
+        return code;
+    }
+
+
+    /**
      * <p> Generate FORTRAN code equivalent of a two-position switch (if-then-else)</p>
      */
     

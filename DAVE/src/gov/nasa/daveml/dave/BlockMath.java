@@ -173,53 +173,38 @@ abstract public class BlockMath extends Block
     public void genInputsFromApply( Iterator<Element> ikid, int inputPortNumber )
     {
 	int i = inputPortNumber;
-	while( ikid.hasNext() )
-	    {
-		// look at each input
-		Element in  = ikid.next();
-		String name = in.getName();
-		//		if (this.getName().equals("divide_4"))
-		//		    System.out.println("*-*-*-* In building block '" + this.getName() 
-		//				       + "' I found input math type " + name + "... adding as input " + i);
-		// is it single scalar variable name <ci>?
-		if( name.equals("ci") )
-		    {
-			String varID = in.getTextTrim();	// get variable name
-			this.addVarID(i, varID);		// add it to proper input
-			//this.hookUpInput(i++);		// and hook up to signal, if defined.
-			// this is now done later
-		    }
-		else if( name.equals("cn") ) // or maybe a constant value?
-		    {
-			String constantValue = in.getTextTrim();	// get constant value
-//			this.addVarID(i, constantValue);		// add it as input - placeholder, not needed
-			this.addConstInput(constantValue, i);		// Create and hook up constant block
-		    }
-		else if( name.equals("apply") ) // recurse
-		    {
-			this.addVarID(i, "");				// placeholder - no longer needed
-			Signal s = new Signal(in, ourModel);		// Signal constructor recognizes <apply>...
-//
-//  Part of DAVE-ML utility suite, written by Bruce Jackson, NASA LaRC
-//  <bruce.jackson@nasa.gov>
-//  Visit <http://daveml.org> for more info.
-//  Latest version can be downloaded from http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html
-//  Copyright (c) 2007 United States Government as represented by LAR-17460-1. No copyright is
-//  claimed in the United States under Title 17, U.S. Code. All Other Rights Reserved.
-									// .. and will call our BlockMath.factory() ...
-			if( s!= null )	 {				// .. and creates upstream blocks & signals
-			    s.addSink(this,i);			// hook us up as output of new signal path
-			    s.setDerivedFlag();	// Note that this is a newly-created signal not part of orig model
-			}
-			else
-			    System.err.println("Null signal returned when creating recursive math element.");
-		    }
-		else
-		    {
-			System.err.println("BlockMath didn't find usable element (something like 'apply', 'ci' or 'cn'),"
-					   + " instead found: " + in.getName());
-		    }
-		i++;
-	    }
+	while( ikid.hasNext() ) {	    
+            // look at each input
+            Element in  = ikid.next();
+            String name = in.getName();
+            //		if (this.getName().equals("divide_4"))
+            //		    System.out.println("*-*-*-* In building block '" + this.getName() 
+            //				       + "' I found input math type " + name + "... adding as input " + i);
+            // is it single scalar variable name <ci>?
+            if( name.equals("ci") ) {
+                String varID = in.getTextTrim();	// get variable name
+                this.addVarID(i, varID);		// add it to proper input
+                //this.hookUpInput(i++);		// and hook up to signal, if defined.
+                // this is now done later
+            } else if( name.equals("cn") ) { // or maybe a constant value?               
+                String constantValue = in.getTextTrim();	// get constant value
+//		this.addVarID(i, constantValue);		// add it as input - placeholder, not needed
+                this.addConstInput(constantValue, i);		// Create and hook up constant block
+            } else if( name.equals("apply") ) { // recurse
+                this.addVarID(i, "");				// placeholder - no longer needed
+                Signal s = new Signal(in, ourModel);		// Signal constructor recognizes <apply>...
+                                                                // .. and will call our BlockMath.factory() ...
+                if( s!= null )	 {				// .. and creates upstream blocks & signals
+                    s.addSink(this,i);			// hook us up as output of new signal path
+                    s.setDerivedFlag();	// Note that this is a newly-created signal not part of orig model
+                }
+                else
+                    System.err.println("Null signal returned when creating recursive math element.");
+            } else {
+                System.err.println("BlockMath didn't find usable element (something like 'apply', 'ci' or 'cn'),"
+                                   + " instead found: " + in.getName());
+            }
+            i++;
+        }
     }
 }

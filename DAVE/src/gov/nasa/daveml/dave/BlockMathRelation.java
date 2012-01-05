@@ -84,19 +84,16 @@ public class BlockMathRelation extends BlockMath
         this.setName( this.relationOp + "_" + m.getNumBlocks() );
         
         // take appropriate action based on type
-        if(!validateRelation())
-            {
-                System.err.println("Error - BlockMathRelation constructor called with" +
+        if(!validateRelation()) {
+            System.err.println("Error - BlockMathRelation constructor called with" +
                                    " unknown relation operator " + this.relationOp);
-            }
-        else
-            {
-                // look for two inputs
-                if(kids.size() != 3)
-                    System.err.println("Error - <apply><[relation]/> only handles 2 arguments, not " + (kids.size()-1));
-                else
-                    this.genInputsFromApply(ikid, 1);
-            }
+        } else {
+            // look for two inputs
+            if(kids.size() != 3)
+                System.err.println("Error - <apply><[relation]/> only handles 2 arguments, not " + (kids.size()-1));
+            else
+                this.genInputsFromApply(ikid, 1);
+        }
 
         //System.out.println("    BlockMathRelation constructor: " + this.getName() + " created.");
     }

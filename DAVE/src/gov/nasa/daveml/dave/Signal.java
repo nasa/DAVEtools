@@ -518,7 +518,6 @@ public class Signal
                 System.err.println("Error message:" + e.getMessage() );
                 System.exit(0);
             }
-
         }
         return b;
     }
