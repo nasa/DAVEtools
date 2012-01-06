@@ -1,6 +1,6 @@
 // This file can be turned into XHTML using AsciiDoc
 
-DAVEtools 0.9.3 beta README
+DAVEtools 0.9.4 beta README
 ===========================
 Bruce Jackson, NASA Langley Research Center <bruce.jackson@nasa.gov>
 :TOC:
@@ -439,6 +439,9 @@ http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html.
 
 Changes since V 0.9
 -------------------
+
+V 0.9.4:: Added new utility: DAVE2POST, to generate POST-II input decks and code sections.
+	Added FORTRAN and C code snippet writers, to support DAVE2POST.
 
 V 0.9.3:: Added tally of checkcases to DAVE's statistics summary (when
 	used with the -c option). Added support for UML diagram
