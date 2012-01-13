@@ -141,7 +141,7 @@ abstract public class Block
      *
      * */
 
-    public Block( Model m)
+    public Block( Model m )
     { 
         this();
         this.ourModel = m;
@@ -880,20 +880,106 @@ abstract public class Block
      * <p> Generate C-code equivalent of our operation</p>
      */
     
-    public String genCcode() {
-        return "// WARNING -- code generator not available for variable \"" + 
-                outVarID + "\" whose type is \"" + this.myType + "\"\n";       
+    public CodeAndVarNames genCode() {
+        return new CodeAndVarNames(
+                wrapComment("WARNING -- " +
+                "code generator not available for variable \"" + 
+                outVarID + "\" whose type is \"" + this.myType + "\"")); 
     }
-
 
     /**
-     * <p> Generate FORTRAN code equivalent of our operation</p>
+     * <p> Generate appropriate indentation spaces </p>
      */
     
-    public String genFcode() {
-        return "**** WARNING -- code generator not available for variable \"" + 
-                outVarID + "\" whose type is \"" + this.myType + "\"\n";       
+    public String indent() {
+        String indent = "";
+        int dialect = ourModel.getCodeDialect();
+        switch (dialect) {
+            case Model.DT_ANSI_C:
+                indent = "  ";
+                break;
+            case Model.DT_FORTRAN:
+                indent = "       ";
+                break;
+        }
+        return indent;
     }
+    
+    /**
+     * <p> Wrap message in appropriate dialect </p>
+     */
+    
+    public String wrapComment( String comment ) {
+        String wrappedComment = "";
+        int dialect = ourModel.getCodeDialect();
+        switch (dialect) {
+            case Model.DT_ANSI_C:
+                wrappedComment = "/* " + comment + " */";
+                break;
+            case Model.DT_FORTRAN:
+                wrappedComment = "!  " + comment;
+                break;
+        }
+        wrappedComment += "\n";
+        return wrappedComment;
+    }
+    
+    
+    /**
+     * <p> Wrap error message in appropriate dialect </p>
+     */
+    
+    public String errorComment( String errMsg ) {
+        return this.wrapComment( "ERROR: " + errMsg );
+    }
+    
+    /**
+     * <p> Add appropriate statement ending characters </p>
+     */
+    
+    public String endLine() {
+        String lineEnd = "\n";
+        if (ourModel.getCodeDialect() == Model.DT_ANSI_C)
+            lineEnd = ";\n";
+        return lineEnd;
+    }
+    
+    /**
+     * <p> Generate appropriate if statement for given language </p>
+     */
+    
+    public String beginIf( String condition ) {
+        String ifStart = "";
+        int dialect = ourModel.getCodeDialect();
+        switch (dialect) {
+            case Model.DT_ANSI_C:
+                ifStart = indent() + "if ( " + condition + " ) {\n";
+                break;
+            case Model.DT_FORTRAN:
+                ifStart = indent() + "IF( " + condition + " ) THEN\n";
+                break;
+        }
+        return ifStart;
+    }
+
+    /**
+     * <p> Generate appropriate if statement ending for given language </p>
+     */
+    
+    public String endIf() {
+        String ifEnd = "";
+        int dialect = ourModel.getCodeDialect();
+        switch (dialect) {
+            case Model.DT_ANSI_C:
+                ifEnd = indent() + "}\n";
+                break;
+            case Model.DT_FORTRAN:
+                ifEnd = indent() + "ENDIF\n";
+                break;
+        }
+        return ifEnd;
+    }
+
 
     /**
      *

@@ -172,23 +172,47 @@ public class BlockMathRelationTest extends TestCase {
     }
 
     public void testGenCcode() {
-        String code;
+        CodeAndVarNames cvn;
+        String expected;
+        _model.setCodeDialect(Model.DT_ANSI_C);
         _block.getOutput().setDerivedFlag();
-        code = "ALP_UNLIM < ALP_LIMIT";
-        assertEquals(code, _block.genCcode());
+        cvn = _block.genCode();
+        expected = "ALP_UNLIM < ALP_LIMIT";
+        assertEquals(expected, cvn.getCode());
+        assertEquals(2, cvn.getVarNames().size());
+        assertEquals("ALP_UNLIM", cvn.getVarName(0));
+        assertEquals("ALP_LIMIT", cvn.getVarName(1));
+        
         _block.getOutput().clearDerivedFlag();
-        code = "    outputSignal = " + code + ";\n";
-        assertEquals(code, _block.genCcode());
+        cvn = _block.genCode();
+        expected = "  outputSignal = " + expected + ";\n";
+        assertEquals(expected, cvn.getCode());
+        assertEquals(3, cvn.getVarNames().size());
+        assertEquals("outputSignal", cvn.getVarName(0));
+        assertEquals("ALP_UNLIM",    cvn.getVarName(1));
+        assertEquals("ALP_LIMIT",    cvn.getVarName(2));
     }
     
     public void testGenFcode() {
-        String code;
+        CodeAndVarNames cvn;
+        String expected;
+        _model.setCodeDialect(Model.DT_FORTRAN);
         _block.getOutput().setDerivedFlag();
-        code = "ALP_UNLIM .LT. ALP_LIMIT";
-        assertEquals(code, _block.genFcode());
+        cvn = _block.genCode();
+        expected = "ALP_UNLIM .LT. ALP_LIMIT";
+        assertEquals(expected, cvn.getCode());
+        assertEquals(2, cvn.getVarNames().size());
+        assertEquals("ALP_UNLIM", cvn.getVarName(0));
+        assertEquals("ALP_LIMIT", cvn.getVarName(1));
+        
         _block.getOutput().clearDerivedFlag();
-        code = "       outputSignal = " + code + "\n";
-        assertEquals(code, _block.genFcode());
+        cvn = _block.genCode();
+        expected = "       outputSignal = " + expected + "\n";
+        assertEquals(expected, cvn.getCode());
+        assertEquals(3, cvn.getVarNames().size());
+        assertEquals("outputSignal", cvn.getVarName(0));
+        assertEquals("ALP_UNLIM",    cvn.getVarName(1));
+        assertEquals("ALP_LIMIT",    cvn.getVarName(2));
     }
     
     public void testDescribeSelfFileWriter() {

@@ -115,13 +115,21 @@ public class BlockMathAbsTest extends TestCase {
     }
 
     public void testGenCcode() {
-        String result = _block.genCcode();
-        assertEquals("  absBeta = fabs( beta );\n", result);
+        _model.setCodeDialect(Model.DT_ANSI_C);
+        CodeAndVarNames result = _block.genCode();
+        assertEquals("  absBeta = fabs( beta );\n", result.getCode());
+        assertEquals(2, result.getVarNames().size());
+        assertEquals("absBeta", result.getVarName(0));
+        assertEquals("beta", result.getVarName(1));
     }
 
     public void testGenFcode() {
-        String result = _block.genFcode();
-        assertEquals("       absBeta = abs( beta )\n", result);
+        _model.setCodeDialect(Model.DT_FORTRAN);
+        CodeAndVarNames result = _block.genCode();
+        assertEquals("       absBeta = ABS( beta )\n", result.getCode());
+        assertEquals(2, result.getVarNames().size());
+        assertEquals("absBeta", result.getVarName(0));
+        assertEquals("beta", result.getVarName(1));
     }
 
     public void testDescribeSelf() {

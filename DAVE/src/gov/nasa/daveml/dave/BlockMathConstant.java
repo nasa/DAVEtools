@@ -47,7 +47,6 @@ public class BlockMathConstant extends BlockMath
 	super("const_" + constantValue + "_", "constant value", m);
 	
 	this.setValue(constantValue);
-
     }
 
 
@@ -73,7 +72,7 @@ public class BlockMathConstant extends BlockMath
      * Sets our value from a string
      */
     
-    public void setValue( String newValue ) {
+    public final void setValue( String newValue ) {
     	this.stringValue = newValue;
 
     	try {
@@ -101,49 +100,26 @@ public class BlockMathConstant extends BlockMath
      */
     
     @Override
-    public String genCcode() {
-        String code = "";
+    public CodeAndVarNames genCode() {
+        CodeAndVarNames cvn = new CodeAndVarNames();
         Signal outputSig = this.getOutput();
         // check to see if we're derived variable (code fragment) or a whole statement
         // if not derived, need preceding command and the LHS of the equation too
         if (!outputSig.isDerived()) {
 //            code = "// Code for variable \"" + outVarID + "\":\n";
-            code = code + "  " + outVarID + " = ";
+            cvn.appendCode(indent() + outVarID + " = ");
+            cvn.addVarName(outVarID);
         }
         
-        code = code + this.getValueAsString();
+        cvn.appendCode(this.getValueAsString());
         
         // if not derived, need trailing semicolon and new line
         if (!outputSig.isDerived())
-            code = code + ";\n";
-        return code;
+            cvn.appendCode(endLine());
+        return cvn;
     }
 
-    
-    /**
-     * <p> Generate FORTRAN code equivalent of our constant</p>
-     */
-    
-    @Override
-    public String genFcode() {
-        String code = "";
-        Signal outputSig = this.getOutput();
-        // check to see if we're derived variable (code fragment) or a whole statement
-        // if not derived, need preceding command and the LHS of the equation too
-        if (!outputSig.isDerived()) {
-//            code = "C Code for variable \"" + outVarID + "\":\n";
-            code = code + "       " + outVarID + " = ";
-        }
         
-        code = code + this.getValueAsString();
-        
-        // if not derived, need new line
-        if (!outputSig.isDerived())
-            code = code + "\n";
-        return code;
-    }
-
-    
     /**
      *
      * <p> Generates description of self </p>
@@ -151,6 +127,7 @@ public class BlockMathConstant extends BlockMath
      * @throws <code>IOException</code>
      **/
 
+    @Override
     public void describeSelf(Writer writer) throws IOException
     {
 	super.describeSelf(writer);
@@ -164,6 +141,7 @@ public class BlockMathConstant extends BlockMath
      *
      **/
 
+    @Override
     public void update() throws DAVEException
     {
 	if (isVerbose()) {
@@ -186,6 +164,7 @@ public class BlockMathConstant extends BlockMath
     *
     **/
 
+    @Override
    public boolean isReady()
    {
 	return true;

@@ -115,17 +115,30 @@ public class BlockMathMinusTest extends TestCase {
     }
 
     public void testGenCcode() {
-        String result1 = _unaryMinusBlock.genCcode();
-        assertEquals("  minusAlpha = -(-3.45);\n", result1);
-        String result2 = _binaryMinusBlock.genCcode();
-        assertEquals("  alphaMinusBeta = (-3.45) - (+3.45);\n", result2);
+        _model.setCodeDialect(Model.DT_ANSI_C);
+        CodeAndVarNames result1 = _unaryMinusBlock.genCode();
+        assertEquals("  minusAlpha = -(-3.45);\n", result1.getCode());
+        assertEquals(1, result1.getVarNames().size());
+        assertEquals("minusAlpha", result1.getVarName(0));
+        
+        
+        CodeAndVarNames result2 = _binaryMinusBlock.genCode();
+        assertEquals("  alphaMinusBeta = (-3.45) - (+3.45);\n", result2.getCode());
+        assertEquals(1, result2.getVarNames().size());
+        assertEquals("alphaMinusBeta", result2.getVarName(0));
     }
 
     public void testGenFcode() {
-        String result1 = _unaryMinusBlock.genFcode();
-        assertEquals("       minusAlpha = -(-3.45)\n", result1);
-        String result2 = _binaryMinusBlock.genFcode();
-        assertEquals("       alphaMinusBeta = (-3.45) - (+3.45)\n", result2);
+        _model.setCodeDialect(Model.DT_FORTRAN);
+        CodeAndVarNames result1 = _unaryMinusBlock.genCode();
+        assertEquals("       minusAlpha = -(-3.45)\n", result1.getCode());
+        assertEquals(1, result1.getVarNames().size());
+        assertEquals("minusAlpha", result1.getVarName(0));
+        
+        CodeAndVarNames result2 = _binaryMinusBlock.genCode();
+        assertEquals("       alphaMinusBeta = (-3.45) - (+3.45)\n", result2.getCode());
+        assertEquals(1, result2.getVarNames().size());
+        assertEquals("alphaMinusBeta", result2.getVarName(0));
     }
 
     public void testDescribeSelf() {

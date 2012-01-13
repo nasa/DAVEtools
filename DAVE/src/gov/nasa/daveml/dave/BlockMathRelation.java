@@ -123,83 +123,75 @@ public class BlockMathRelation extends BlockMath
 
 
     /**
-     * <p> Generate C-code equivalent of a relationship test </p>
+     * <p> Generate code equivalent of a relationship test </p>
      */
     
     @Override
-    public String genCcode() {
-        String code = "";
-        String indent = "    ";
+    public CodeAndVarNames genCode() {
+        CodeAndVarNames cvn = new CodeAndVarNames();
         Signal outputSig = this.getOutput();
         
         // check to see if we're derived variable (code fragment) or a whole statement
         // if not derived, need preceding command and the LHS of the equation too
         if (!outputSig.isDerived()) {
-            code = code + indent + outVarID + " = ";
-        }
-        code = code + inputs.get(0).genCcode();
-        switch (relation) {
-            case LT:  code = code + " < " ; break;
-            case LEQ: code = code + " <= "; break;
-            case EQ:  code = code + " == "; break;
-            case GEQ: code = code + " >= "; break;
-            case GT:  code = code + " > " ; break;
-            case NEQ: code = code + " != "; break;
-        }
-        code = code + inputs.get(1).genCcode();
-        
-        // if not derived, need new line
-        if (!outputSig.isDerived())
-            code = code + ";\n";
-        return code;
-    }
-    /**
-     * <p> Generate FORTRAN code equivalent of a relationship test </p>
-     */
-    
-    @Override
-    public String genFcode() {
-        String code = "";
-        String indent = "       ";
-        Signal outputSig = this.getOutput();
-        
-        // check to see if we're derived variable (code fragment) or a whole statement
-        // if not derived, need preceding command and the LHS of the equation too
-        if (!outputSig.isDerived()) {
-            code = code + indent + outVarID + " = ";
+            cvn.appendCode(indent() + outVarID + " = ");
+            cvn.addVarName(outVarID);
         }
         
         if (inputs == null) {
-            return "* ERROR: in BlockMathRelation genFcode(): encountered null input list.\n";
+            cvn.appendCode(errorComment(
+                    "in BlockMathRelation genCode(): encountered null input list."));
+            return cvn;
         }
         
         if (inputs.size() < 2) {
-            return "* ERROR: in BlockMathRelation genFcode(): encountered input list" +
-                    " with less than the expected three elements.\n";
+            cvn.appendCode(errorComment(
+                    "in BlockMathRelation genFcode(): encountered input list" +
+                    " with less than the expected three elements."));
+            return cvn;
         }
         Signal arg1 = inputs.get(0);
         if (arg1 == null) {
-            return "* ERROR: in BlockMathRelation genFcode(): first input signal was null.\n";
+            cvn.appendCode(errorComment(
+                    "in BlockMathRelation genFcode(): first input signal was null."));
+            return cvn;
         }
         Signal arg2 = inputs.get(1);
         if (arg2 == null) {
-            return "* ERROR: in BlockMathRelation genFcode(): second input signal was null.\n";
+            cvn.appendCode(errorComment(
+            "in BlockMathRelation genFcode(): second input signal was null."));
+            return cvn;
         }
-        code = code + arg1.genCcode();
-        switch (relation) {
-            case LT:  code = code + " .LT. "; break;
-            case LEQ: code = code + " .LE. "; break;
-            case EQ:  code = code + " .EQ. "; break;
-            case GEQ: code = code + " .GE. "; break;
-            case GT:  code = code + " .GT. "; break;
-            case NEQ: code = code + " .NE. "; break;
+        cvn.append(arg1.genCode());
+        int dialect = ourModel.getCodeDialect();
+        switch(dialect) {
+            case Model.DT_ANSI_C:
+                switch (relation) {
+                    case LT:  cvn.appendCode(" < " ); break;
+                    case LEQ: cvn.appendCode(" <= "); break;
+                    case EQ:  cvn.appendCode(" == "); break;
+                    case GEQ: cvn.appendCode(" >= "); break;
+                    case GT:  cvn.appendCode(" > " ); break;
+                    case NEQ: cvn.appendCode(" != "); break;
+                }
+                break;
+            case Model.DT_FORTRAN:
+                switch (relation) {
+                    case LT:  cvn.appendCode(" .LT. "); break;
+                    case LEQ: cvn.appendCode(" .LE. "); break;
+                    case EQ:  cvn.appendCode(" .EQ. "); break;
+                    case GEQ: cvn.appendCode(" .GE. "); break;
+                    case GT:  cvn.appendCode(" .GT. "); break;
+                    case NEQ: cvn.appendCode(" .NE. "); break;
+                }
+                break;
         }
-        code = code + arg2.genCcode();
+        cvn.append(arg2.genCode());
         
         // if not derived, need new line
         if (!outputSig.isDerived())
-            code = code + "\n";
-        return code;
+            cvn.appendCode(this.endLine());
+        return cvn;
     }
 
 
@@ -210,6 +202,7 @@ public class BlockMathRelation extends BlockMath
      * @throws <code>IOException</code>
      **/
 
+    @Override
     public void describeSelf(Writer writer) throws IOException
     {
         super.describeSelf(writer);
@@ -244,6 +237,7 @@ public class BlockMathRelation extends BlockMath
      *
      **/
 
+    @Override
     public void update() throws DAVEException
     {
         int numInputs;

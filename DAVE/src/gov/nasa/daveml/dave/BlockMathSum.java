@@ -73,61 +73,32 @@ public class BlockMathSum extends BlockMath
     }
 
     /**
-     * <p> Generate C-code equivalent of our operation</p>
+     * <p> Generate code equivalent of our operation</p>
      */
     
     @Override
-    public String genCcode() {
-        String code = "";
+    public CodeAndVarNames genCode() {
+        CodeAndVarNames cvn = new CodeAndVarNames();
         Iterator<Signal> inputSig = inputs.iterator();
         Signal outputSig = this.getOutput();
         // check to see if we're derived variable (code fragment) or a whole statement
         // if not derived, need preceding command and the LHS of the equation too
         if (!outputSig.isDerived()) {
 //            code = "// Code for variable \"" + outVarID + "\":\n";
-            code = code + "  " + outVarID + " = ";
+            cvn.appendCode(indent() + outVarID + " = ");
+            cvn.addVarName(outVarID);
         }
         while (inputSig.hasNext()) {
             Signal inSig = inputSig.next();
-            code = code + inSig.genCcode();
+            cvn.append(inSig.genCode());
             if (inputSig.hasNext()) {
-                code = code + " + ";
+                cvn.appendCode(" + ");
             }
         }
         // if not derived, need trailing semicolon and new line
         if (!outputSig.isDerived())
-            code = code + ";\n";
-        return code;
-    }
-
-
-    /**
-     * <p> Generate FORTRAN code equivalent of our operation</p>
-     */
-    
-    @Override
-    public String genFcode() {
-        String indent = "       ";
-        String code = "";
-        Iterator<Signal> inputSig = inputs.iterator();
-        Signal outputSig = this.getOutput();
-        // check to see if we're derived variable (code fragment) or a whole statement
-        // if not derived, need preceding command and the LHS of the equation too
-        if (!outputSig.isDerived()) {
-//            code = "C Code for variable \"" + outVarID + "\":\n";
-            code = code + indent + outVarID + " = ";
-        }
-        while (inputSig.hasNext()) {
-            Signal inSig = inputSig.next();
-            code = code + inSig.genFcode();
-            if (inputSig.hasNext()) {
-                code = code + " + ";
-            }
-        }
-        // if not derived, need newline
-        if (!outputSig.isDerived())
-            code = code + "\n";
-        return code;
+            cvn.appendCode(endLine());
+        return cvn;
     }
 
         
@@ -138,6 +109,7 @@ public class BlockMathSum extends BlockMath
      * @throws <code>IOException</code>
      **/
 
+    @Override
     public void describeSelf(Writer writer) throws IOException
     {
         super.describeSelf(writer);
@@ -151,6 +123,7 @@ public class BlockMathSum extends BlockMath
      *
      **/
 
+    @Override
     public void update() throws DAVEException
     {
         Iterator<Signal> theInputs;

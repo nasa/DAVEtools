@@ -75,61 +75,35 @@ public class BlockMathMinus extends BlockMath
     
     
     /**
-     * <p> Generate C-code equivalent of our operation</p>
+     * <p> Generate code equivalent of our operation</p>
      */
     
     @Override
-    public String genCcode() {
-        String code = "";
+    public CodeAndVarNames genCode() {
+        CodeAndVarNames cvn = new CodeAndVarNames();
         Signal input0, input1;
         Signal outputSig = this.getOutput();
         // check to see if we're derived variable (code fragment) or a whole statement
         // if not derived, need preceding command and the LHS of the equation too
         if (!outputSig.isDerived()) {
 //            code = "// Code for variable \"" + outVarID + "\":\n";
-            code = code + "  " + outVarID + " = ";
+            cvn.appendCode(indent() + outVarID + " = ");
+            cvn.addVarName(outVarID);
         }
         input0 = inputs.get(0);
         if (inputs.size() == 1) { // unary minus
-            code = code + "-" + input0.genCcode();
+            cvn.appendCode("-");
+            cvn.append(input0.genCode());
         } else { // must be binary minus: input 0 less 1    
             input1 = inputs.get(1);
-            code = code + input0.genCcode() + " - " + input1.genCcode();           
+            cvn.append(input0.genCode());
+            cvn.appendCode(" - ");
+            cvn.append(input1.genCode());           
         }
         // if not derived, need trailing semicolon and new line
         if (!outputSig.isDerived())
-            code = code + ";\n";
-        return code;
-    }
-
-
-    /**
-     * <p> Generate FORTRAN code equivalent of our operation</p>
-     */
-    
-    @Override
-    public String genFcode() {
-        String code = "";
-        String indent = "       ";
-        Signal input0, input1;
-        Signal outputSig = this.getOutput();
-        // check to see if we're derived variable (code fragment) or a whole statement
-        // if not derived, need preceding command and the LHS of the equation too
-        if (!outputSig.isDerived()) {
-//            code = "C Code for variable \"" + outVarID + "\":\n";
-            code = code + indent + outVarID + " = ";
-        }
-        input0 = inputs.get(0);
-        if (inputs.size() == 1) { // unary minus
-            code = code + "-" + input0.genFcode();
-        } else { // must be binary minus: input 0 less 1    
-            input1 = inputs.get(1);
-            code = code + input0.genCcode() + " - " + input1.genFcode();           
-        }
-        // if not derived, need new line
-        if (!outputSig.isDerived())
-            code = code + "\n";
-        return code;
+            cvn.appendCode(endLine());
+        return cvn;
     }
 
     

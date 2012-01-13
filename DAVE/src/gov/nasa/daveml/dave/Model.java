@@ -111,6 +111,19 @@ public class Model
      */
 
     int cycleCounter;
+    
+    /**
+     * Code output dialect
+     */
+    
+    int codeDialect;
+    
+    /**
+     * Code generation dialects
+     */
+    
+    public static final int DT_FORTRAN = 0;
+    public static final int DT_ANSI_C  = 1;
 
     /**
      * private return codes
@@ -142,6 +155,7 @@ public class Model
 	this.verbose = false;
 	this.cycleCounter = 0;
 	this.ourName = "untitled";
+        this.codeDialect = DT_ANSI_C;
     }
 
 
@@ -316,6 +330,21 @@ public class Model
 
     public BlockArrayList getOutputBlocks() { return outputBlocks; }
 
+    /**
+     *
+     * Return code dialect
+     * 
+     **/
+    
+    public int getCodeDialect() { return codeDialect; }
+    
+    /**
+     * 
+     * Set emitted code dialect
+     * 
+     */
+    
+    public void setCodeDialect( int dialect ) { codeDialect = dialect; }
 
     /**
      *

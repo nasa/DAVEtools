@@ -85,23 +85,27 @@ public class BlockMathSwitchTest extends TestCase {
     }
     
     public void testGenCcode() {
+        _model.setCodeDialect(Model.DT_ANSI_C);
         String code = "";
-        String indent = "    ";
+        String indent = "  ";
         code = code + indent + "outputSignal = (1);\n";
-        code = code + indent + "if((switchVal < (0))) {\n";
+        code = code + indent + "if ( (switchVal < (0)) ) {\n";
         code = code + indent + indent + "outputSignal = (-1);\n";
         code = code + indent + "}\n";
-        assertEquals(code, _block.genCcode());
+        CodeAndVarNames cvn = _block.genCode();
+        assertEquals(code, cvn.getCode());
     }
     
     public void testGenFcode() {
+        _model.setCodeDialect(Model.DT_FORTRAN);
         String code = "";
         String indent = "       ";
         code = code + indent + "outputSignal = (1)\n";
-        code = code + indent + "if((switchVal .LT. (0))) then\n";
+        code = code + indent + "IF( (switchVal .LT. (0)) ) THEN\n";
         code = code + indent + "  outputSignal = (-1)\n";
-        code = code + indent + "endif\n";
-        assertEquals(code, _block.genFcode());
+        code = code + indent + "ENDIF\n";
+        CodeAndVarNames cvn = _block.genCode();
+        assertEquals(code, cvn.getCode());
     }
 
     public void testDescribeSelfWriter() {

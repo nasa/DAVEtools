@@ -118,8 +118,8 @@ public class DAVE2POST extends DAVE {
     @Override
     public void setInputFileName(String fn) {
         super.setInputFileName(fn);	// sets stub and file name fields
-        this.tableFileName = this.getStubName() + "_table.pos2";
-        this.sourceFileName = this.getStubName() + "_table.f";
+        this.tableFileName = this.getStubName() + ".pos2";
+        this.sourceFileName = this.getStubName() + ".f";
     }
 
     /**

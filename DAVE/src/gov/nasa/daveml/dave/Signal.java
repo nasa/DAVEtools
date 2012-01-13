@@ -900,36 +900,22 @@ public class Signal
     
     
     /**
-     * <p> Generate C-code for signal</p>
+     * <p> Generate code for signal </p>
      */
     
-    public String genCcode( ) {
-        String code = "";
+    public CodeAndVarNames genCode( ) {
+        CodeAndVarNames cvn = new CodeAndVarNames();
         if (this.isDerived()) {
             if (this.source != null) {
-                code = code + "(" + this.source.genCcode() + ")";
+                cvn.appendCode("(");
+                cvn.append(this.source.genCode());
+                cvn.appendCode(")");
             }
         } else {
-            code = code + this.getVarID();
+            cvn.appendCode(this.getVarID());
+            cvn.addVarName(this.getVarID());
         }  
-        return code;
-    }
-
-
-    /**
-     * <p> Generate FORTRAN code for signal</p>
-     */
-    
-    public String genFcode( ) {
-        String code = "";
-        if (this.isDerived()) {
-            if (this.source != null) {
-                code = code + "(" + this.source.genFcode() + ")";
-            }
-        } else {
-            code = code + this.getVarID();
-        }  
-        return code;
+        return cvn;
     }
 
 

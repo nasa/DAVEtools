@@ -166,11 +166,12 @@ public class BlockLimiterTest extends TestCase {
     
     public void testGenCcode() {
         BlockLimiter blk;
-        String result;
-        
+        model.setCodeDialect(Model.DT_ANSI_C);
+        CodeAndVarNames result = new CodeAndVarNames();
+
         // check symmetric limiter code
         blk = blockArray[0];
-        result = blk.genCcode();
+        result = blk.genCode();
         assertEquals(
                 "  symLim = input;\n" +
                 "  if ( symLim < -2.0 ) {\n" +
@@ -178,35 +179,47 @@ public class BlockLimiterTest extends TestCase {
                 "  }\n" +
                 "  if ( symLim > 2.0 ) {\n" +
                 "    symLim = 2.0;\n" +
-                "  }\n", result);
+                "  }\n", result.getCode());
+        assertEquals(2, result.getVarNames().size());
+        assertEquals("symLim", result.getVarName(0));
+        assertEquals("input", result.getVarName(1));
         
         // check upper limiter code
         blk = blockArray[1];
-        result = blk.genCcode();
+        result = blk.genCode();
         assertEquals(
                 "  hiLim = input;\n" +
                 "  if ( hiLim > 2.0 ) {\n" +
                 "    hiLim = 2.0;\n" +
-                "  }\n", result);
+                "  }\n", result.getCode());
+        assertEquals(2, result.getVarNames().size());
+        assertEquals("hiLim", result.getVarName(0));
+        assertEquals("input", result.getVarName(1));
         
         // check lower limiter code
         blk = blockArray[2];
-        result = blk.genCcode();
+        result = blk.genCode();
         assertEquals(
                 "  loLim = input;\n" +
                 "  if ( loLim < -2.0 ) {\n" +
                 "    loLim = -2.0;\n" +
-                "  }\n", result);
+                "  }\n", result.getCode());
+        assertEquals(2, result.getVarNames().size());
+        assertEquals("loLim", result.getVarName(0));
+        assertEquals("input", result.getVarName(1));
         
         // check no limiter code
         blk = blockArray[3];
-        result = blk.genCcode();
+        result = blk.genCode();
         assertEquals(
-                "  noLim = input;\n", result);
+                "  noLim = input;\n", result.getCode());
+        assertEquals(2, result.getVarNames().size());
+        assertEquals("noLim", result.getVarName(0));
+        assertEquals("input", result.getVarName(1));
         
         // check swapped limits limiter code
         blk = blockArray[4];
-        result = blk.genCcode();
+        result = blk.genCode();
         assertEquals(
                 "  swapLim = input;\n" +
                 "  if ( swapLim < -2.0 ) {\n" +
@@ -214,62 +227,79 @@ public class BlockLimiterTest extends TestCase {
                 "  }\n" +
                 "  if ( swapLim > 2.0 ) {\n" +
                 "    swapLim = 2.0;\n" +
-                "  }\n", result);
+                "  }\n", result.getCode());
+        assertEquals(2, result.getVarNames().size());
+        assertEquals("swapLim", result.getVarName(0));
+        assertEquals("input", result.getVarName(1));
      }
 
 
 
     public void testGenFcode() {
         BlockLimiter blk;
-        String result;
+        model.setCodeDialect(Model.DT_FORTRAN);
+        CodeAndVarNames result = new CodeAndVarNames();
         
         // check symmetric limiter code
         blk = blockArray[0];
-        result = blk.genFcode();
+        result = blk.genCode();
         assertEquals(
                 "       symLim = input\n" +
-                "       if ( symLim .LT. -2.0 ) then\n" +
+                "       IF( symLim .LT. -2.0 ) THEN\n" +
                 "         symLim = -2.0\n" +
-                "       endif\n" +
-                "       if ( symLim .GT. 2.0 ) then\n" +
+                "       ENDIF\n" +
+                "       IF( symLim .GT. 2.0 ) THEN\n" +
                 "         symLim = 2.0\n" +
-                "       endif\n", result);
+                "       ENDIF\n", result.getCode());
+        assertEquals(2, result.getVarNames().size());
+        assertEquals("symLim", result.getVarName(0));
+        assertEquals("input", result.getVarName(1));
         
         // check upper limiter code
         blk = blockArray[1];
-        result = blk.genFcode();
+        result = blk.genCode();
         assertEquals(
                 "       hiLim = input\n" +
-                "       if ( hiLim .GT. 2.0 ) then\n" +
+                "       IF( hiLim .GT. 2.0 ) THEN\n" +
                 "         hiLim = 2.0\n" +
-                "       endif\n", result);
-        
+                "       ENDIF\n", result.getCode());
+        assertEquals(2, result.getVarNames().size());
+        assertEquals("hiLim", result.getVarName(0));
+        assertEquals("input", result.getVarName(1));
+       
         // check lower limiter code
         blk = blockArray[2];
-        result = blk.genFcode();
+        result = blk.genCode();
         assertEquals(
                 "       loLim = input\n" +
-                "       if ( loLim .LT. -2.0 ) then\n" +
+                "       IF( loLim .LT. -2.0 ) THEN\n" +
                 "         loLim = -2.0\n" +
-                "       endif\n", result);
+                "       ENDIF\n", result.getCode());
         
         // check no limiter code
         blk = blockArray[3];
-        result = blk.genFcode();
+        result = blk.genCode();
         assertEquals(
-                "       noLim = input\n", result);
+                "       noLim = input\n", result.getCode());
+        assertEquals(2, result.getVarNames().size());
+        assertEquals("noLim", result.getVarName(0));
+        assertEquals("input", result.getVarName(1));
         
         // check swapped limits limiter code
         blk = blockArray[4];
-        result = blk.genFcode();
+        result = blk.genCode();
         assertEquals(
                 "       swapLim = input\n" +
-                "       if ( swapLim .LT. -2.0 ) then\n" +
+                "       IF( swapLim .LT. -2.0 ) THEN\n" +
                 "         swapLim = -2.0\n" +
-                "       endif\n" +
-                "       if ( swapLim .GT. 2.0 ) then\n" +
+                "       ENDIF\n" +
+                "       IF( swapLim .GT. 2.0 ) THEN\n" +
                 "         swapLim = 2.0\n" +
-                "       endif\n", result);
+                "       ENDIF\n", result.getCode());
+        assertEquals(2, result.getVarNames().size());
+        assertEquals("swapLim", result.getVarName(0));
+        assertEquals("input", result.getVarName(1));
+
      }
 
 

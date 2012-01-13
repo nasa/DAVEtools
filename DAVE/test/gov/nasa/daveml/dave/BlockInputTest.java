@@ -80,13 +80,19 @@ public class BlockInputTest extends TestCase {
 	}
         
         public void testGenCcode() {
-            String code = _bi.genCcode();
-            assertEquals("// fulsig is a model input with units 'deg'\n", code);
+            _m.setCodeDialect(Model.DT_ANSI_C);
+            CodeAndVarNames cvn = new CodeAndVarNames();
+            cvn.append(_bi.genCode());
+            assertEquals("/* fulsig is a model input with units 'deg' */\n", cvn.getCode());
+            assertEquals("fulsig", cvn.getVarName(0));
         }
 
         public void testGenFcode() {
-            String code = _bi.genFcode();
-            assertEquals("* fulsig is a model input with units 'deg'\n", code);
+            _m.setCodeDialect(Model.DT_FORTRAN);
+            CodeAndVarNames cvn = new CodeAndVarNames();
+            cvn.append(_bi.genCode());
+            assertEquals("!  fulsig is a model input with units 'deg'\n", cvn.getCode());
+            assertEquals("fulsig", cvn.getVarName(0));
         }
 	
 	public void testDescribeSelf() {
@@ -94,7 +100,6 @@ public class BlockInputTest extends TestCase {
 			_bi.describeSelf(_writer);
 		} catch (IOException e) {
 			assertTrue(false);
-			e.printStackTrace();
 		}
 		assertEquals( "Block \"full signal\" has NO INPUTS, one output (full signal), value [NaN] (deg)", 
 				_writer.toString() );

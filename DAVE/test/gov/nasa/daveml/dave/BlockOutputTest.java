@@ -17,13 +17,14 @@ public class BlockOutputTest extends TestCase {
 	
 	private final double EPS = 0.00000001;
 
+    @Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		
 		_writer = new StringWriter();
 
 		_model = new Model(4,4);
-		_signalID = new String("outputValue");
+		_signalID = "outputValue";
 		_signal = new Signal(_signalID, _model);
 		_constBlock = new BlockMathConstant("3.45", _model);
 		_constBlock.addOutput(_signal);
@@ -75,13 +76,17 @@ public class BlockOutputTest extends TestCase {
 	}
         
         public void testGenCcode() {
-            String code = _block.genCcode();
-            assertEquals("// outputValue is a model output with units 'unkn'\n", code);
+            _model.setCodeDialect(Model.DT_ANSI_C);
+            CodeAndVarNames cvn = _block.genCode();
+            assertEquals("/* outputValue is a model output with units 'unkn' */\n", 
+                    cvn.getCode());
         }
 
         public void testGenFcode() {
-            String code = _block.genFcode();
-            assertEquals("* outputValue is a model output with units 'unkn'\n", code);
+            _model.setCodeDialect(Model.DT_FORTRAN);
+            CodeAndVarNames cvn = _block.genCode();
+            assertEquals("!  outputValue is a model output with units 'unkn'\n", 
+                    cvn.getCode());
         }
 
 	public void testGetUnits() {

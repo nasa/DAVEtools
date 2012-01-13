@@ -66,13 +66,19 @@ public class BlockMathConstantTest extends TestCase {
     }
 
     public void testGenCcode() {
-        String result = _block.genCcode();
-        assertEquals("  constantOutput = -3.45;\n", result);
+        _model.setCodeDialect(Model.DT_ANSI_C);
+        CodeAndVarNames result = _block.genCode();
+        assertEquals("  constantOutput = -3.45;\n", result.getCode());
+        assertEquals(1, result.getVarNames().size());
+        assertEquals("constantOutput", result.getVarName(0));
     }
 
     public void testGenFcode() {
-        String result = _block.genFcode();
-        assertEquals("       constantOutput = -3.45\n", result);
+        _model.setCodeDialect(Model.DT_FORTRAN);
+        CodeAndVarNames result = _block.genCode();
+        assertEquals("       constantOutput = -3.45\n", result.getCode());
+        assertEquals(1, result.getVarNames().size());
+        assertEquals("constantOutput", result.getVarName(0));
     }
 
     public void testDescribeSelf() {

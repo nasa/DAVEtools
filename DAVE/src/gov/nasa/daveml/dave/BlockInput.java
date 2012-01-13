@@ -83,42 +83,29 @@ public class BlockInput extends Block {
         return modelInputs.indexOf(this) + 1;
     }
 
-    /**
-     * <p> Generate C-code comment about inputs </p>
-     * @return string containing C comment description of input
-     */
-    @Override
-    public String genCcode() {
-        return "// " + this.genCode();
-    }
-
-    /**
-     * <p> Generate FORTRAN code comment about inputs </p>
-     * @return string containing FORTRAN comment description of input
-     */
-    @Override
-    public String genFcode() {
-        return "* " + this.genCode();
-    }
     
     /**
      * Common input documentation scheme for all code types
      * @return string with description of input signal
      */
-    private String genCode() {
+    @Override
+    public CodeAndVarNames genCode() {
+        CodeAndVarNames cvn = new CodeAndVarNames();
         String code = "";
         Signal theSignal = this.getOutput();
         if (theSignal != null) {
-            code = code + outVarID;
+            cvn.addVarName(outVarID);
+            code += outVarID;
             if (theSignal.isStdAIAA()) 
-                code = code + " (" + theSignal.getName() + ")";
-            code = code + " is a model input";
+                code += " (" + theSignal.getName() + ")";
+            code += " is a model input";
             if (units.equalsIgnoreCase("nd"))
-                code = code + " and is non-dimensional.\n";
+                code += " and is non-dimensional.";
             else
-                code = code + " with units \'" + units + "\'\n";
+                code += " with units \'" + units + "\'";
         }
-        return code;
+        cvn.appendCode(this.wrapComment(code));
+        return cvn;
     }
 
     /**

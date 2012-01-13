@@ -192,60 +192,42 @@ public class BlockMathSwitch extends BlockMath {
     
     
     /**
-     * <p> Generate C-code equivalent of a two-position switch (if-then-else)</p>
+     * <p> Generate code equivalent of a two-position switch (if-then-else)</p>
      */
     
     @Override
-    public String genCcode() {
-        String code = "";
-        String indent = "    ";
+    public CodeAndVarNames genCode() {
+        CodeAndVarNames cvn = new CodeAndVarNames();
         Iterator<Signal> inputSig = inputs.iterator();
         Signal outputSig = this.getOutput();
         
         if (inputs == null) {
-            return "* ERROR: Encountered null input list in BlockMathSwitch genFcode";
+            cvn.appendCode(this.errorComment(
+                    "Encountered null input list in BlockMathSwitch genFcode"));
+            return cvn;
         }
         
         if (inputs.size() < 3) {
-            return "* ERROR: in BlockMathSwitch genFcode(): encountered input list" +
-                    " with less than the expected three elements.";
+            cvn.appendCode(this.errorComment(
+                    "in BlockMathSwitch genFcode(): encountered input list" +
+                    " with less than the expected three elements."));
+            return cvn;
         }
         
         // Must generate several lines of code
-        code = code + indent + outVarID + " = " + inputs.get(2).genCcode() + ";\n";
-        code = code + indent + "if(" + inputs.get(1).genCcode() + ") {\n";
-        code = code + indent + indent + outVarID + " = " + inputs.get(0).genCcode() + ";\n";
-        code = code + indent + "}\n";
-        return code;
-    }
+        cvn.appendCode(indent() + outVarID + " = ");
+        cvn.append(inputs.get(2).genCode());
+        cvn.appendCode(endLine());
+        // have to break things apart here to extract code for if statement
+        CodeAndVarNames ifCvn = inputs.get(1).genCode();
+        cvn.addVarName(ifCvn.getVarName(0));
+        cvn.appendCode(this.beginIf(ifCvn.getCode()));
+        cvn.appendCode(indent() + "  " + outVarID + " = ");
+        cvn.append(inputs.get(0).genCode());
+        cvn.appendCode(this.endLine());
+        cvn.appendCode(this.endIf());
 
-
-    /**
-     * <p> Generate FORTRAN code equivalent of a two-position switch (if-then-else)</p>
-     */
-    
-    @Override
-    public String genFcode() {
-        String code = "";
-        String indent = "       ";
-        Iterator<Signal> inputSig = inputs.iterator();
-        Signal outputSig = this.getOutput();
-        
-        if (inputs == null) {
-            return "* ERROR: Encountered null input list in BlockMathSwitch genFcode";
-        }
-        
-        if (inputs.size() < 3) {
-            return "* ERROR: in BlockMathSwitch genFcode(): encountered input list" +
-                    " with less than the expected three elements.";
-        }
-        
-        // Must generate several lines of code
-        code = code + indent + outVarID + " = " + inputs.get(2).genFcode() + "\n";
-        code = code + indent + "if(" + inputs.get(1).genFcode() + ") then\n";
-        code = code + indent + "  " + outVarID + " = " + inputs.get(0).genFcode() + "\n";
-        code = code + indent + "endif\n";
-        return code;
+        return cvn;
     }
 
 

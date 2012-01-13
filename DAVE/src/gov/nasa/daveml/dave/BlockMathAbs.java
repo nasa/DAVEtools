@@ -119,51 +119,31 @@ public class BlockMathAbs extends BlockMath
      */
     
     @Override
-    public String genCcode() {
-        String code = "";
+    public CodeAndVarNames genCode() {
+        CodeAndVarNames cvn = new CodeAndVarNames();
         Signal input;
         Signal outputSig = this.getOutput();
         // check to see if we're derived variable (code fragment) or a whole statement
         // if not derived, need preceding command and the LHS of the equation too
         if (!outputSig.isDerived()) {
 //            code = "// Code for variable \"" + outVarID + "\":\n";
-            code = code + "  " + outVarID + " = ";
+            cvn.appendCode(indent() + outVarID + " = ");
+            cvn.addVarName(outVarID);
         }
         input = inputs.get(0);
         
-        code = code + "fabs( " + input.genCcode() + " )";
+        String op = "fabs";
+        if (ourModel.getCodeDialect() == Model.DT_FORTRAN)
+            op = "ABS";
+        
+        cvn.appendCode( op + "( ");
+        cvn.append(input.genCode());
+        cvn.appendCode(" )");
         
         // if not derived, need trailing semicolon and new line
         if (!outputSig.isDerived())
-            code = code + ";\n";
-        return code;
-    }
-
-
-    /**
-     * <p> Generate FORTRAN code equivalent of our operation</p>
-     */
-    
-    @Override
-    public String genFcode() {
-        String code = "";
-        String indent = "       ";
-        Signal input;
-        Signal outputSig = this.getOutput();
-        // check to see if we're derived variable (code fragment) or a whole statement
-        // if not derived, need preceding command and the LHS of the equation too
-        if (!outputSig.isDerived()) {
-//            code = "* Code for variable \"" + outVarID + "\":\n";
-            code = code + indent + outVarID + " = ";
-        }
-        input = inputs.get(0);
-        
-        code = code + "abs( " + input.genFcode() + " )";
-        
-        // if not derived, need new line
-        if (!outputSig.isDerived())
-            code = code + "\n";
-        return code;
+            cvn.appendCode(endLine());
+        return cvn;
     }
 
 

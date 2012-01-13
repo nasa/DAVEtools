@@ -8,9 +8,9 @@ import gov.nasa.daveml.dave.*;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -38,10 +38,14 @@ class FEquationsFileWriter extends FileWriter {
     
     
     public void writeFcode() throws IOException {
+        CodeAndVarNames cvn = new CodeAndVarNames();
         BlockArrayList sortedBlocks;
         BlockArrayList outputBlocks = new BlockArrayList(10);
         Iterator<Block> blkIt;
         Block blk;
+        String codeBody = "";
+        String codeDeclarations = "";
+        ourModel.setCodeDialect(Model.DT_FORTRAN);
         try {
             sortedBlocks = ourModel.getSortedBlocks();
             if (sortedBlocks.isEmpty()) {
@@ -87,13 +91,11 @@ class FEquationsFileWriter extends FileWriter {
                     outputBlocks.add(blk);
                 // if source block is a BlockFuncTable, generate the table call
                 } else if (blk instanceof BlockFuncTable) {
-                    this.generateTableCall( (BlockFuncTable) blk);
+                    cvn.appendCode( this.generateTableCall( (BlockFuncTable) blk));
 
-                } else { // otherwise generate equation code
-                    String code = blk.genFcode();
-//                    System.out.println(code);
-                    if (!skip) 
-                        write(code);
+                } else { // otherwise generate equation variables and code
+                    if (!skip)
+                        cvn.append( blk.genCode() );
                 }
                     
             } // end of while (blkIt.hasNext()) loop
@@ -101,22 +103,37 @@ class FEquationsFileWriter extends FileWriter {
             // write information about model outputs
             blkIt = outputBlocks.iterator();
             while (blkIt.hasNext()) {
-                write( blkIt.next().genFcode() );
+                cvn.append(blkIt.next().genCode());
+                codeBody = cvn.getCode();
             }
+            
+            // Now write the declarations - sorted with no duplicates
+            codeDeclarations = "";
+            ArrayList<String> varNames = cvn.getVarNames();
+            ArrayList<String> uniqueNames = new ArrayList<String>(new HashSet( varNames ));
+            Collections.sort(uniqueNames, String.CASE_INSENSITIVE_ORDER);
+            Iterator<String> varIt = uniqueNames.iterator();
+            while (varIt.hasNext()) {
+                codeDeclarations += indent + "REAL " + varIt.next() + "\n";
+            }
+            write( codeDeclarations );
+            
+            // followed by the body (algorithms)
+            write( codeBody );
+            
+            // write the STOP and END statements
+            writeln( indent + "STOP");
+            writeln( indent + "END");
         
         } catch (DAVEException ex) {
-            System.err.println("Warning: Order of exection could not be determined (sorted varID list null).");
+            System.err.println("Warning: Order of execution could not be determined (sorted varID list null).");
         }
     }
 
 
-    private void generateTableCall(BlockFuncTable bft) {
+    private String generateTableCall(BlockFuncTable bft) {
         String outVarID = bft.getOutputVarID();
-        try {
-            writeln(indent + outVarID + " = gentab (gs.motbl." + outVarID + "t(1))");
-        } catch (IOException ex) {
-            Logger.getLogger(FEquationsFileWriter.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        return indent + outVarID + " = gentab (gs.motbl." + outVarID + "t(1))\n";
     }
     
 }
