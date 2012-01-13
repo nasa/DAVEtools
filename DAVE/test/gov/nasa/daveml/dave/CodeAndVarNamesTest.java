@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
  */
 public class CodeAndVarNamesTest {
     
-    CodeAndVarNames cvn1, cvn2;
+    CodeAndVarNames cvn0, cvn1, cvn2;
     
     public CodeAndVarNamesTest() {
     }
@@ -32,6 +32,7 @@ public class CodeAndVarNamesTest {
     
     @Before
     public void setUp() {
+        cvn0 = new CodeAndVarNames();
         cvn1 = new CodeAndVarNames("alpha is a variable\n");
         cvn1.addVarName("alpha");
         cvn2 = new CodeAndVarNames("beta is a variable\n");
@@ -48,9 +49,25 @@ public class CodeAndVarNamesTest {
         assertEquals(2, cvn1.getVarNames().size());
         assertEquals("alpha", cvn1.getVarName(0));
         assertEquals("beta",  cvn1.getVarName(1));
+        assertEquals("beta is a variable\n", cvn2.getCode());
         assertEquals(1, cvn2.getVarNames().size());
         assertEquals("beta",  cvn2.getVarName(0));
-    }
+        
+        cvn0.append(cvn1);
+        assertEquals("alpha is a variable\nbeta is a variable\n", cvn0.getCode());
+        assertEquals(2, cvn0.getVarNames().size());
+        assertEquals("alpha", cvn0.getVarName(0));
+        assertEquals("beta",  cvn0.getVarName(1));
+        
+        assertEquals("alpha is a variable\nbeta is a variable\n", cvn1.getCode());
+        assertEquals(2, cvn1.getVarNames().size());
+        assertEquals("alpha", cvn1.getVarName(0));
+        assertEquals("beta",  cvn1.getVarName(1));
+
+        assertEquals("beta is a variable\n", cvn2.getCode());
+        assertEquals(1, cvn2.getVarNames().size());
+        assertEquals("beta",  cvn2.getVarName(0));
+}
 
     /**
      * Test of appendCode method, of class CodeAndVarNames.
@@ -99,6 +116,10 @@ public class CodeAndVarNamesTest {
     @Test
     public void testGetVarNames() {
         ArrayList<String> varNames;
+        
+        varNames = cvn0.getVarNames();
+        assertNotNull(varNames);
+        assertEquals(0, varNames.size());
 
         varNames = cvn1.getVarNames();
         assertEquals(1, varNames.size());
@@ -128,7 +149,8 @@ public class CodeAndVarNamesTest {
      */
     @Test
     public void testGetCode() {
-        assertEquals("beta is a variable\n", cvn2.getCode());
+        assertEquals("",                      cvn0.getCode());
         assertEquals("alpha is a variable\n", cvn1.getCode());
+        assertEquals("beta is a variable\n",  cvn2.getCode());
     }
 }
