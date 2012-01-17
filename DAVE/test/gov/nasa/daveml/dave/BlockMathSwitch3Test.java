@@ -110,6 +110,40 @@ public class BlockMathSwitch3Test extends TestCase {
         return _block.getValue();
     }
 
+        private void checkCode( String code ) {
+        Signal defaultInput = _block.inputs.get(2);
+        defaultInput.setDefinedFlag();
+        CodeAndVarNames cvn = _block.genCode();
+        assertEquals(code, cvn.getCode());
+    }
+    
+    public void testGenCcode() {
+        // this three-stage switch gets broken into three separate switch blocks.
+        // in normal operation, the upstream blocks would have their code generated
+        // prior to this block, so we'll pretend it's output signal has previously
+        // been defined.
+        _model.setCodeDialect(Model.DT_ANSI_C);
+        String code = "";
+        String indent = "  ";
+        code = code + indent + "outputSignal = switch_7;\n";
+        code = code + indent + "if ( (ALP_UNLIM < (-2)) ) {\n";
+        code = code + indent + indent + "outputSignal = (-2);\n";
+        code = code + indent + "}\n";
+        checkCode( code );
+    }
+    
+    public void testGenFcode() {
+        // see comments in GenCCode above
+        _model.setCodeDialect(Model.DT_FORTRAN);
+        String code = "";
+        String indent = "       ";
+        code = code + indent + "outputSignal = switch_7\n";
+        code = code + indent + "IF( (ALP_UNLIM .LT. (-2)) ) THEN\n";
+        code = code + indent + "  outputSignal = (-2)\n";
+        code = code + indent + "ENDIF\n";
+        checkCode( code );
+    }
+
     public void testDescribeSelfWriter() {
         try {
             _block.describeSelf(_writer);
@@ -223,8 +257,9 @@ public class BlockMathSwitch3Test extends TestCase {
         // inputs get wired in later with model.wireBlocks()
 
         // hook up output
-        try {
+        try { // hook up inputs and outputs to the switch block
             bms.addOutput(outputSignal);
+            model.wireBlocks();
         } catch (DAVEException e) {
             fail("Unexpected exception in hooking up output signal "
                     + "in TestBlockMathSwitch2.generateSampleSwitch: " + e.getMessage());

@@ -94,11 +94,11 @@ public class BlockMathSwitch2Test extends TestCase {
     }
     
     public void testGenCcode() {
-        _model.setCodeDialect(Model.DT_ANSI_C);
         // this two-stage switch gets broken into two separate switch blocks.
         // in normal operation, the upstream block would have it's code generated
         // prior to this block, so we'll pretend it's output signal has previously
         // been defined.
+        _model.setCodeDialect(Model.DT_ANSI_C);
         String code = "";
         String indent = "  ";
         code = code + indent + "outputSignal = switch_6;\n";
@@ -109,6 +109,7 @@ public class BlockMathSwitch2Test extends TestCase {
     }
     
     public void testGenFcode() {
+        // see comments in GenCCode above
         _model.setCodeDialect(Model.DT_FORTRAN);
         String code = "";
         String indent = "       ";
