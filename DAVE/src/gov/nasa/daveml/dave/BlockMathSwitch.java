@@ -27,7 +27,8 @@ import java.util.Iterator;
  * <p>  This Block represents a simple two-position switch function.</p>
  * 
  * <p>
- * A switch has a minimum of three inputs: A, A_case, and B for a two-position switch.
+ * A switch has a minimum of three inputs: <code>A</code>, <code>A_case</code>, 
+ * and <code>B</code> for a two-position switch.
  * These correspond to the following MathML snippet:
  * 
 <pre>
@@ -44,7 +45,8 @@ import java.util.Iterator;
 
 </pre>
  * 
- * which emits input signal A if A_case is true (non-zero); otherwise B.
+ * which emits input signal <code>A</code> if <code>A_case</code> is true
+ * (non-zero); otherwise it emits <code>B</code>.
  * </p>
  * <p>
  * To implement a switch with more than two positions, such as the three-position
@@ -68,19 +70,22 @@ import java.util.Iterator;
 
 </pre>
  *
- * then the problem has five inputs: A, A_case, B, B_case, and C. 
+ * then the problem has five inputs: <code>A</code>, <code>A_case</code>, 
+ * <code>B</code>, <code>B_case</code>, and <code>C</code>. 
+ * 
  * The output should be the first input pair whose case is true (non-zero); if no 
- * input is true, the otherwise input (C) should be chosen.
+ * input is true, the otherwise input (</code>C</code>) should be chosen.
  * </p>
  * <p>
- * This is implemented in our Model by cascading BlockMathSwitches, one per input pair;
- * the final downstream block deals with A and A_case; the 'otherwise' input
- * is the output from an upstream block that deals with B and B_case with C as 
+ * This is implemented in our {@link Model} by cascading BlockMathSwitches, one per input pair;
+ * the final downstream block deals with <code>A</code> and <code>A_case</code>;
+ * the 'otherwise' input is the output from an upstream block that deals with
+ * <code>B</code> and <code>B_case</code>, with <code>C</code> as 
  * its otherwise block.
  * </p>
  * <p>
- * The multiple case switch is implemented this way as it is the lowest common
- * denominator way of several potential software implementations 
+ * The multiple case switch is implemented this way as it is the 'lowest common
+ * denominator' way of several potential software implementations 
  * (not all languages have a switch/case statement).
  * </p>
  * 
@@ -164,11 +169,11 @@ public class BlockMathSwitch extends BlockMath {
                             + other.size() + " instead.");
                     return;
                 }
-                // process like:                  this.genInputsFromApply(ikid);
+                // process like: this.genInputsFromApply(ikid);
                 // piece has two children: output 1 and condition it is used, and
                 // otherwise has default condition.
                 // Input 1 is passed if condition is true
-                this.genInputsFromApply(pieceChildren.iterator(), 1);        // input 1 & condition (input 2)
+                this.genInputsFromApply(pieceChildren.iterator(), 1); // input 1 & condition (input 2)
 
                 if (pieces.size() <= 1) {
                     // if last piece, then input 3 is the <otherwise> child
@@ -214,10 +219,22 @@ public class BlockMathSwitch extends BlockMath {
             return cvn;
         }
         
-        // Must generate several lines of code
+        Signal defaultInput = inputs.get(2);
+        // generate constant value in parentheses; otherwise, use varID
+        boolean defaultInputIsConst = 
+                defaultInput.source.getType().equals("BlockMathConst");
+        if (defaultInput.isDerived() && defaultInputIsConst) {
+            defaultInput.clearDerivedFlag();
+        }
         cvn.appendCode(indent() + outVarID + " = ");
-        cvn.append(inputs.get(2).genCode());
+        // one last test: don't duplicate a definition
+        if (defaultInput.isDefined()) {
+            cvn.appendCode( defaultInput.getVarID() );
+        } else {
+            cvn.append(defaultInput.genCode());
+        }
         cvn.appendCode(endLine());
+        
         // have to break things apart here to extract code for if statement
         CodeAndVarNames ifCvn = inputs.get(1).genCode();
         cvn.addVarName(ifCvn.getVarName(0));

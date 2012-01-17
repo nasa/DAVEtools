@@ -161,6 +161,14 @@ public class Signal
     private boolean derived = false;
 
     /**
+     * indicates this signal's equivalent code has been emitted by a call to 
+     * {@link genCode}
+     * 
+     */
+    
+    private boolean defined = false;
+    
+    /**
      * lower limit. Default is -Infinity (no lower limit)
      */
 
@@ -198,6 +206,7 @@ public class Signal
         isOutput = false;
         isStdAIAA = false;
         derived = false;
+        defined = false;
         lowerLim = Double.NEGATIVE_INFINITY;
         upperLim = Double.POSITIVE_INFINITY;
     }
@@ -239,6 +248,8 @@ public class Signal
         if (signalName == null)
             myName = "unnamed";
         myVarID = varID;
+        if (varID == null)
+            myVarID = "derived_signal_" + m.getNumSignals();
         myUnits = units;
         dests = new BlockArrayList(numConnects);
         destPorts = new ArrayList<Integer>(numConnects);
@@ -580,7 +591,6 @@ public class Signal
      *
      * Returns the indicator flag to show this was automatically generated
      *
-     * <p>
      *  This flag should be set for all 'derived' signals; i.e. those
      *  not corresponding to varDefs in the DAVE-ML source file
      *
@@ -588,6 +598,27 @@ public class Signal
 
     public boolean isDerived() { return this.derived; }
 
+    /**
+     * Sets the indicator flag to show this has been defined in code
+     */
+    
+    protected void setDefinedFlag() { this.defined = true; }
+    
+    
+    /**
+     * Clears the indicator flag (unlikely instance)
+     */
+    
+    protected void clearDefinedFlag() { this.defined = false; }
+    
+    
+    /**
+     * Returns true if this signal has been encoded already
+     */
+    
+    public boolean isDefined() { return this.defined; }
+    
+    
     /**
      * indicates a lower limit is in force
      */
@@ -915,6 +946,7 @@ public class Signal
             cvn.appendCode(this.getVarID());
             cvn.addVarName(this.getVarID());
         }  
+//        this.setDefinedFlag(); // record that we've emitted our code
         return cvn;
     }
 
