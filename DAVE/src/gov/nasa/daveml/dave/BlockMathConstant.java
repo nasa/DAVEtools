@@ -44,8 +44,7 @@ public class BlockMathConstant extends BlockMath
     public BlockMathConstant( String constantValue, Model m )
     {
 	// Initialize superblock elements
-	super("const_" + constantValue + "_", "constant value", m);
-	
+	super("const_" + m.getNumBlocks(), "constant value", m);
 	this.setValue(constantValue);
     }
 
