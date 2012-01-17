@@ -87,7 +87,7 @@ public class BlockMathConstantTest extends TestCase {
             } catch (IOException e) {
                     assertTrue(false);
             }
-            assertEquals( "Block \"const_-3.45_\" has NO INPUTS, one output (constantOutput)," +
+            assertEquals( "Block \"const_0\" has NO INPUTS, one output (constantOutput)," +
                             " value [-3.45] and is a Constant Value math block.", 
                             _writer.toString() );
     }
@@ -113,7 +113,7 @@ public class BlockMathConstantTest extends TestCase {
     }
 
     public void testGetSetName() {
-            assertEquals( "const_-3.45_", _block.getName() );
+            assertEquals( "const_0", _block.getName() );
             _block.setName("fart");
             assertEquals( "fart", _block.getName() );
     }

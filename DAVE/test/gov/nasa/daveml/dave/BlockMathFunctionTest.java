@@ -123,7 +123,7 @@ public class BlockMathFunctionTest extends TestCase {
             fail("testDescribeSelfWriter of TestBlockMathSum threw unexpected exception: " 
                   + e.getMessage() );
         }
-        assertEquals( "Block \"cos_1\" has one input (const_0.5_)," +
+        assertEquals( "Block \"cos_1\" has one input (const_1)," +
                       " NO OUTPUTS, value [0.8775825618903728] and is a Function math block.", 
                       _writer.toString() );
     }

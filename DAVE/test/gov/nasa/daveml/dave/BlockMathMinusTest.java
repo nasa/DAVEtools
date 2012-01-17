@@ -151,7 +151,7 @@ public class BlockMathMinusTest extends TestCase {
             fail("Unexpected exception in BlockMathMinusTest::testDescribeSelf with unaryMinusBlock: "
                     + e1.getMessage() );
         }
-        assertEquals( "Block \"minus_1\" has one input (const_-3.45_)," +
+        assertEquals( "Block \"minus_1\" has one input (const_1)," +
         		" one output (minusAlpha), value [3.45] and is a Minus block.",
                 writer.toString() );
 
@@ -164,7 +164,7 @@ public class BlockMathMinusTest extends TestCase {
             fail("Unexpected exception in BlockMathMinusTest::testDescribeSelf with binaryMinusBlock: "
                     + e2.getMessage() );
         }
-        assertEquals( "Block \"minus_3\" has two inputs (const_-3.45_, const_+3.45_)," +
+        assertEquals( "Block \"minus_3\" has two inputs (const_1, const_3)," +
         		" one output (alphaMinusBeta), value [-6.9] and is a Minus block.",
                 writer.toString() );
     }

@@ -464,7 +464,7 @@ public class SignalTest extends TestCase {
         assertEquals( 1,             abs_1.numInputs() );
         assertEquals( 1,             abs_1.numVarIDs() );
         assertTrue(                  abs_1.allInputsConnected() );
-        assertEquals( "const_-6.78_",abs_1.getVarID(1) );
+        assertEquals( "const_1",     abs_1.getVarID(1) );
         assertEquals( "dv",          abs_1.getOutputVarID() );
         assertEquals( theSignal,     abs_1.getOutput() );
         assertTrue(                  abs_1.outputConnected() );

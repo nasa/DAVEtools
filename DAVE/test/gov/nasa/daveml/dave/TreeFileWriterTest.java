@@ -65,12 +65,12 @@ public class TreeFileWriterTest extends TestCase {
                         "\n" +
 			"Number of signals: 1\n" +
 			"\n" +
-			"1 Signal \"theSig\" (unkn) [theSig] connects outport 1 of block const_3.4_ " +
+			"1 Signal \"theSig\" (unkn) [theSig] connects outport 1 of block const_0 " +
 			"to inport 1 of block theSig.\n" +
 			"\n" +
 			"Number of blocks: 2\n" +
 			"\n" +
-			"1 Block \"const_3.4_\" has NO INPUTS, one output (theSig), value [3.4] " +
+			"1 Block \"const_0\" has NO INPUTS, one output (theSig), value [3.4] " +
 			"and is a Constant Value math block.\n" +
 			"2 Block \"theSig\" has one input (theSig), NO OUTPUTS, value [NaN] (unkn) " +
 			"and is an output block.";

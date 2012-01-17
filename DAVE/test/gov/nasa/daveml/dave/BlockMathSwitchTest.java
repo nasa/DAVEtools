@@ -115,7 +115,7 @@ public class BlockMathSwitchTest extends TestCase {
             fail("testDescribeSelfWriter of TestBlockMathSwitch threw unexpected exception: "
                     + e.getMessage());
         }
-        assertEquals("Block \"switch_2\" has three inputs (const_-1_, unnamed, const_1_),"
+        assertEquals("Block \"switch_2\" has three inputs (const_2, unnamed, const_5),"
                 + " one output (outputSignal), value [NaN] and is a Switch math block.",
                 _writer.toString());
     }

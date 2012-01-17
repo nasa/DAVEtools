@@ -95,7 +95,7 @@ public class BlockMathFunctionExtensionTest extends BlockMathFunctionTest {
             fail("testDescribeSelfWriter of TestBlockMathSum threw unexpected exception: " 
                  + e.getMessage() );
         }
-        assertEquals( "Block \"atan2_1\" has two inputs (const_0.5_, const_0.5_)," +
+        assertEquals( "Block \"atan2_1\" has two inputs (const_1, const_2)," +
                       " NO OUTPUTS, value [0.7853981633974483] and is a Function math block.", 
                       _writer.toString() );
     }
