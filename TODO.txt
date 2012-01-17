@@ -1,7 +1,13 @@
 To-do list for DAVE/DAVE2SL
 
-110421 Get rid of setup script by putting data in block's workspace
-       through init commands (per Dave Cox)
+120117 Code generation should be done after sorting blocks, as is done 
+       now, but by calling the output signals of each block as these are 
+       really the variables in the program. Right now both signals and 
+       blocks have genCode() calls, but signal genCode() simply emits 
+       the variable name, unless it is a 'derived' (e.g. created 
+       implicitly while constructing the model but not explicitly 
+       defined in the DAVE-ML input deck) variable in which case it 
+       surrounds the source block's code in parentheses.
 
 110304 Consider allowing setting/getting inputs/outputs using
        java.util.Vector, or provide utility function to get
@@ -32,7 +38,7 @@ To-do list for DAVE/DAVE2SL
 
 070223 Resolve means to set number of input blocks (blockmathfunc
        mixes 1 and 2 inputs, but # input is defaulted to 1 in
-       constructor). See inconsisten tests performed in update()
+       constructor). See inconsistent tests performed in update()
        method of BlockMathFunction and BlockMathFunctionExtension
        classes.
 
@@ -52,6 +58,10 @@ To-do list for DAVE/DAVE2SL
 061117 Need to honor interpolate attributes in DML
 
 --- completed ---
+
+110421 Get rid of setup script by putting data in block's workspace
+       through init commands (per Dave Cox) [done, but need to keep setup 
+       script handy since doing this to library block is pointless]
 
 110114 Add support for binary <minus> [completed 2011-01-21]
 

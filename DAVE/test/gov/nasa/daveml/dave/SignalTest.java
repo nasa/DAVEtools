@@ -549,6 +549,9 @@ public class SignalTest extends TestCase {
             fail("Exception thrown while getting value of signal source in testSingleElement_ctor: " 
                  + e.getMessage());
         }
+        
+        m.setCodeDialect(Model.DT_ANSI_C);
+        assertTrue( theSignal.genCode().getCode().equals("dv") );
 
     }
 
@@ -754,6 +757,10 @@ public class SignalTest extends TestCase {
             fail("Exception thrown while getting value of signal source in testSingleElement_ctor: " 
                  + e.getMessage());
         }
+        
+        m.setCodeDialect(Model.DT_ANSI_C);
+        assertTrue( beta.genCode().getCode().equals("beta") );
+        assertTrue( dv.genCode().getCode().equals("dv") );
     }
 
     public void testSignalElementWithCalculation() {
