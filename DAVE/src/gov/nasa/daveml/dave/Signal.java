@@ -189,8 +189,8 @@ public class Signal
     public Signal()
     {
         ourModel = null;
-        myName =  "";
-        myVarID = "";
+        myName =  "unnamed";
+        myVarID = "unnamed";
         myUnits = "";
         source = null;
         sourcePort = 0;
@@ -224,7 +224,7 @@ public class Signal
 
     public Signal(String signalName, Model m)
     {
-        this( signalName, signalName, "unkn", 1, m);
+        this( signalName, Signal.toValidId(signalName), "unkn", 1, m);
     }
 
 
@@ -349,6 +349,17 @@ public class Signal
         } else {
             System.err.println("Error: Signal constructor called with " + name + " element.");
         }
+    }
+    
+    /**
+     * Converts String to valid XML ID by replacing spaces with underscores
+     */
+    
+    protected static String toValidId( String input ) {
+        String output = "";
+        if (input != null)
+            output = input.replace(" ", "_");
+        return output;
     }
     
     /**
@@ -648,7 +659,7 @@ public class Signal
      * @param strValue String containing the value
      */
 
-    protected void setLowerLimit( String strValue ) {
+    protected final void setLowerLimit( String strValue ) {
         lowerLim = Double.parseDouble( strValue );
     }
 
@@ -675,7 +686,7 @@ public class Signal
      * @param strValue String containing the value
      */
 
-    protected void setUpperLimit( String strValue ) {
+    protected final void setUpperLimit( String strValue ) {
         upperLim = Double.parseDouble( strValue );
     }
 
@@ -946,7 +957,8 @@ public class Signal
             cvn.appendCode(this.getVarID());
             cvn.addVarName(this.getVarID());
         }  
-//        this.setDefinedFlag(); // record that we've emitted our code
+        if (this.source != null)
+            this.setDefinedFlag(); // record that we've emitted our code
         return cvn;
     }
 
