@@ -79,7 +79,7 @@ class OtisTableFileWriter extends FileWriter {
         writeln(indent + outVarID);
         writeln(indent + outVarID);
         writeln(indent + "1.0");
-        writeln(indent + "* " + "no description");
+        writeTextComment( ft.getDescription() );
         writeln(indent + "1");
         writeln(indent + "NCOEF 1");
         write(  indent + "* this term is a function of ");
@@ -149,8 +149,11 @@ class OtisTableFileWriter extends FileWriter {
         }
         
         // write top-level header
-        writeln(  indent + "* " + outVarID + " values for various " +
-                bft.getVarID(numDims));
+        write(  indent + "* " + outVarID + " values");
+        if (numDims > 1)
+            writeln(  " for various " + bft.getVarID(numDims));
+        else
+            writeln();
         
         // recursively write comment header and last bit of table
         writeIndepValHdr(bft, ptIt, coords, 1);
@@ -192,5 +195,34 @@ class OtisTableFileWriter extends FileWriter {
             }
             writeln(buffer);
         }
+    }
+    
+    /**
+     * Returns input string reformatted as OTIS comment line
+     * @param description 
+     */
+
+    private void writeTextComment(String input) throws IOException {
+        String buffer = "";
+        String testBuffer;
+        if (input != null) {
+            input = input.replace("\n"," "); // newlines -> spaces
+            input = input.replace("\t", " "); // tabs -> spaces
+            input = input.replace("  ", " "); // remove dup spaces
+            String[] word = input.split(" "); // split into words
+            buffer = indent + "*";
+            for (int i = 0; i < word.length; i++) {
+                testBuffer = buffer + " " + word[i];
+                if (testBuffer.length() > lineWrapLength) {
+                    writeln(buffer);
+                    buffer = indent + "* " + word[i];
+                } else {
+                    buffer = testBuffer;
+                }
+            }
+        }
+        writeln(buffer);
+                    
+        
     }
 }
