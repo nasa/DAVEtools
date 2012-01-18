@@ -83,7 +83,15 @@ class OtisTableFileWriter extends FileWriter {
         writeln(indent + outVarID);
         writeln(indent + outVarID);
         writeln(indent + "1.0");
-        writeTextComment( ft.getDescription() );
+        
+        // add comment line
+        String descr = ft.getDescription();
+        if (descr == null)
+            descr = "No description";
+        if (descr.length() < 2)
+            descr = "No description";
+        writeTextComment( descr );
+       
         writeln(indent + "1");
         writeln(indent + "NCOEF 1");
         write(  indent + "* this term is a function of ");
@@ -223,7 +231,5 @@ class OtisTableFileWriter extends FileWriter {
             }
         }
         writeln(buffer);
-                    
-        
     }
 }
