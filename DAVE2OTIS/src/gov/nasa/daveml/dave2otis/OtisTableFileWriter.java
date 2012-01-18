@@ -21,14 +21,25 @@ class OtisTableFileWriter extends FileWriter {
     
     int tableNumber, tableRefNumber;
     Model  ourModel;
-    String indent; // indent for table values
-    int    lineWrapLength; /** max chars per line in tables */
+    int    lineWrapLen; /** max chars per line in tables                    */
+    BlockFuncTable bft; /** the model block containing the function table   */
+    FuncTable ft;       /** function table currently being written          */
+    String outVarID;    /** output variable ID for table result             */
+    String indent;      /** indent for OTIS table lines, if any             */
+    int[] dims;         /** vector of table dimensions                      */
+    int[] coords;       /** working list of progress along table dimensions */
+    int numDims;        /** number of dimensions of table                   */
 
-    public OtisTableFileWriter(Model theModel, String tableFileName) throws IOException {
+    public OtisTableFileWriter(Model theModel, String tableFileName) 
+            throws IOException {
         super( tableFileName );
         ourModel = theModel;
         indent = "         ";
-        lineWrapLength = 72;
+        lineWrapLen = 72;
+        ft = null;
+        outVarID = "";
+        dims = null;
+        numDims = -1;
     }
     
     /**
@@ -39,40 +50,33 @@ class OtisTableFileWriter extends FileWriter {
      *
      */
 
-    private void writeln( String cbuf ) throws IOException
-    {
-            super.write( cbuf + "\n" );
+    private void writeln( String cbuf ) throws IOException {
+        super.write( cbuf + "\n" );
     }
     
     /**
      * Adds just a newline
      */
     
-    private void writeln() throws IOException
-    {
+    private void writeln() throws IOException {
         this.writeln("");
     }
 
     
-    void generateTableDescription(BlockFuncTable bft) {
-        String outVarID = bft.getOutputVarID();
-        FuncTable ft    = bft.getFunctionTableDef();
-        int[] dims      = ft.getDimensions();
-        int numDims     = dims.length;
-        String gtID     = ft.getGTID();
-        
+    void generateTableDescription(BlockFuncTable theBft) {
+        bft      = theBft;
+        ft       = bft.getFunctionTableDef();
+        outVarID = bft.getOutputVarID();
+        dims     = ft.getDimensions();
+        numDims  = dims.length;
         try {               
-            this.writeTable(bft);
+            this.writeTable();
         } catch (IOException ex) {
             Logger.getLogger(OtisTableFileWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    private void writeTable(BlockFuncTable bft) throws IOException {
-        FuncTable ft    = bft.getFunctionTableDef();
-        String outVarID = bft.getOutputVarID();
-        int[] dims      = ft.getDimensions();
-        int numDims     = dims.length;
+    private void writeTable() throws IOException {
         
         // write header
         
@@ -122,7 +126,7 @@ class OtisTableFileWriter extends FileWriter {
             while (bpIt.hasNext()) {
                 double breakpointVal = bpIt.next();
                 String testBuffer = buffer + breakpointVal + "  ";
-                if (testBuffer.length() > lineWrapLength) {
+                if (testBuffer.length() > lineWrapLen) {
                     writeln(buffer);
                     buffer = indent + breakpointVal + "  ";
                 } else {
@@ -141,7 +145,7 @@ class OtisTableFileWriter extends FileWriter {
         Iterator<Double> ptIt = pts.iterator();
 
         // duplicate the dims array (vector of integers giving table dimension)
-        int[] coords = dims.clone();
+        coords = dims.clone();
         
         // zero out the array
         for (int i = 0; i < coords.length; i++) {
@@ -156,17 +160,14 @@ class OtisTableFileWriter extends FileWriter {
             writeln();
         
         // recursively write comment header and last bit of table
-        writeIndepValHdr(bft, ptIt, coords, 1);
+        writeIndepValHdr(ptIt, 1);
 
         writeln();
         writeln();
     }
 
-    private void writeIndepValHdr(BlockFuncTable bft, Iterator<Double> ptIt, 
-            int[] coords, int dim ) throws IOException {
-        FuncTable ft    = bft.getFunctionTableDef();
-        int[] dims      = ft.getDimensions();
-        int numDims     = dims.length;
+    private void writeIndepValHdr(Iterator<Double> ptIt, int dim ) 
+            throws IOException {
         if (dim < numDims) {
             String bpID = ft.getBPID(dim);
             ArrayList<Double> bps = ourModel.getBPSetByID(bpID).values();
@@ -174,7 +175,7 @@ class OtisTableFileWriter extends FileWriter {
                 coords[dim] = i; // increment along this breakpoint dimension
                 double bpVal = bps.get(coords[dim]);
                 writeln(indent + "* for " + bft.getVarID(dim) + " = " + bpVal + " ");
-                writeIndepValHdr(bft, ptIt, coords, dim+1);
+                writeIndepValHdr(ptIt, dim+1);
             }
             
         } else { // last dimension shows final-dimension vector at given coordinates
@@ -186,7 +187,7 @@ class OtisTableFileWriter extends FileWriter {
             for (int i = 0; i < numLastBps; i++) {
                 double val = ptIt.next();
                 String testBuffer = buffer + val + "  ";
-                if (testBuffer.length() > lineWrapLength) {
+                if (testBuffer.length() > lineWrapLen) {
                     writeln(buffer);
                     buffer = indent + "  " + val + "  ";
                 } else {
@@ -213,7 +214,7 @@ class OtisTableFileWriter extends FileWriter {
             buffer = indent + "*";
             for (int i = 0; i < word.length; i++) {
                 testBuffer = buffer + " " + word[i];
-                if (testBuffer.length() > lineWrapLength) {
+                if (testBuffer.length() > lineWrapLen) {
                     writeln(buffer);
                     buffer = indent + "* " + word[i];
                 } else {
