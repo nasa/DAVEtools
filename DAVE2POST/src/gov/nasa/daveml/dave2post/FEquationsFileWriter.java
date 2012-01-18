@@ -50,8 +50,9 @@ class FEquationsFileWriter extends FileWriter {
             sortedBlocks = ourModel.getSortedBlocks();
             if (sortedBlocks.isEmpty()) {
                 System.err.println(
-                        "Warning: Order of execution could not be determined" +
+                        "Error: Order of execution could not be determined" +
                         " (sorted block execution list empty).");
+                System.exit(1);
             }
             blkIt = sortedBlocks.iterator();
             while (blkIt.hasNext()) {
