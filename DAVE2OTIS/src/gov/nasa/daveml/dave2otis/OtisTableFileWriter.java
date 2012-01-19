@@ -8,7 +8,9 @@ import gov.nasa.daveml.dave.*;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -21,10 +23,12 @@ class OtisTableFileWriter extends FileWriter {
     
     int tableNumber, tableRefNumber;
     Model  ourModel;
+    Map<String,String> idMap; /** mapping of Std AIAA names to OTIS names   */
     int    lineWrapLen; /** max chars per line in tables                    */
     BlockFuncTable bft; /** the model block containing the function table   */
     FuncTable ft;       /** function table currently being written          */
     String outVarID;    /** output variable ID for table result             */
+    String outOtisName; /** translation of outVarID into OTIS namespace     */
     String indent;      /** indent for OTIS table lines, if any             */
     int[] dims;         /** vector of table dimensions                      */
     int[] coords;       /** working list of progress along table dimensions */
@@ -38,8 +42,10 @@ class OtisTableFileWriter extends FileWriter {
         lineWrapLen = 72;
         ft = null;
         outVarID = "";
+        outOtisName  = "";  
         dims = null;
         numDims = -1;
+        idMap = null;
     }
     
     /**
@@ -64,11 +70,12 @@ class OtisTableFileWriter extends FileWriter {
 
     
     void generateTableDescription(BlockFuncTable theBft) {
-        bft      = theBft;
-        ft       = bft.getFunctionTableDef();
-        outVarID = bft.getOutputVarID();
-        dims     = ft.getDimensions();
-        numDims  = dims.length;
+        bft         = theBft;
+        ft          = bft.getFunctionTableDef();
+        outVarID    = bft.getOutputVarID();
+        outOtisName = this.translate(outVarID);
+        dims        = ft.getDimensions();
+        numDims     = dims.length;
         try {               
             this.writeTable();
         } catch (IOException ex) {
@@ -81,7 +88,7 @@ class OtisTableFileWriter extends FileWriter {
         // write header
         
         writeln(indent + outVarID);
-        writeln(indent + outVarID);
+        writeln(indent + outOtisName);
         writeln(indent + "1.0");
         
         // add comment line
@@ -100,7 +107,7 @@ class OtisTableFileWriter extends FileWriter {
         else
             write(numDims + " things: ");
         for (int dim = numDims; dim >= 1; dim-- ) {
-            write( bft.getVarID(dim) );
+            write( translate(bft.getVarID(dim)) );
             if (dim > 2)
                 write( ", " );
             if (dim == 2)
@@ -117,15 +124,16 @@ class OtisTableFileWriter extends FileWriter {
         
         for (int dim = numDims; dim >= 1; dim-- ) {
        
-            String inVarID  = bft.getVarID(dim); // convert to port (1-based) number
-            String bpID     = ft.getBPID(dim);
+            String inVarID    = bft.getVarID(dim); // convert to port (1-based) number
+            String inOtisName = this.translate( inVarID );
+            String bpID       = ft.getBPID(dim);
             ArrayList<Double> bps  = ourModel.getBPSetByID(bpID).values();
             Iterator<Double> bpIt  = bps.iterator();
             
-            writeln(indent + inVarID);
-            writeln(indent + "* number of " + inVarID + "s");
+            writeln(indent + inOtisName);
+            writeln(indent + "* number of " + inOtisName + "s");
             writeln(indent + bps.size());
-            writeln(indent + "* " + inVarID + " values");
+            writeln(indent + "* " + inOtisName + " values");
             String origIndent = indent;
             indent = indent + "      "; // add six spaces
             
@@ -161,9 +169,9 @@ class OtisTableFileWriter extends FileWriter {
         }
         
         // write top-level header
-        write(  indent + "* " + outVarID + " values");
+        write(  indent + "* " + outOtisName + " values");
         if (numDims > 1)
-            writeln(  " for various " + bft.getVarID(numDims));
+            writeln(  " for various " + translate( bft.getVarID(numDims) ));
         else
             writeln();
         
@@ -182,7 +190,8 @@ class OtisTableFileWriter extends FileWriter {
             for (int i = 0; i < bps.size(); i++ ) {
                 coords[dim] = i; // increment along this breakpoint dimension
                 double bpVal = bps.get(coords[dim]);
-                writeln(indent + "* for " + bft.getVarID(dim) + " = " + bpVal + " ");
+                writeln(indent + "* for " + translate( bft.getVarID(dim) ) + 
+                        " = " + bpVal + " ");
                 writeIndepValHdr(ptIt, dim+1);
             }
             
@@ -231,5 +240,60 @@ class OtisTableFileWriter extends FileWriter {
             }
         }
         writeln(buffer);
+    }
+    
+    /**
+     * Translates variable identified by varID into OTIS ABLOCK name
+     * if available.
+     * 
+     * Uses the varID to fetch the variable; if the variable is a standard AIAA 
+     * variable, and there is a matching OTIS variable name, it returns the OTIS
+     * name.
+     * 
+     * @param varID variable ID to translate into OTIS name
+     */
+    
+    private String translate( String varID ) {
+        
+        String output = varID;
+        if (idMap == null)
+            this.setupMap(); // initialize the mapping of AIAA -> OTIS varnames
+        
+        // find variable (signal) definition in source XML
+        Signal signal = ourModel.getSignals().findByID(varID);
+        
+        // if standard, do lookup in map
+        if( signal.isStdAIAA() ) {
+            String varName = signal.getName();
+            String units   = signal.getUnits();
+            String aiaaName = varName;
+            if (!units.equalsIgnoreCase("nd")) {
+                aiaaName = varName + "_" + units;
+            }
+            String otisName = idMap.get(signal.getName());
+            if (otisName != null) {
+                output = otisName;
+            }
+        }
+        
+        return output;
+    }
+
+    /**
+     * Build the map from Standard AIAA (S-119 defined) variable names to OTIS
+     */
+    private void setupMap() {
+        idMap = new HashMap<String, String>();
+        //         AIAA Standard Name_units  OTIS
+        idMap.put("angleOfAttack_rad"      , "ALPHA" );
+        idMap.put("angleOfAttack_deg"      , "ALPHAD");
+        idMap.put("angleOfSideslip_rad"    , "BETA"  );
+        idMap.put("angleOfSideslip_deg"    , "BETAD" );
+        idMap.put("totalCoefficientOfDrag" , "CD"    );
+        idMap.put("totalCoefficientOfLift" , "CL"    );
+        idMap.put("trueAirspeed_ft_s"      , "VEL"   );
+        idMap.put("dynamicPressure_lbf_ft2", "Q"     );
+        idMap.put("mach"                   , "MACH"  );
+        // TODO - needs expansion - above for proof-of-concept
     }
 }
