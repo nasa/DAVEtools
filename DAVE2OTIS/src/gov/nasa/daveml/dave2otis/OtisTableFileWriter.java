@@ -264,13 +264,8 @@ class OtisTableFileWriter extends FileWriter {
         
         // if standard, do lookup in map
         if( signal.isStdAIAA() ) {
-            String varName = signal.getName();
-            String units   = signal.getUnits();
-            String aiaaName = varName;
-            if (!units.equalsIgnoreCase("nd")) {
-                aiaaName = varName + "_" + units;
-            }
-            String otisName = idMap.get(signal.getName());
+            String aiaaName = this.getAIAAName( signal );
+            String otisName = idMap.get(aiaaName);
             if (otisName != null) {
                 output = otisName;
             }
@@ -291,9 +286,45 @@ class OtisTableFileWriter extends FileWriter {
         idMap.put("angleOfSideslip_deg"    , "BETAD" );
         idMap.put("totalCoefficientOfDrag" , "CD"    );
         idMap.put("totalCoefficientOfLift" , "CL"    );
-        idMap.put("trueAirspeed_ft_s"      , "VEL"   );
-        idMap.put("dynamicPressure_lbf_ft2", "Q"     );
         idMap.put("mach"                   , "MACH"  );
+        idMap.put("eulerAngle_rad_Roll"    , "PHIG"  );
+        idMap.put("eulerAngle_deg_Roll"    , "PHIGD" );
+        idMap.put("eulerAngle_rad_Yaw"     , "PSIG"  );
+        idMap.put("eulerAngle_deg_Yaw"     , "PSIGD" );
+        idMap.put("dynamicPressure_lbf_ft2", "Q"     );
+        idMap.put("eulerAngle_rad_Pitch"   , "THETG" );
+        idMap.put("eulerAngle_deg_Pitch"   , "THETGD");
+        idMap.put("trueAirspeed_ft_s"      , "VEL"   );
         // TODO - needs expansion - above for proof-of-concept
+    }
+
+    
+    /**
+     * Convert signal name (pseudo-AIAA name) into true AIAA name
+     * that potentially has both units and/or axis id appended
+     * @param signal
+     * @return 
+     */
+    private String getAIAAName(Signal signal) {
+        String varName  = signal.getName();
+        String units    = signal.getUnits();
+        String aiaaName = varName;
+        String axisName = "";
+
+        // now deal with eulerAngle_deg_Roll; scalar AIAA name would 
+        // be coded as eulerAngle_Roll; must insert units ahead of _Roll
+        int underbar = varName.indexOf("_");
+        int varNameLen = varName.length();
+
+        if (underbar > 0) {
+            axisName = varName.substring(underbar,(varNameLen-underbar));
+            aiaaName = varName.substring(underbar);
+        }
+        if (!units.equalsIgnoreCase("nd")) {
+            aiaaName = varName + "_" + units;
+        }
+        aiaaName += axisName; // add _Roll, e.g.
+        
+        return aiaaName;
     }
 }
