@@ -68,7 +68,13 @@ class OtisTableFileWriter extends FileWriter {
         this.writeln("");
     }
 
-    
+    /**
+     * Top-level entry point; pass in each table to be written into OTIS format.
+     * This top-level stores information from the provided <code>BlockFuncTable</code>
+     * into local fields for convenience.
+     * 
+     * @param theBft The <code>BlockFuncTable</code> to be expressed in OTIS format
+     */
     void generateTableDescription(BlockFuncTable theBft) {
         bft         = theBft;
         ft          = bft.getFunctionTableDef();
@@ -83,6 +89,11 @@ class OtisTableFileWriter extends FileWriter {
         }
     }
     
+    /**
+     * Private routine that actually generates the OTIS output in several parts.
+     * @throws IOException 
+     */
+    
     private void writeTable() throws IOException {
         
         // write header
@@ -92,12 +103,8 @@ class OtisTableFileWriter extends FileWriter {
         writeln(indent + "1.0");
         
         // add comment line
-        String descr = ft.getDescription();
-        if (descr == null)
-            descr = "No description";
-        if (descr.length() < 2)
-            descr = "No description";
-        writeTextComment( descr );
+        String descr = bft.getDescription();
+        this.writeTextComment( descr );
        
         writeln(indent + "1");
         writeln(indent + "NCOEF 1");
@@ -113,32 +120,52 @@ class OtisTableFileWriter extends FileWriter {
             if (dim == 2)
                 write( " and ");
         }
+        
         writeln();
         writeln(indent + numDims);
         
-        // WRITE BREAKPOINTS (INDEPENDENT VALUES)
+        // Generate the independent variables listing in OTIS
+        this.writeIndependentValues();
         
-        // note that we work backwards in writing independent values
-        // as OTIS's convention is first breakpoint varies fastest
-        // whereas DAVE-ML the last dimension varies fastest
+        // Generate the table of dependent values, with headers separating
+        // each dimension
         
+        this.writeDependentValues();
+        
+        // put two blank lines after each table
+        
+        writeln();
+        writeln();
+    }
+    
+    
+    /**
+     * Emit the breakpoint (independent values) vectors
+     */
+
+    private void writeIndependentValues() throws IOException {
+        
+    // note that we work backwards in writing independent values
+    // as OTIS's convention is first breakpoint varies fastest
+    // whereas DAVE-ML the last dimension varies fastest
+
         for (int dim = numDims; dim >= 1; dim-- ) {
-       
+
             String inVarID    = bft.getVarID(dim); // convert to port (1-based) number
             String inOtisName = this.translate( inVarID );
             String bpID       = ft.getBPID(dim);
             ArrayList<Double> bps  = ourModel.getBPSetByID(bpID).values();
             Iterator<Double> bpIt  = bps.iterator();
-            
+
             writeln(indent + inOtisName);
             writeln(indent + "* number of " + inOtisName + "s");
             writeln(indent + bps.size());
             writeln(indent + "* " + inOtisName + " values");
             String origIndent = indent;
             indent = indent + "      "; // add six spaces
-            
+
             String buffer = indent;
-            
+
             while (bpIt.hasNext()) {
                 double breakpointVal = bpIt.next();
                 String testBuffer = buffer + breakpointVal + "  ";
@@ -152,9 +179,15 @@ class OtisTableFileWriter extends FileWriter {
             writeln(buffer);
             indent = origIndent;
         }
-        
+    }
+    
+    /**
+     * Emit the table of dependent values in OTIS format
+     */
+    
+    private void writeDependentValues() throws IOException {
         // WRITE TABLE VALUES (DEPENDENT VALUES)
-        
+
         // these are in the stored order, since we wrote breakpoints 
         // in reverse order
         ArrayList<Double> pts = ft.getValues();
@@ -162,28 +195,60 @@ class OtisTableFileWriter extends FileWriter {
 
         // duplicate the dims array (vector of integers giving table dimension)
         coords = dims.clone();
-        
+
         // zero out the array
         for (int i = 0; i < coords.length; i++) {
             coords[i] = 0;
         }
-        
+
         // write top-level header
         write(  indent + "* " + outOtisName + " values");
         if (numDims > 1)
             writeln(  " for various " + translate( bft.getVarID(numDims) ));
         else
             writeln();
-        
-        // recursively write comment header and last bit of table
-        writeIndepValHdr(ptIt, 1);
 
-        writeln();
-        writeln();
+        // recursively write comment header and last bit of table
+        writeIndepValsWithHdr(ptIt, 1);
     }
 
-    private void writeIndepValHdr(Iterator<Double> ptIt, int dim ) 
+    
+    /**
+     * Called by writeDependentValues(), this recursive routines writes comments 
+     * documenting the current coordinates corresponding to outer dimensions 
+     * followed current inner-most vector of dependent values (DV) from the data
+     * table.
+     * 
+     * The <code>dim</code> parameter is the offset (0-based) into the 
+     * <code>coords[]</code> vector, which is a list of current table coordinates
+     * (we don't make use of the last entry since we emit that dimension all at 
+     * once).
+     * 
+     * If called with <code>dim</code> equal to an value of something less 
+     * than the next-to-last dimension offset (0-based), this routine 
+     * emits a single comment line giving that coordinate value, and calls 
+     * itself  with <code>dim</code> incremented to point to the next outer-most 
+     * entry of <code>coords[]</code>.
+     * 
+     * If called with <code>dim</code> equal to the offset to the next-to-last
+     * entry in <code>coords[]</code>, we generate the DV points corresponding 
+     * to the final dimension of entries corresponding to the table coordinates
+     * specified in <code>coords[]</code>.
+     * 
+     * If the table is f(Mach, alpha, deflection) then this emits something like
+     * 
+     *   * for Mach = 0.8
+     *   * for alpha = 10.3
+     *   ...appropriate points from table separated by spaces...
+     * 
+     * @param ptIt  An <code>Iterator</code> pointing to next DV point
+     * @param dim   The current offset into the vector of dimensions
+     * @throws IOException 
+     */
+    
+    private void writeIndepValsWithHdr(Iterator<Double> ptIt, int dim ) 
             throws IOException {
+        
         if (dim < numDims) {
             String bpID = ft.getBPID(dim);
             ArrayList<Double> bps = ourModel.getBPSetByID(bpID).values();
@@ -192,7 +257,7 @@ class OtisTableFileWriter extends FileWriter {
                 double bpVal = bps.get(coords[dim]);
                 writeln(indent + "* for " + translate( bft.getVarID(dim) ) + 
                         " = " + bpVal + " ");
-                writeIndepValHdr(ptIt, dim+1);
+                writeIndepValsWithHdr(ptIt, dim+1);
             }
             
         } else { // last dimension shows final-dimension vector at given coordinates
@@ -215,12 +280,14 @@ class OtisTableFileWriter extends FileWriter {
         }
     }
     
+
     /**
      * Returns input string reformatted as OTIS comment line
      * @param description 
      */
 
     private void writeTextComment(String input) throws IOException {
+        
         String buffer = "";
         String testBuffer;
         if (input != null) {
@@ -270,7 +337,6 @@ class OtisTableFileWriter extends FileWriter {
                 output = otisName;
             }
         }
-        
         return output;
     }
 
