@@ -5,7 +5,6 @@
 package gov.nasa.daveml.dave2otis;
 
 import gov.nasa.daveml.dave.*;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,15 +15,12 @@ import java.util.Iterator;
  *
  * @author ebjackso
  */
-class FOtisEquationsFileWriter extends FileWriter {
-    
-    Model ourModel;
+class FOtisEquationsFileWriter extends OtisWriter {
     
     String indent;
 
     public FOtisEquationsFileWriter(Model theModel, String sourceFileName) throws IOException {
-        super( sourceFileName );
-        ourModel = theModel;
+        super( theModel, sourceFileName );
         indent = "       ";
     }
     
