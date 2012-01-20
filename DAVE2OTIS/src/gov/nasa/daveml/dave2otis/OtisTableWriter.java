@@ -32,7 +32,7 @@ class OtisTableWriter extends OtisWriter {
     public OtisTableWriter(Model theModel, String tableFileName) 
             throws IOException {
         super( theModel, tableFileName );
-        indent = "         ";
+        indent = "";
         lineWrapLen = 72;
         ft = null;
         outVarID = "";
@@ -92,16 +92,23 @@ class OtisTableWriter extends OtisWriter {
         
         // write header
         
+        writeln("* Data set name");
         writeln(indent + outVarID);
+        writeln("* Table name");
         writeln(indent + outOtisName);
+        writeln("* Data set scale factor");
         writeln(indent + "1.0");
         
-        // add comment line
+        // add comment line(s)
+        writeln("*============================");
         String descr = bft.getDescription();
-        this.writeTextComment( descr );
+        this.writeTextComment( normalize(descr) );
+        writeln("*============================");
        
+        writeln("* Number of terms");
         writeln(indent + "1");
-        writeln(indent + "NCOEF 1");
+        writeln("* Number of tabular coefficients");
+        writeln(indent + "NCOEF1");
         write(  indent + "* this term is a function of ");
         if (numDims == 1)
             write("one thing: ");
@@ -126,10 +133,10 @@ class OtisTableWriter extends OtisWriter {
         
         this.writeDependentValues();
         
-        // put two blank lines after each table
+        // put two empty comment lines after each table
         
-        writeln();
-        writeln();
+        writeln("*");
+        writeln("*-----------------------------------------------------");
     }
     
     
@@ -285,9 +292,7 @@ class OtisTableWriter extends OtisWriter {
         String buffer = "";
         String testBuffer;
         if (input != null) {
-            input = input.replace("\n"," "); // newlines -> spaces
-            input = input.replace("\t", " "); // tabs -> spaces
-            input = input.replace("  ", " "); // remove dup spaces
+            input = normalize(input);
             String[] word = input.split(" "); // split into words
             buffer = indent + "*";
             for (int i = 0; i < word.length; i++) {

@@ -110,4 +110,18 @@ public abstract class OtisWriter extends FileWriter {
         return aiaaName;
     }
     
+    
+    /**
+     * Remove extra whitespace from input string
+     */
+    
+    public String normalize( String input ) {
+        if (input != null) {
+            input = input.replace('\n', ' '); // newlines -> spaces
+            input = input.replace('\t', ' '); // tabs -> spaces
+            input = input.replace("  ", " "); // remove dup spaces
+            input = input.replace("  ", " "); // again
+        }
+        return input;
+    }
 }
