@@ -741,5 +741,14 @@ public class BlockFuncTable extends Block
 	if (verbose) System.out.println(" Interpolated between " + a + " and " + b + " is value " + value);
 	return value;
     }
+    
+    /**
+     * Returns the contents of the description field, with spaces substituted for newlines
+     * @return 
+     */
+
+    public String getDescription() {
+        return description.replace('\n', ' ');
+    }
 }
 
