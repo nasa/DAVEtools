@@ -16,7 +16,7 @@ import java.util.logging.Logger;
  *
  * @author ebjackso
  */
-class OtisTableFileWriter extends OtisWriter {
+class OtisTableWriter extends OtisWriter {
     
     int tableNumber, tableRefNumber;
     int    lineWrapLen; /** max chars per line in tables                    */
@@ -29,7 +29,7 @@ class OtisTableFileWriter extends OtisWriter {
     int[] coords;       /** working list of progress along table dimensions */
     int numDims;        /** number of dimensions of table                   */
 
-    public OtisTableFileWriter(Model theModel, String tableFileName) 
+    public OtisTableWriter(Model theModel, String tableFileName) 
             throws IOException {
         super( theModel, tableFileName );
         indent = "         ";
@@ -79,7 +79,7 @@ class OtisTableFileWriter extends OtisWriter {
         try {               
             this.writeTable();
         } catch (IOException ex) {
-            Logger.getLogger(OtisTableFileWriter.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(OtisTableWriter.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     

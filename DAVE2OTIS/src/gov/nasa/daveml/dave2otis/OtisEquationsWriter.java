@@ -15,11 +15,11 @@ import java.util.Iterator;
  *
  * @author ebjackso
  */
-class FOtisEquationsFileWriter extends OtisWriter {
+class OtisEquationsWriter extends OtisWriter {
     
     String indent;
 
-    public FOtisEquationsFileWriter(Model theModel, String sourceFileName) throws IOException {
+    public OtisEquationsWriter(Model theModel, String sourceFileName) throws IOException {
         super( theModel, sourceFileName );
         indent = "       ";
     }

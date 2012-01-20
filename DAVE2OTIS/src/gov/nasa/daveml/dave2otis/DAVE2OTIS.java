@@ -186,8 +186,8 @@ public class DAVE2OTIS extends DAVE {
         String modelName = file.getName();	// removes path
 
         // script file for now
-        OtisTableFileWriter tableWriter = new OtisTableFileWriter(theModel, this.tableFileName);
-        FOtisEquationsFileWriter equationWriter = new FOtisEquationsFileWriter(theModel, this.sourceFileName);
+        OtisTableWriter tableWriter = new OtisTableWriter(theModel, this.tableFileName);
+        OtisEquationsWriter equationWriter = new OtisEquationsWriter(theModel, this.sourceFileName);
 
         // Write headers
 //        mdlWriter.writeSLHeader(modelName);
