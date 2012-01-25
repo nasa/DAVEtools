@@ -689,6 +689,15 @@ abstract public class Block
         this.outVarID = this.output.getVarID();
     }
 
+    /**
+     * Forces the variable ID of the specified input port to match the connected signal
+     */
+    
+    public void renameInVarID(Integer portNum) {
+        Signal input = this.inputs.get(portNum-1);
+        String newVarID = input.myVarID;
+        this.inVarIDs.set(portNum-1, newVarID);
+    }
 
 
     /**

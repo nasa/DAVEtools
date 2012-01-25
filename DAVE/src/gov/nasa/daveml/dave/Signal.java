@@ -583,12 +583,30 @@ public class Signal
     /**
      *
      * <p> Set the unique varID of the signal </p>
+     * 
+     * <p> Also changes the varID of connected blocks </p>
      *
      * @param theVarID <code>String</code> to use for varID
      *
      **/
 
-    public void setVarID( String theVarID ) { this.myVarID = theVarID; }
+    public void setVarID( String theVarID ) { 
+        // set our variable ID
+        this.myVarID = theVarID;
+        
+        // set our source blocks output var ID
+        if (this.source != null)
+            this.source.renameOutVarID();
+        
+        // set our destination blocks input varIDs
+        BlockArrayList sinks = this.getDests();
+        ArrayList<Integer> sinkPorts = this.getDestPortNumbers();
+        if ((sinks != null) && (sinkPorts != null))
+            for (int i = 0; i < sinks.size(); i++) {
+                Block blk = sinks.get(i);
+                blk.renameInVarID( sinkPorts.get(i));
+            }
+    }
 
 
     /**
