@@ -17,6 +17,8 @@ import gov.nasa.daveml.dave.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -52,7 +54,7 @@ public class DAVE2OTIS extends DAVE {
     /**
      *  Name of the _table.c (equations) file
      */
-    String sourceFileName;
+    String modelFileName;
 //    /**
 //     *  indicates user asked for Warn on clip at run time for table lookups
 //     */
@@ -119,7 +121,7 @@ public class DAVE2OTIS extends DAVE {
     public void setInputFileName(String fn) {
         super.setInputFileName(fn);	// sets stub and file name fields
         this.tableFileName = this.getStubName() + ".dat";
-        this.sourceFileName = this.getStubName() + ".f";
+        this.modelFileName = this.getStubName() + ".inl";
     }
 
     /**
@@ -185,28 +187,58 @@ public class DAVE2OTIS extends DAVE {
         File file = new File(this.getStubName());
         String modelName = file.getName();	// removes path
 
-        // script file for now
+        // select only CL and CD outputs
+        
+        theModel.clearSelections();
+        
+        if (!theModel.selectOutputByName("totalCoefficientOfLift")) {
+            System.err.println( "Error: lift coefficient not found");
+            System.exit(1);
+        }
+        
+        if (!theModel.selectOutputByName("totalCoefficientOfDrag")) {
+            System.err.println( "Error: drag coefficient not found");
+            System.exit(1);
+        }
+        
+        // create two file writers
         OtisTableWriter tableWriter = new OtisTableWriter(theModel, this.tableFileName);
-        OtisEquationsWriter equationWriter = new OtisEquationsWriter(theModel, this.sourceFileName);
-
-        // Write headers
-//        mdlWriter.writeSLHeader(modelName);
-//        matWriter.writeDataHeader(modelName);
+        OtisModelWriter modelWriter = new OtisModelWriter(theModel, this.modelFileName);
 
         // generate contents
         
-        equationWriter.writeFcode();
+        modelWriter.writeModel( modelName );
         
         // find the function blocks
-        BlockArrayList blocks = theModel.getBlocks();
-        Iterator<Block> it = blocks.iterator();
-        while(it.hasNext()) {
-            Block blk = it.next();
-            if (blk instanceof BlockFuncTable) {
-                BlockFuncTable bft = (BlockFuncTable) blk;
-                tableWriter.generateTableDescription( bft );
+        BlockArrayList blocks = null;
+        try {
+            blocks = theModel.getSelectedBlocks();
+            if (blocks == null) {
+                System.err.println(
+                        "Error: Order of execution could not be determined" +
+                        " (sorted block execution list null).");
+                System.exit(1);
             }
-        }   
+            if (blocks.isEmpty()) {
+                System.err.println(
+                        "Error: Order of execution could not be determined" +
+                        " (sorted block execution list empty).");
+                System.exit(1);
+            }        
+        
+            Iterator<Block> it = blocks.iterator();
+            while(it.hasNext()) {
+                Block blk = it.next();
+                if (blk instanceof BlockFuncTable) {
+                    BlockFuncTable bft = (BlockFuncTable) blk;
+                    tableWriter.generateTableDescription( bft );
+                }
+            }   
+        
+        } catch (DAVEException ex) {
+            Logger.getLogger(DAVE2OTIS.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
 
         // Write footers
 //        mdlWriter.writeSLFooter(this.getVersion(), modelName);
@@ -214,7 +246,7 @@ public class DAVE2OTIS extends DAVE {
 
         // Close the files
         tableWriter.close();
-        equationWriter.close();
+        modelWriter.close();
 
     }
 

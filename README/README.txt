@@ -42,6 +42,14 @@ DAVE2SL::
 	provided DAVE-ML model. It also creates and runs a
 	verification script, if the DAVE-ML model included checkcases.
 
+DAVE2OTIS::
+	Generates an OTIS4 input deck (*.dat) and scenario file
+	(*.inl)
+
+DAVE2POST:: 
+	Generates appropriate POST II table (*.pos2) and model (*.f)
+	files.
+
 ModelSweeper::
 	Provides a GUI-based tool to inspect the outputs of the
 	DAVE-ML model by plotting a 3D response surface of any output
@@ -178,6 +186,10 @@ to define these aliases in your +.cshrc+ or +.bashrc+ file:
 gov.nasa.daveml.dave.DAVE"+ +
 +alias *dave2sl*="java -cp _path_to/DAVEtools.jar_
 gov.nasa.daveml.dave2sl.DAVE2SL"+ +
++alias *dave2post*="java -cp _path_to/DAVEtools.jar_
+gov.nasa.daveml.dave2post.DAVE2POST"+ +
++alias *dave2otis*="java -cp _path_to/DAVEtools.jar_
+gov.nasa.daveml.dave2otis.DAVE2OTIS"+ +
 +alias *sweep*="java -cp 'path_to/DAVEtools.jar'
 gov.nasa.daveml.sweeper.ModelSweeperUI"+ +
 =====================================================================
@@ -415,6 +427,31 @@ Method update() called for output block 'aeroBodyMomentCoefficient_Roll'
 Verified 25 of 25 embedded checkcases.
 ----
 
+Using DAVE2POST or DAVE2OTIS
+----------------------------
+
+Both of these tools are invoked similar to DAVE2SL:
+
+----
+$ dave2post HL20_aero.dml
+----
+
+will generate two POST-II input files: +HL20_aero.pos2+ will contain
+data tables in POST-II format, and +HL20_aero.f+ will contain an aero
+model snippet in Fortran, suitable for inclusion in POST-II.
+
+----
+$ dave2otis HL20_aero.dml
+---- 
+
+likewise generates two OTIS4 input files: +HL20_aero.dat+ will contain
+data tables in OTIS4 format, and +HL20_aero.inl+ is the input file for
+OTIS4 operation (six-dof). Some manual editing of this file will be
+needed before execution by OTIS4, including setting the type of
+simulation (2DOF, 3DOF, etc) and setting the necessary initial state
+values.
+ 
+
 Using ModelSweeper
 ------------------
 
@@ -440,8 +477,11 @@ http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html.
 Changes since V 0.9
 -------------------
 
-V 0.9.4:: Added new utility: DAVE2POST, to generate POST-II input decks and code sections.
-	Added FORTRAN and C code snippet writers, to support DAVE2POST.
+V 0.9.4:: Added new utilities: DAVE2POST, to generate POST-II input
+	decks and code sections; and DAVE2OTIS, to generate OTIS4
+	input decks.  Added FORTRAN and C code snippet writers, to
+	support these.  Added selectionFlag to Block and
+	selectOutput(), getSelectedBlocks() to Model
 
 V 0.9.3:: Added tally of checkcases to DAVE's statistics summary (when
 	used with the -c option). Added support for UML diagram
