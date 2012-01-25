@@ -124,4 +124,16 @@ public abstract class OtisWriter extends FileWriter {
         }
         return input;
     }
+    
+    /**
+     * Indicates if provided varID needs to be converted
+     * @param varID
+     * @return flag is true if translation required
+     */
+    public boolean needsTranslation(String varID) {
+        
+        return !this.translate(varID).equals(varID);
+    }
+
+
 }

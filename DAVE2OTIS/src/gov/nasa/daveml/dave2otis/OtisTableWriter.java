@@ -66,14 +66,11 @@ class OtisTableWriter extends OtisWriter {
      * Top-level entry point; pass in each table to be written into OTIS format.
      * This top-level stores information from the provided <code>BlockFuncTable</code>
      * into local fields for convenience.
-     * 
-     * @param theBft The <code>BlockFuncTable</code> to be expressed in OTIS format
      */
-    void generateTableDescription(BlockFuncTable theBft) {
-        bft         = theBft;
+    void generateTableDescription() {
         ft          = bft.getFunctionTableDef();
         outVarID    = bft.getOutputVarID();
-        outOtisName = this.translate(outVarID);
+        outOtisName = outVarID;
         dims        = ft.getDimensions();
         numDims     = dims.length;
         try {               
@@ -115,7 +112,7 @@ class OtisTableWriter extends OtisWriter {
         else
             write(numDims + " things: ");
         for (int dim = numDims; dim >= 1; dim-- ) {
-            write( translate(bft.getVarID(dim)) );
+            write( bft.getVarID(dim) );
             if (dim > 2)
                 write( ", " );
             if (dim == 2)
@@ -153,7 +150,7 @@ class OtisTableWriter extends OtisWriter {
         for (int dim = numDims; dim >= 1; dim-- ) {
 
             String inVarID    = bft.getVarID(dim); // convert to port (1-based) number
-            String inOtisName = this.translate( inVarID );
+            String inOtisName = inVarID; // translation should have been done previously
             String bpID       = ft.getBPID(dim);
             ArrayList<Double> bps  = ourModel.getBPSetByID(bpID).values();
             Iterator<Double> bpIt  = bps.iterator();
@@ -205,7 +202,7 @@ class OtisTableWriter extends OtisWriter {
         // write top-level header
         write(  indent + "* " + outOtisName + " values");
         if (numDims > 1)
-            writeln(  " for various " + translate( bft.getVarID(numDims) ));
+            writeln(  " for various " + bft.getVarID(numDims) );
         else
             writeln();
 
@@ -256,7 +253,7 @@ class OtisTableWriter extends OtisWriter {
             for (int i = 0; i < bps.size(); i++ ) {
                 coords[dim] = i; // increment along this breakpoint dimension
                 double bpVal = bps.get(coords[dim]);
-                writeln(indent + "* for " + translate( bft.getVarID(dim) ) + 
+                writeln(indent + "* for " + bft.getVarID(dim) + 
                         " = " + bpVal + " ");
                 writeIndepValsWithHdr(ptIt, dim+1);
             }
@@ -306,6 +303,18 @@ class OtisTableWriter extends OtisWriter {
             }
         }
         writeln(buffer);
+    }
+
+    void writeTables( BlockArrayList blocks ) {
+        
+        Iterator<Block> it = blocks.iterator();
+        while(it.hasNext()) {
+            Block blk = it.next();
+            if (blk instanceof BlockFuncTable) {
+                bft = (BlockFuncTable) blk;
+                this.generateTableDescription();
+            }
+        }   
     }
     
 }

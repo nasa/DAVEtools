@@ -7,8 +7,6 @@ package gov.nasa.daveml.dave2otis;
 import gov.nasa.daveml.dave.*;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,80 +41,72 @@ class OtisModelWriter extends OtisWriter {
     }
     
     
-    public void writeModel(String modelName) throws IOException {
+    public void writeModel(BlockArrayList sortedBlocks, String modelName) throws IOException {
         CodeAndVarNames cvn = new CodeAndVarNames();
-        BlockArrayList sortedBlocks;
         Iterator<Block> blkIt;
         Block blk;
         ourModel.setCodeDialect(Model.DT_FORTRAN);
-        try {
-            sortedBlocks = ourModel.getSelectedBlocks();
-            if (sortedBlocks.isEmpty()) {
-                System.err.println(
-                        "Error: Order of execution could not be determined" +
-                        " (sorted block execution list empty).");
-                System.exit(1);
-            }
-            
-            // Write aero intermediate calculations
-            blkIt = sortedBlocks.iterator();
-            
-            
-            while (blkIt.hasNext()) {
-                blk = blkIt.next();
-                boolean skip = false;
-                
-                // Mark 'derived' limiter and switch blocks as 'underived'
-                // These blocks were inserted during parsing a <variableDef>
-                // element and in essence create a new variable, previously undefined.
-                // They are marked as 'derived' because they don't appear in the original MathML
-                // We need to treat them as an original ('underived') variable
-                // so the logic gets expressed as separate lines, not within 
-                // a parenthetical expression.
-                
-                if (blk instanceof BlockLimiter || blk instanceof BlockMathSwitch )
-                    blk.getOutput().clearDerivedFlag();
-                
-                // debugging section
-                String id = blk.getOutputVarID();
-                if (id != null)
-                    if (id.equals("BSPAN")) {
-                        System.out.println("Found " + id);
-                    }
+        
+        // Write aero intermediate calculations
+        blkIt = sortedBlocks.iterator();
 
-                // If we output a 'derived' signal, don't generate code;
-                // such a signal-generating block was inserted for Simulink
-                // realization
-                
-                Signal outSig = blk.getOutput();
-                if (outSig != null)
-                    if (outSig.isDerived()) {
-//                      System.out.println("Skipping block " + blk.getName() + " as a derived block");
-                        skip = true;// don't emit code at this point
-                    }
-               
-                if (blk instanceof BlockBP ) {          // ignore this block
-                    // skip code generation
-                } else if (blk instanceof BlockInput)  { // collect for start
-                    inputBlocks.add(blk);
-//                  System.out.println("Putting block " + blk.getName() + " into input block list");
-                    skip = true;
-                } else if (blk instanceof BlockOutput) { // collect for end
-                    outputBlocks.add(blk);
-//                  System.out.println("Putting block " + blk.getName() + " into output block list");
-                    skip = true;
-                // if source block is a BlockFuncTable, generate the table call
-                } else if (blk instanceof BlockFuncTable) {
-                    cvn.appendCode( this.generateTableCall( (BlockFuncTable) blk));
+        while (blkIt.hasNext()) {
+            blk = blkIt.next();
+            boolean skip = false;
 
-                } else { // otherwise generate equation variables and code
-                    if (!skip)
-                        cvn.append( blk.genCode() );
+            // Mark 'derived' limiter and switch blocks as 'underived'
+            // These blocks were inserted during parsing a <variableDef>
+            // element and in essence create a new variable, previously undefined.
+            // They are marked as 'derived' because they don't appear in the original MathML
+            // We need to treat them as an original ('underived') variable
+            // so the logic gets expressed as separate lines, not within 
+            // a parenthetical expression.
+
+            if (blk instanceof BlockLimiter || blk instanceof BlockMathSwitch )
+                blk.getOutput().clearDerivedFlag();
+
+//                // debugging section
+//                String id = blk.getOutputVarID();
+//                if (id != null)
+//                    if (id.equals("BSPAN")) {
+//                        System.out.println("Found " + id);
+//                    }
+
+            // If we output a 'derived' signal, don't generate code;
+            // such a signal-generating block was inserted for Simulink
+            // realization
+
+            Signal outSig = blk.getOutput();
+            if (outSig != null)
+                if (outSig.isDerived()) {
+//                  System.out.println("Skipping block " + blk.getName() + " as a derived block");
+                    skip = true;// don't emit code at this point
                 }
-                    
-            } // end of while (blkIt.hasNext()) loop
-            
-            
+
+            if (blk instanceof BlockBP ) {          // ignore this block
+                // skip code generation
+            } else if (blk instanceof BlockInput)  { // collect for start
+                inputBlocks.add(blk);
+                translateInputBlockVarID(blk);
+//              System.out.println("Putting block " + blk.getName() + " into input block list");
+                skip = true;
+            } else if (blk instanceof BlockOutput) { // collect for end
+                outputBlocks.add(blk);
+                translateOutputBlockVarID(blk);
+//              System.out.println("Putting block " + blk.getName() + " into output block list");
+                skip = true;
+            // if source block is a BlockFuncTable, generate the table call
+            } else if (blk instanceof BlockFuncTable) {
+                cvn.appendCode( this.generateTableCall( (BlockFuncTable) blk));
+
+            } else { // otherwise generate equation variables and code
+                if (!skip)
+                    cvn.append( blk.genCode() );
+            }
+
+        } // end of while (blkIt.hasNext()) loop
+
+
 //            // Now write the declarations - sorted with no duplicates
 //            codeDeclarations = "";
 //            ArrayList<String> varNames = cvn.getVarNames();
@@ -127,23 +117,20 @@ class OtisModelWriter extends OtisWriter {
 //                codeDeclarations += indent + "REAL " + varIt.next() + "\n";
 //            }
 //            
-            // Write initial part of $OTISIN
-            // including input XPARS and CALs
-            writeModelHeader(modelName);
-        
-            // followed by the body (algorithms)
-            writeAsOtisCalc(cvn.getCode());
-            
-            // write the $PHASEIN section including aero outputs CL and CD
-            writeModelFooter();
-            
-            // write the STOP and END statements
+        // Write initial part of $OTISIN
+        // including input XPARS and CALs
+        writeModelHeader(modelName);
+
+        // followed by the body (algorithms)
+        writeAsOtisCalc(cvn.getCode());
+
+        // write the $PHASEIN section including aero outputs CL and CD
+        writeModelFooter();
+
+        // write the STOP and END statements
 //            writeln( indent + "STOP");
 //            writeln( indent + "END");
         
-        } catch (DAVEException ex) {
-            System.err.println("Warning: Order of execution could not be determined (sorted varID list null).");
-        }
     }
 
 
@@ -178,24 +165,26 @@ class OtisModelWriter extends OtisWriter {
             while (blkIt.hasNext()) {
                 Block inputBlk = blkIt.next();
                 Signal theSignal = inputBlk.getOutput();
-                writeln("! " + theSignal.getVarID().trim() + " (" + 
-                        theSignal.getName().trim() + "):");
-                String description = theSignal.getDescription().trim();
-                
-                // wrap comments, breaking at spaces
-                while (description.length() > (MAX_COMMENT_LENGTH-4)) {
-                    int finalSpace = description.lastIndexOf(" ");
-                    writeln("!   " + description.substring(0, finalSpace));
-                    description = description.substring(finalSpace+1);
+                if (!theSignal.isMarked()) { // skip over OTIS-defined signals
+                    writeln("! " + theSignal.getVarID().trim() + " (" + 
+                            theSignal.getName().trim() + "):");
+                    String description = theSignal.getDescription().trim();
+
+                    // wrap comments, breaking at spaces
+                    while (description.length() > (MAX_COMMENT_LENGTH-4)) {
+                        int finalSpace = description.lastIndexOf(" ");
+                        writeln("!   " + description.substring(0, finalSpace));
+                        description = description.substring(finalSpace+1);
+                    }
+                    writeln("!   " + description);
+                    writeln("!");
+                    String icVal = "0.0";
+                    if (theSignal.hasIC())
+                        icVal = theSignal.getIC();
+                    writeln("xpar(" + xparNumber + ")=" + icVal );
+                    writeln("!");
+                    xparNumber++;
                 }
-                writeln("!   " + description);
-                writeln("!");
-                String icVal = "0.0";
-                if (theSignal.hasIC())
-                    icVal = theSignal.getIC();
-                writeln("xpar(" + xparNumber + ")=" + icVal );
-                writeln("!");
-                xparNumber++;
             }
             
             writeln("!");
@@ -206,11 +195,12 @@ class OtisModelWriter extends OtisWriter {
             while (blkIt.hasNext()) {
                 Block inputBlk = blkIt.next();
                 Signal theSignal = inputBlk.getOutput();
-            
-                writeln("cal(" + nextCalVarNumber + ")='DEF=XPAR(" +
-                        nextCalVarNumber + "):NAM=" + 
-                        theSignal.getVarID().trim() + ":LOC=10',");
-                nextCalVarNumber++;
+                if (!theSignal.isMarked()) { // skip over OTIS-defined signals
+                    writeln("cal(" + nextCalVarNumber + ")='DEF=XPAR(" +
+                            nextCalVarNumber + "):NAM=" + 
+                            theSignal.getVarID().trim() + ":LOC=10',");
+                    nextCalVarNumber++;
+                }
             }
 
             writeln("!");
@@ -410,6 +400,40 @@ class OtisModelWriter extends OtisWriter {
             Logger.getLogger(OtisModelWriter.class.getName()).log(Level.SEVERE, null, ex);
             System.err.println("Encountered problem while writing OTIS model footer");
         }
+    }
+
+    private void translateInputBlockVarID(Block blk) {
+        // change the varID for the signal fed by this input block
+        String dmlVarID = blk.getOutputVarID();
+        if (this.needsTranslation(dmlVarID)) {
+            
+            // get new varID
+            String otisVarID = this.translate(dmlVarID);
+            
+            // change input block's output signal varID; this will 
+            // change varIDs for source block and all dest block ports
+            Signal sig = blk.getOutput();
+            sig.mark(); // mark as an OTIS input variable
+            sig.setVarID(otisVarID);
+        }
+                    
+    }
+
+    private void translateOutputBlockVarID(Block blk) {
+        // change the varID for the upstream Signal that feeds this block
+        Signal inputSig = blk.getInput(0);
+        String dmlVarID = inputSig.getVarID();
+        if (this.needsTranslation(dmlVarID)) {
+            
+            // get new varID
+            String otisVarID = this.translate(dmlVarID);
+            
+            // change input block's output signal varID; this will 
+            // change varIDs for source block and all dest block ports
+            inputSig.mark(); // mark for model writing code
+            inputSig.setVarID(otisVarID);
+        }
+                    
     }
 
 }

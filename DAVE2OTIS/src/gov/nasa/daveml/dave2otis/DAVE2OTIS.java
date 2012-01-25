@@ -204,41 +204,35 @@ public class DAVE2OTIS extends DAVE {
         // create two file writers
         OtisTableWriter tableWriter = new OtisTableWriter(theModel, this.tableFileName);
         OtisModelWriter modelWriter = new OtisModelWriter(theModel, this.modelFileName);
-
-        // generate contents
         
-        modelWriter.writeModel( modelName );
-        
-        // find the function blocks
-        BlockArrayList blocks = null;
+        // fetch sorted, downselected block list
+        BlockArrayList sortedBlocks = null;
         try {
-            blocks = theModel.getSelectedBlocks();
-            if (blocks == null) {
+            sortedBlocks = theModel.getSelectedBlocks();
+
+            if (sortedBlocks == null) {
                 System.err.println(
                         "Error: Order of execution could not be determined" +
-                        " (sorted block execution list null).");
+                        " (sorted block execution list was null).");
                 System.exit(1);
             }
-            if (blocks.isEmpty()) {
+            if (sortedBlocks.isEmpty()) {
                 System.err.println(
                         "Error: Order of execution could not be determined" +
                         " (sorted block execution list empty).");
                 System.exit(1);
-            }        
-        
-            Iterator<Block> it = blocks.iterator();
-            while(it.hasNext()) {
-                Block blk = it.next();
-                if (blk instanceof BlockFuncTable) {
-                    BlockFuncTable bft = (BlockFuncTable) blk;
-                    tableWriter.generateTableDescription( bft );
-                }
-            }   
-        
+            }
         } catch (DAVEException ex) {
-            Logger.getLogger(DAVE2OTIS.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println(
+                    "Error: Unable to obtain sorted list of selected blocks.");
+            System.exit(1);
         }
 
+        // generate contents
+        // modelWriter translates varIDs of inputs & outputs to match OTIS names
+        modelWriter.writeModel(  sortedBlocks, modelName );
+        tableWriter.writeTables( sortedBlocks );
+        
 
         // Write footers
 //        mdlWriter.writeSLFooter(this.getVersion(), modelName);
