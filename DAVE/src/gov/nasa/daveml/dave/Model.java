@@ -276,6 +276,41 @@ public class Model
 
     public boolean isVerbose() { return this.verbose; }
 
+    /**
+     * Deselects all blocks
+     * @since 0.9.4
+     */
+    
+    public void clearSelections() {
+        Iterator<Block> blkIt = this.blocks.iterator();
+        while (blkIt.hasNext()) {
+            Block blk = blkIt.next();
+            blk.deselect();
+        }
+    }
+    
+    /**
+     * Selects all blocks involved in feeding specified input
+     * @return found boolean true if varName is found
+     * @since 0.9.4
+     */
+    
+    public boolean selectOutputByName( String varName ) {
+        boolean found = false;
+        Iterator<Block> blkIt = this.outputBlocks.iterator();
+        while (blkIt.hasNext()) {
+            Block blk = blkIt.next();
+            if (blk.numInputs() > 0) {
+                Signal inputSig = blk.getInput(0);
+                if (inputSig.myName.equals(varName)) {
+                    found = true;
+                    blk.selectWithAncestors();
+                    break;
+                }
+            }
+        }
+        return found;
+    }
 
     /**
      *
@@ -1232,7 +1267,7 @@ public class Model
     }
     
     /**
-     * Returns the blocks in execution sorted order; available only after call to initialize()
+     * Returns all the blocks in execution sorted order; available only after call to initialize()
      * @return BlockArrayList of sorted blocks, in appropriate order of execution
      */
     
@@ -1241,6 +1276,29 @@ public class Model
             throw new DAVEException("Execution order not yet determined");
         }
         return executeOrder;
+    }
+    
+    /**
+     * Returns all the selected blocks in execution order; available only after
+     * a call to initialize(). By default, all blocks are selected; to select
+     * blocks involved in calculating only some outputs, a call should be made to
+     * clearSelections() followed by one or more calls to selectOutputByName(). 
+     * 
+     * @return BlockArrayList of blocks involved in calculating selected outputs,
+     * in appropriate order of execution
+     * @since 0.9.4
+     */
+    
+    public BlockArrayList getSelectedBlocks() throws DAVEException {
+        BlockArrayList sortedBlocks = getSortedBlocks();
+        BlockArrayList selectedBlocks = new BlockArrayList();
+        Iterator<Block> blkIt = sortedBlocks.iterator();
+        while (blkIt.hasNext()) {
+            Block blk = blkIt.next();
+            if (blk.isSelected())
+                selectedBlocks.add(blk);
+        }
+        return selectedBlocks;
     }
     
     /**

@@ -97,16 +97,23 @@ abstract public class Block
      *  our latest output value
      */
 
-    double  value;
+    double value;
 
     /**
      *  are we chatty?
      */
 
     boolean verboseFlag;
+    
+    /**
+     * selected flag
+     * @since 0.9.4
+     */
+    
+    protected boolean selectedFlag;
 
     /**
-     *  possible masking object (like SLBlock)
+     * possible masking object (like SLBlock)
      */
 
     Object mask;
@@ -129,6 +136,7 @@ abstract public class Block
         this.resultsCycleCount = -1;
         this.value = Double.NaN;
         this.verboseFlag = false;
+        this.selectedFlag = true;
         this.mask = null;
     }
 
@@ -286,6 +294,47 @@ abstract public class Block
      **/
 
     public boolean isVerbose() { return this.verboseFlag; }
+
+    
+    /**
+     * Sets the block as 'selected'
+     * @since 0.9.4
+     */
+    
+    public void select() { selectedFlag = true; }
+    
+    /**
+     * Sets the block and all ancestors as 'selected'
+     * @since 0.9.4
+     */
+    
+    public void selectWithAncestors() {
+        this.select();
+        Iterator<Signal> sigIt = this.getInputIterator();
+        while (sigIt.hasNext()) {
+            Signal sig = sigIt.next();
+            Block ancestor = sig.getSource();
+            if (ancestor != null)
+                ancestor.selectWithAncestors();
+        }
+    }
+
+    
+    /**
+     * Unselects the block
+     * @since 0.9.4
+     */
+    
+    public void deselect() { selectedFlag = false; }
+    
+    /**
+     * Returns the status of selection
+     * @return selectedFlag
+     * @since 0.9.4
+     */
+    
+    public boolean isSelected() { return selectedFlag; }
+
 
 
     /**
@@ -546,8 +595,8 @@ abstract public class Block
         return inVarIDs.get( portNum-1 );
     }
 
-
-    /**
+    
+     /**
      *
      * <p> Returns an iterator to loop through input signals </p>
      *
@@ -877,7 +926,8 @@ abstract public class Block
     }
     
     /**
-     * <p> Generate C-code equivalent of our operation</p>
+     * Generate C-code equivalent of our operation
+     * @since 0.9.4
      */
     
     public CodeAndVarNames genCode() {
@@ -888,7 +938,8 @@ abstract public class Block
     }
 
     /**
-     * <p> Generate appropriate indentation spaces </p>
+     * Generate appropriate indentation spaces
+     * @since 0.9.4
      */
     
     public String indent() {
@@ -906,7 +957,8 @@ abstract public class Block
     }
     
     /**
-     * <p> Wrap message in appropriate dialect </p>
+     * Wrap message in appropriate dialect
+     * @since 0.9.4
      */
     
     public String wrapComment( String comment ) {
@@ -926,7 +978,8 @@ abstract public class Block
     
     
     /**
-     * <p> Wrap error message in appropriate dialect </p>
+     * Wrap error message in appropriate dialect
+     * @since 0.9.4
      */
     
     public String errorComment( String errMsg ) {
@@ -934,7 +987,8 @@ abstract public class Block
     }
     
     /**
-     * <p> Add appropriate statement ending characters </p>
+     * Add appropriate statement-ending characters
+     * @since 0.9.4
      */
     
     public String endLine() {
@@ -945,7 +999,8 @@ abstract public class Block
     }
     
     /**
-     * <p> Generate appropriate if statement for given language </p>
+     * Generate appropriate if statement for given language
+     * @since 0.9.4
      */
     
     public String beginIf( String condition ) {
@@ -963,7 +1018,8 @@ abstract public class Block
     }
 
     /**
-     * <p> Generate appropriate if statement ending for given language </p>
+     * Generate appropriate if statement ending for given language
+     * @since 0.9.4
      */
     
     public String endIf() {
@@ -983,8 +1039,7 @@ abstract public class Block
 
     /**
      *
-     * <p> Generates brief description on output stream </p>
-     *
+     * Generates brief description on output stream
      * @param writer FileWriter to use
      *
      **/
@@ -1102,9 +1157,7 @@ abstract public class Block
 
 
     /**
-     *
      * Updates the output value of the block.
-     *
      **/
 
     abstract public void update() throws DAVEException; // updates value of block
