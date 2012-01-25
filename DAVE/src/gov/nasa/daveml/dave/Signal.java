@@ -68,6 +68,12 @@ public class Signal
      */
 
     String myUnits;
+    
+    /**
+     *  Description of signal
+     */
+    
+    String description;
 
     /**
      *  source block for signal
@@ -194,6 +200,7 @@ public class Signal
         myUnits = "";
         source = null;
         sourcePort = 0;
+        description = "No description.";
         dests = null;
         destPorts = null;
         hasIC = false;
@@ -325,7 +332,7 @@ public class Signal
                     signalElement.getNamespace());
             Element isStdAIAAElement = signalElement.getChild("isStdAIAA",
                     signalElement.getNamespace());
-
+            
             // record findings
 
             // first three flags (input, control, disturbance) are mutually exclusive
@@ -344,6 +351,12 @@ public class Signal
             if(isOutputElement     != null) this.isOutput     = true;
             if(isStdAIAAElement    != null) this.isStdAIAA    = true;
 
+            // Look for description
+            this.description = signalElement.getChildTextNormalize("description",
+                    signalElement.getNamespace());
+            if (this.description == null)
+                this.description = "No description.";
+            
             // Search for calculation/math element
             this.handleCalculation( signalElement, m );
         } else {
@@ -940,6 +953,20 @@ public class Signal
 
     public boolean isStdAIAA() { return this.isStdAIAA; }
     
+    
+    /**
+     *  Set the description directly
+     */
+    
+    public void setDescription( String newDescription ) {
+        this.description = newDescription;
+    }
+    
+    /**
+     *  Get the description field
+     */
+    
+    public String getDescription() { return this.description; }
     
     /**
      * <p> Generate code for signal </p>
