@@ -67,29 +67,22 @@ public class BlockMathProduct extends BlockMath
 	this.setName( blockType + "_" + m.getNumBlocks() );
 	
 	// take appropriate action based on type
-	if(blockType.equals("times"))
-	  {
-	      this.genInputsFromApply(ikid, 1);
-	  }
-	else if (blockType.equals("quotient"))
-	    {
-		if(kids.size() != 3)
-		    System.err.println("Error - <apply><quotient/> only handles 2 arguments, not " + (kids.size()-1));
-		else
-		    this.genInputsFromApply(ikid, 1);
-	    }
-	else if (blockType.equals("divide"))
-	    {
-		if(kids.size() != 3)
-		    System.err.println("Error - <apply><divide/> only handles 2 arguments, not " + (kids.size()-1));
-		else
-		    this.genInputsFromApply(ikid, 1);
-	    }
-	else
-	  {
+	if(blockType.equals("times")) {
+            this.genInputsFromApply(ikid, 1);
+	} else if (blockType.equals("quotient")) {
+            if(kids.size() != 3)
+                System.err.println("Error - <apply><quotient/> only handles 2 arguments, not " + (kids.size()-1));
+            else
+                this.genInputsFromApply(ikid, 1);
+	} else if (blockType.equals("divide")) {
+            if(kids.size() != 3)
+                System.err.println("Error - <apply><divide/> only handles 2 arguments, not " + (kids.size()-1));
+            else
+                this.genInputsFromApply(ikid, 1);
+	} else {
 	    System.err.println("Error - BlockMathProduct constructor called with" +
 			       " type element:" + blockType);
-	  }
+	}
 
 //System.out.println("    BlockMathProduct constructor: " + this.getName() + " created.");
     }
@@ -124,7 +117,12 @@ public class BlockMathProduct extends BlockMath
             Signal inSig = inputSig.next();
             cvn.append(inSig.genCode());
             if (inputSig.hasNext()) {
-                cvn.appendCode("*");
+                if (this.blockType.equals("times")) 
+                    cvn.appendCode("*");
+                else if (this.blockType.equals("divide"))
+                    cvn.appendCode("/");
+                else if (this.blockType.equals("quotient"))
+                    cvn.appendCode("/");
             }
         }
         // if not derived, need trailing semicolon and new line

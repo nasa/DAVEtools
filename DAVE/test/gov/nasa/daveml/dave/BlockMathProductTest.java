@@ -87,16 +87,42 @@ public class BlockMathProductTest extends TestCase {
     }
 
     public void testGenCcode() {
+        // check with multiply operations
         _model.setCodeDialect(Model.DT_ANSI_C);
         CodeAndVarNames result = _block.genCode();
         assertEquals("  outputSignal = PB*BSPAN;\n", result.getCode());
         this.checkVarNames(result);
+        
+        // check with divide operation
+        _block.blockType = "divide";
+        result = _block.genCode();
+        assertEquals("  outputSignal = PB/BSPAN;\n", result.getCode());
+        this.checkVarNames(result);
+        
+        // check with quotient operation
+        _block.blockType = "quotient";
+        result = _block.genCode();
+        assertEquals("  outputSignal = PB/BSPAN;\n", result.getCode());
+        this.checkVarNames(result);
     }
 
     public void testGenFcode() {
+        // check with multiply operations
         _model.setCodeDialect(Model.DT_FORTRAN);
         CodeAndVarNames result = _block.genCode();
         assertEquals("       outputSignal = PB*BSPAN\n", result.getCode());
+        this.checkVarNames(result);
+        
+        // check with divide operation
+        _block.blockType = "divide";
+        result = _block.genCode();
+        assertEquals("       outputSignal = PB/BSPAN\n", result.getCode());
+        this.checkVarNames(result);
+        
+        // check with quotient operation
+        _block.blockType = "quotient";
+        result = _block.genCode();
+        assertEquals("       outputSignal = PB/BSPAN\n", result.getCode());
         this.checkVarNames(result);
     }
     
