@@ -175,6 +175,13 @@ public class Signal
     private boolean defined = false;
     
     /**
+     * general purpose marking capability; all signals initially unmarked
+     * @since 0.9.4
+     */
+    
+    private boolean marked = false;
+    
+    /**
      * lower limit. Default is -Infinity (no lower limit)
      */
 
@@ -216,6 +223,7 @@ public class Signal
         defined = false;
         lowerLim = Double.NEGATIVE_INFINITY;
         upperLim = Double.POSITIVE_INFINITY;
+        marked = false;
     }
 
 
@@ -660,6 +668,27 @@ public class Signal
     
     public boolean isDefined() { return this.defined; }
     
+    
+    /**
+     * Sets general purpose marker flag
+     * @since 0.9.4
+     */
+    
+    public void mark() { this.marked = true; }
+    
+    /**
+     * Clears the general purpose marking flag
+     * @since 0.9.4
+     */
+    
+    public void unmark() { this.marked = false; }
+    
+    /**
+     * Returns true if the signal is marked for some reason
+     * @since 0.9.4
+     */
+    
+    public boolean isMarked() { return this.marked; }
     
     /**
      * indicates a lower limit is in force
