@@ -273,9 +273,9 @@ class OtisModelWriter extends OtisWriter {
             if ((line[i+1].startsWith("IF")) &&
                     ( line[i+3].startsWith("ENDIF"))) {
                 // convert into single OTIS IF(x, y, z)
-                // line[i]   is equation part y, with variable assignment
+                // line[i]   is equation part z, with variable assignment
                 // line[i+1] is x: IF((a.GT.b))THEN
-                // line[i+2] is equation part z, with variable assignment
+                // line[i+2] is equation part y, with variable assignment
                 // line[i+3] should be ENDIF
 
                 // deal with line i (part y)
@@ -285,7 +285,7 @@ class OtisModelWriter extends OtisWriter {
                         ": unrecognized grammar in line preceding IF statement: " 
                         + line[i]);
                 String varname = parts[0];
-                String y = parts[1];
+                String z = parts[1];
 
                 // deal with line i+1
                 parts = line[i+1].split("\\."); // matches dot "."
@@ -306,16 +306,14 @@ class OtisModelWriter extends OtisWriter {
 
                 String x = a + relTest + b;
 
-                newLine +=  x + "," + y;
-
-
                 // deal with line i+2: z
                 parts = line[i+2].split("=");
                 if (parts.length != 2) throw new DAVEException("line " + (i+2) + 
                         ": unrecognized grammar in line inside IF statement: " +
                         line[i+2]);
-                String z = parts[1];
-
+                String y = parts[1];
+                
+                newLine +=  x + "," + y;
                 newLine = varname + "=IF(" + x + "," + y + "," + z + ")";
                 outLines.add(newLine);
                 i = i + 3;
@@ -405,6 +403,8 @@ class OtisModelWriter extends OtisWriter {
     private void translateInputBlockVarID(Block blk) {
         // change the varID for the signal fed by this input block
         String dmlVarID = blk.getOutputVarID();
+//        if (dmlVarID.equals("XMACH"))
+//            System.out.println("found XMACH input");
         if (this.needsTranslation(dmlVarID)) {
             
             // get new varID
