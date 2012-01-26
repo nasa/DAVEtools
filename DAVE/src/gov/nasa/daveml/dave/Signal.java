@@ -613,6 +613,12 @@ public class Signal
             for (int i = 0; i < sinks.size(); i++) {
                 Block blk = sinks.get(i);
                 blk.renameInVarID( sinkPorts.get(i));
+                // Special treatment for breakpoint blocks - need to 
+                // change associated varID in all function blocks too
+                if (blk instanceof BlockBP) {
+                    Signal sig = blk.getOutput();
+                    sig.setVarID(theVarID);
+                }
             }
     }
 
