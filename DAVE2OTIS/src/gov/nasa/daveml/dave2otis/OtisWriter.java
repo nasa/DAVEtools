@@ -25,6 +25,7 @@ public abstract class OtisWriter extends FileWriter {
         super( tableFileName );
         ourModel = theModel;
     }
+    
     /**
      * Translates variable identified by varID into OTIS ABLOCK name
      * if available.
@@ -127,12 +128,33 @@ public abstract class OtisWriter extends FileWriter {
     
     /**
      * Indicates if provided varID needs to be converted
-     * @param varID
+     * 
+     * Uses the varID to fetch the variable; if the variable is a standard AIAA 
+     * variable, and there is a matching OTIS variable name, it returns the OTIS
+     * name.
+     * 
+     * @param varID variable ID to translate into OTIS name
      * @return flag is true if translation required
      */
+    
     public boolean needsTranslation(String varID) {
         
-        return !this.translate(varID).equals(varID);
+        String output = varID;
+        if (idMap == null)
+            this.setupMap(); // initialize the mapping of AIAA -> OTIS varnames
+        
+        // find variable (signal) definition in source XML
+        Signal signal = ourModel.getSignals().findByID(varID);
+        
+        // if standard, do lookup in map
+        if( signal.isStdAIAA() ) {
+            String aiaaName = this.getAIAAName( signal );
+            String otisName = idMap.get(aiaaName);
+            if (otisName != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
 

@@ -125,7 +125,8 @@ class OtisModelWriter extends OtisWriter {
         writeAsOtisCalc(cvn.getCode());
 
         // write the $PHASEIN section including aero outputs CL and CD
-        writeModelFooter();
+        // BUG - need to dig these out of model if they exist
+        writeModelFooter( modelName, "17000.", "323.27");
 
         // write the STOP and END statements
 //            writeln( indent + "STOP");
@@ -251,6 +252,9 @@ class OtisModelWriter extends OtisWriter {
                     Cmdef = rhs;
                     skip = true;
                 }
+                if ( varName.equals("MACH") ) {
+                    skip = true; // don't write Mach as an input; it's automatic
+                }
                 if ( !skip ) {
                     writeln("cal(" + nextCalVarNumber + ")='NAM=" +
                             varName + ":def=" + rhs + ":LOC=10',");
@@ -327,7 +331,7 @@ class OtisModelWriter extends OtisWriter {
         return outLines.toArray(new String[0]);
     }
 
-    private void writeModelFooter() {
+    private void writeModelFooter( String vehicleName, String vehicleWeight, String vehicleRefArea ) {
         try {
             writeln("$END");
             writeln("!");
@@ -335,14 +339,14 @@ class OtisModelWriter extends OtisWriter {
             writeln("!");
             writeln("ph_nam='glide', ");
             writeln("ph_type='E',");
-            writeln("ph_title='HL-20 glide problem',");
+            writeln("ph_title='" + vehicleName + " 2DOF glide problem',");
             writeln("!");
             writeln("! Planet model");
             writeln("cb_flat=0.,");
             writeln("cb_rot=0.,");
             writeln("atmos='index=1',");
             writeln("! vehicle model");
-            writeln("sref='def=286.45',");
+            writeln("sref='def=" + vehicleRefArea + "',");
             writeln("! Sum coefficients");
             
             // write output coefficients
@@ -379,7 +383,7 @@ class OtisModelWriter extends OtisWriter {
             writeln("state(4)='ic_val= 10000.',");
             writeln("state(5)='ic_val=    0.', ");
             writeln("state(6)='ic_val=    0.',");
-            writeln("state(7)='ic_val=  19100.',");
+            writeln("state(7)='ic_val=  " + vehicleWeight + "',");
             writeln("!");
             writeln("control(1)='nam=ALPHA,def=.1745',");
             writeln("! ");
