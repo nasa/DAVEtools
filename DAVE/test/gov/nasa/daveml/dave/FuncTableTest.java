@@ -1,6 +1,7 @@
 package gov.nasa.daveml.dave;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -74,9 +75,9 @@ public class FuncTableTest extends TestCase {
 		assertEquals( 6, ft.size() );
 		StringWriter writer = new StringWriter();
 		try {
-			ft.printTable(writer);
+		    ft.printTable(new PrintWriter(writer));
 		} catch (IOException e) {
-			fail("Exception thrown in test of FuncTable SSSIM constructor: " + e.getMessage());
+		    fail("Exception thrown in test of FuncTable SSSIM constructor: " + e.getMessage());
 		}
 //		assertEquals( "gov.nasa.daveml", writer.toString());
 		// TODO need to expand tests here
@@ -193,7 +194,7 @@ public class FuncTableTest extends TestCase {
                         if (osName.contains("Windows")) {
                             assertEquals( 451, buffer.length() );
                         } else {
-                            assertEquals( 453, buffer.length() );
+                            assertEquals( 873, buffer.length() );
                         }
 			
                         String[] lines = buffer.toString().split(System.getProperty("line.separator"));
@@ -201,19 +202,29 @@ public class FuncTableTest extends TestCase {
                         assertEquals(5, lines.length );
                         
 			assertNotNull( lines[0] );
-			assertEquals("0.205, 0.168, 0.186, 0.196, 0.213, 0.251, 0.245, 0.238, 0.252, 0.231, 0.198, 0.192, ", lines[0] );
+			assertEquals("2.050000E-01, 1.680000E-01, 1.860000E-01, 1.960000E-01, " +
+                                     "2.130000E-01, 2.510000E-01, 2.450000E-01, 2.380000E-01, " +
+                                     "2.520000E-01, 2.310000E-01, 1.980000E-01, 1.920000E-01, ", lines[0] );
 
                         assertNotNull( lines[1] );
-			assertEquals("0.081, 0.077, 0.107, 0.11, 0.11, 0.141, 0.127, 0.119, 0.133, 0.108, 0.081, 0.093, ", lines[1] );
+			assertEquals("8.100000E-02, 7.700000E-02, 1.070000E-01, 1.100000E-01, " +
+                                     "1.100000E-01, 1.410000E-01, 1.270000E-01, 1.190000E-01, " +
+                                     "1.330000E-01, 1.080000E-01, 8.100000E-02, 9.300000E-02, ", lines[1] );
 
 			assertNotNull( lines[2] );
-			assertEquals("-0.046, -0.02, -0.009, -0.005, -0.006, 0.01, 0.006, -0.001, 0.014, 0.0, -0.013, 0.032, ", lines[2] );
+			assertEquals("-4.600000E-02, -2.000000E-02, -9.000000E-03, -5.000000E-03, " +
+                                     "-6.000000E-03, 1.000000E-02, 6.000000E-03, -1.000000E-03, " +
+                                     "1.400000E-02, 0.000000E00, -1.300000E-02, 3.200000E-02, ", lines[2] );
 
 			assertNotNull( lines[3] );
-			assertEquals("-0.174, -0.145, -0.121, -0.127, -0.129, -0.102, -0.097, -0.113, -0.087, -0.084, -0.069, -0.006, ", lines[3] ); 
+			assertEquals("-1.740000E-01, -1.450000E-01, -1.210000E-01, -1.270000E-01, " +
+                                     "-1.290000E-01, -1.020000E-01, -9.700000E-02, -1.130000E-01, " +
+                                     "-8.700000E-02, -8.400000E-02, -6.900000E-02, -6.000000E-03, ", lines[3] ); 
 
 			assertNotNull( lines[4] );
-			assertEquals("-0.259, -0.202, -0.184, -0.193, -0.199, -0.15, -0.16, -0.167, -0.104, -0.076, -0.041, -0.005", lines[4] ); 
+			assertEquals("-2.590000E-01, -2.020000E-01, -1.840000E-01, -1.930000E-01, " +
+                                     "-1.990000E-01, -1.500000E-01, -1.600000E-01, -1.670000E-01, " +
+                                     "-1.040000E-01, -7.600000E-02, -4.100000E-02, -5.000000E-03", lines[4] ); 
 
 		} catch (IOException e) {
 			fail("Unexpected exception in testPrintTable(): " 

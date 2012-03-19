@@ -93,6 +93,12 @@ public class Model
      */
 
     VectorInfoArrayList outputVec;
+    
+    /**
+     * Data format string
+     */
+    
+    String dataFormat;
 
     /**
      *  indicates if we've set up our execution order, etc.
@@ -132,6 +138,13 @@ public class Model
     private static final int exit_success = 0;
     private static final int exit_failure = 1;
     
+    
+    /**
+     * Data format string
+     */
+    
+    private static String defaultDataFormat = "0.000000E00";
+    
     /**
      *
      * <p> Constructor for Model </p>
@@ -156,6 +169,7 @@ public class Model
 	this.cycleCounter = 0;
 	this.ourName = "untitled";
         this.codeDialect = DT_ANSI_C;
+        this.dataFormat = defaultDataFormat;
     }
 
 

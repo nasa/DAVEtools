@@ -19,12 +19,10 @@ package gov.nasa.daveml.dave;
  *
  **/
 
+import java.io.IOException;
+import java.util.ArrayList;
 import org.jdom.Element;
 import org.jdom.Namespace;
-
-import java.util.ArrayList;
-
-import java.io.IOException;
 
 /**
  *

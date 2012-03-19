@@ -17,15 +17,15 @@ package gov.nasa.daveml.dave;
  *
  **/
 
-import org.jdom.Element;
-import org.jdom.Namespace;
-
+import java.io.IOException;
+import java.io.Writer;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
-
-import java.io.Writer;
-import java.io.IOException;
+import org.jdom.Element;
+import org.jdom.Namespace;
 
 /**
  *
@@ -467,6 +467,7 @@ public class FuncTable
         int offset;
         int i;
         String newline = System.getProperty("line.separator");
+        DecimalFormat form = new DecimalFormat(myModel.dataFormat);
 
 
         // System.out.println("printTable called recursively, index = " + startIndex + 
@@ -480,7 +481,8 @@ public class FuncTable
                 for ( i = 0; i < dims[0]; i++)
                     {
                         Double theValue = table.get(i+startIndex);
-                        writer.write( theValue.toString() );
+                        String valueStr = form.format( theValue );
+                        writer.write( valueStr );
                         if( i < dims[0]-1) writer.write(", ");
                     }
                 return i;
@@ -539,8 +541,6 @@ public class FuncTable
         int mult = 1;
         int offset = 0;
         int i;
-
-        boolean verbose = this.isVerbose();
 
         if (verbose) {
             System.out.print("  getting point '" + this.tableName + "[");

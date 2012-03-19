@@ -21,15 +21,14 @@ package gov.nasa.daveml.dave;
  *
  **/
 
-import org.jdom.Element;
-import org.jdom.Namespace;
-
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ArrayList;
-
-import java.io.Writer;
-import java.io.IOException;
+import org.jdom.Element;
+import org.jdom.Namespace;
 
 /**
  *
@@ -590,7 +589,7 @@ public class BlockFuncTable extends Block
      *
      * <p> This method directs output to designated Writer </p>
      *
-     * @param writer <code>Writer</code> to receive values
+     * @param writer <code>PrinterWriter</code> to receive values
      * @throws <code>IOException</code>
      *
      **/
@@ -614,6 +613,7 @@ public class BlockFuncTable extends Block
      *
      **/
 
+    @Override
     public void describeSelf(Writer writer) throws IOException
     {
 	super.describeSelf(writer);
