@@ -748,7 +748,7 @@ public class BlockFuncTable extends Block
      */
 
     public String getDescription() {
-        return description.replace('\n', ' ');
+        return description.replaceAll(System.getProperty("line.separator"), " ");
     }
 }
 

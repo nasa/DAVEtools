@@ -466,6 +466,8 @@ public class FuncTable
  
         int offset;
         int i;
+        String newline = System.getProperty("line.separator");
+
 
         // System.out.println("printTable called recursively, index = " + startIndex + 
         //                 "; dims.length = " + dims.length + "; dims[0] = " + dims[0]);
@@ -489,7 +491,7 @@ public class FuncTable
                         newDims[0] = dims[1];
                         offset = printTable( writer, table, newDims, startIndex );
                         if( i < dims[0]-1) writer.write(", ");
-                        writer.write("\n");
+                        writer.write(newline);
                         startIndex = startIndex + offset;
                     }
                 return startIndex;
@@ -502,7 +504,7 @@ public class FuncTable
                         //System.out.println();
                         offset = printTable( writer, table, newDims, startIndex );
                         if( i < dims[0]-1) writer.write(", ");
-                        writer.write("\n");
+                        writer.write(newline);
                         startIndex = startIndex + offset;
                     }
                 return startIndex;

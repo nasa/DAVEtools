@@ -236,12 +236,14 @@ public class StaticShotTest extends TestCase {
         String errMsg;
         String expectedMsg;
         errMsg = myStream.toString();
+        String newline = System.getProperty("line.separator");
         expectedMsg =
-                "\nFor output 'aeroBodyForceCoefficient_Y': expected 0.0\n"
-                + " but found 1.0099999999999999E-6; difference is 1.0099999999999999E-6\n"
-                + " which is greater than allowed tolerance of 1.0E-6.\n";
+            newline + 
+            "For output 'aeroBodyForceCoefficient_Y': expected 0.0" + newline +
+            " but found 1.0099999999999999E-6; difference is 1.0099999999999999E-6" + newline +
+            " which is greater than allowed tolerance of 1.0E-6." + newline;
         assertEquals(expectedMsg, errMsg);
-
+                
         myStream = new ByteArrayOutputStream();  // clear output buffer
         ps = new PrintStream(myStream);
 
@@ -255,9 +257,10 @@ public class StaticShotTest extends TestCase {
         // should get out-of-tolerance message on standard out
         errMsg = myStream.toString();
         expectedMsg =
-                "\nFor output 'aeroBodyForceCoefficient_Y': expected 0.0\n"
-                + " but found -1.0099999999999999E-6; difference is 1.0099999999999999E-6\n"
-                + " which is greater than allowed tolerance of 1.0E-6.\n";
+                newline + 
+                "For output 'aeroBodyForceCoefficient_Y': expected 0.0" + newline +
+                " but found -1.0099999999999999E-6; difference is 1.0099999999999999E-6" + newline +
+                " which is greater than allowed tolerance of 1.0E-6." + newline;
         assertEquals(expectedMsg, errMsg);
     }
 

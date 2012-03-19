@@ -185,32 +185,35 @@ public class FuncTableTest extends TestCase {
 	public void testPrintTableWriter() {
 		StringWriter writer = new StringWriter();
 		StringBuffer buffer;
-		String substr;
+                String osName = System.getProperty("os.name");
 		assertNotNull( writer );
 		try {
 			_gft.printTable(writer);
 			buffer = writer.getBuffer();
-			assertEquals( 453, buffer.length() );
+                        if (osName.contains("Windows")) {
+                            assertEquals( 451, buffer.length() );
+                        } else {
+                            assertEquals( 453, buffer.length() );
+                        }
 			
-			substr = buffer.substring(0,85);
-			assertNotNull( substr );
-			assertEquals("0.205, 0.168, 0.186, 0.196, 0.213, 0.251, 0.245, 0.238, 0.252, 0.231, 0.198, 0.192, \n", substr );
+                        String[] lines = buffer.toString().split(System.getProperty("line.separator"));
 
-			substr = buffer.substring(85,168);
-			assertNotNull( substr );
-			assertEquals("0.081, 0.077, 0.107, 0.11, 0.11, 0.141, 0.127, 0.119, 0.133, 0.108, 0.081, 0.093, \n", substr );
+                        assertEquals(5, lines.length );
+                        
+			assertNotNull( lines[0] );
+			assertEquals("0.205, 0.168, 0.186, 0.196, 0.213, 0.251, 0.245, 0.238, 0.252, 0.231, 0.198, 0.192, ", lines[0] );
 
-			substr = buffer.substring(168,261);
-			assertNotNull( substr );
-			assertEquals("-0.046, -0.02, -0.0090, -0.0050, -0.0060, 0.01, 0.0060, -0.0010, 0.014, 0.0, -0.013, 0.032, \n", substr );
+                        assertNotNull( lines[1] );
+			assertEquals("0.081, 0.077, 0.107, 0.11, 0.11, 0.141, 0.127, 0.119, 0.133, 0.108, 0.081, 0.093, ", lines[1] );
 
-			substr = buffer.substring(261,359);
-			assertNotNull( substr );
-			assertEquals("-0.174, -0.145, -0.121, -0.127, -0.129, -0.102, -0.097, -0.113, -0.087, -0.084, -0.069, -0.0060, \n", substr ); 
+			assertNotNull( lines[2] );
+			assertEquals("-0.046, -0.02, -0.009, -0.005, -0.006, 0.01, 0.006, -0.001, 0.014, 0.0, -0.013, 0.032, ", lines[2] );
 
-			substr = buffer.substring(359,453);
-			assertNotNull( substr );
-			assertEquals("-0.259, -0.202, -0.184, -0.193, -0.199, -0.15, -0.16, -0.167, -0.104, -0.076, -0.041, -0.0050\n", substr ); 
+			assertNotNull( lines[3] );
+			assertEquals("-0.174, -0.145, -0.121, -0.127, -0.129, -0.102, -0.097, -0.113, -0.087, -0.084, -0.069, -0.006, ", lines[3] ); 
+
+			assertNotNull( lines[4] );
+			assertEquals("-0.259, -0.202, -0.184, -0.193, -0.199, -0.15, -0.16, -0.167, -0.104, -0.076, -0.041, -0.005", lines[4] ); 
 
 		} catch (IOException e) {
 			fail("Unexpected exception in testPrintTable(): " 
