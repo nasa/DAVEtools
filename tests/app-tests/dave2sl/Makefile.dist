@@ -26,7 +26,7 @@ make  : test
 test  : $(SIMULINK_MODELS)
 
 # the .mdl files are generated from creation scripts 
-%.mdl : ${TEST_MODEL_DIR}/%.dml ${DT}
+%.mdl : ${TEST_MODEL_DIR}/%.dml
 	@echo "Generating creation and verification script for $*. "
 	@java -Xmx128M -cp $(CLASSPATH) gov.nasa.daveml.dave2sl.DAVE2SL -d $< &> $@_dave2sl_log.txt
 	@echo "Starting MATLAB; running creation and verification script for $*. "

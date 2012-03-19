@@ -265,7 +265,6 @@ public class StaticShot
         Iterator<VectorInfo> checkIt = this.outputs.iterator();
 
         // loop for each checkcase signal
-
         while (checkIt.hasNext()) {
             checkSig = checkIt.next();
             String sigName = checkSig.getName();
@@ -295,36 +294,13 @@ public class StaticShot
                                         + "' in model's output vector.");
 
             // compare values; see if within tolerance
-            double actual   = modelSig.getValue();
-            double expected = checkSig.getValue();
-            // first make sure neither actual or expect is Not-A-Number
-            if (Double.isNaN(actual))
-                if (!Double.isNaN(expected)) {
-                    comparison = false;
-                    out.println(); // blank line
-                    out.println("For output '" + sigName +
-                        "': encountered unexpected not-a-number (NaN) value.");
-                }
-            if (Double.isNaN(expected))
-                if (!Double.isNaN(actual)) {
-                    comparison = false;
-                    out.println(); // blank line
-                    out.println("For output '" + sigName +
-                        "': expected not-a-number (NaN) value but found "
-                        + actual + ".");
-                }
-            if (Double.isNaN(expected) && Double.isNaN(actual)) {
-                // good to go
-            } else {
-                double diff = Math.abs(actual - expected);
-                double tol = Math.abs(checkSig.getTolerance());
-                if (diff > tol) {
-                    comparison = false;
-                    out.println(); // blank line
-                    out.println("For output '" + sigName + "': expected " + expected);
-                    out.println(" but found " + actual + "; difference is " + diff);
-                    out.println(" which is greater than allowed tolerance of " + tol + ".");
-                }
+            double diff = Math.abs(modelSig.getValue() - checkSig.getValue());
+            double tol = Math.abs(checkSig.getTolerance());
+            if (diff > tol) {
+                comparison = false;
+                out.println("For output '" + sigName + "': expected " + checkSig.getValue());
+                out.println(" but found " + modelSig.getValue() + "; difference is " + diff);
+                out.println(" which is greater than allowed tolerance of " + tol + ".");
             }
         }
         return comparison;

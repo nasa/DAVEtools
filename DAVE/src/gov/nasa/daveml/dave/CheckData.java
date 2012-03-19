@@ -62,12 +62,5 @@ public class CheckData
      **/
 
     public ArrayList<StaticShot> getStaticShots() { return this.staticShots; }
-
-    /**
-     * Return the count of checkcases
-     **/
-
-    public int count() { return this.staticShots.size(); }
-
 }
 

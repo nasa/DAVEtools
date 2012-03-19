@@ -87,7 +87,6 @@ public class Model
      */
 
     VectorInfoArrayList inputVec;
-    
     /**
      *  output vector (if null, not yet established)
      */
@@ -111,19 +110,6 @@ public class Model
      */
 
     int cycleCounter;
-    
-    /**
-     * Code output dialect
-     */
-    
-    int codeDialect;
-    
-    /**
-     * Code generation dialects
-     */
-    
-    public static final int DT_FORTRAN = 0;
-    public static final int DT_ANSI_C  = 1;
 
     /**
      * private return codes
@@ -131,7 +117,7 @@ public class Model
 
     private static final int exit_success = 0;
     private static final int exit_failure = 1;
-    
+
     /**
      *
      * <p> Constructor for Model </p>
@@ -155,7 +141,6 @@ public class Model
 	this.verbose = false;
 	this.cycleCounter = 0;
 	this.ourName = "untitled";
-        this.codeDialect = DT_ANSI_C;
     }
 
 
@@ -276,41 +261,6 @@ public class Model
 
     public boolean isVerbose() { return this.verbose; }
 
-    /**
-     * Deselects all blocks
-     * @since 0.9.4
-     */
-    
-    public void clearSelections() {
-        Iterator<Block> blkIt = this.blocks.iterator();
-        while (blkIt.hasNext()) {
-            Block blk = blkIt.next();
-            blk.deselect();
-        }
-    }
-    
-    /**
-     * Selects all blocks involved in feeding specified input
-     * @return found boolean true if varName is found
-     * @since 0.9.4
-     */
-    
-    public boolean selectOutputByName( String varName ) {
-        boolean found = false;
-        Iterator<Block> blkIt = this.outputBlocks.iterator();
-        while (blkIt.hasNext()) {
-            Block blk = blkIt.next();
-            if (blk.numInputs() > 0) {
-                Signal inputSig = blk.getInput(0);
-                if (inputSig.myName.equals(varName)) {
-                    found = true;
-                    blk.selectWithAncestors();
-                    break;
-                }
-            }
-        }
-        return found;
-    }
 
     /**
      *
@@ -365,21 +315,6 @@ public class Model
 
     public BlockArrayList getOutputBlocks() { return outputBlocks; }
 
-    /**
-     *
-     * Return code dialect
-     * 
-     **/
-    
-    public int getCodeDialect() { return codeDialect; }
-    
-    /**
-     * 
-     * Set emitted code dialect
-     * 
-     */
-    
-    public void setCodeDialect( int dialect ) { codeDialect = dialect; }
 
     /**
      *
@@ -456,7 +391,7 @@ public class Model
 	    if (success && (setSize>oldSize))
 		System.out.println("...successfully registered to key '" + key + "'");
 	    else
-		System.out.println("...appears to be duplicate; proceeding");
+		System.out.println("...UNSUCCESSFUL");
 	}
     }
 
@@ -516,7 +451,7 @@ public class Model
 	    if (success && (setSize>oldSize))
 		System.out.println("...successfully registered to key '" + key + "'");
 	    else
-		System.out.println("...appears to be duplicate; proceeding");
+		System.out.println("...UNSUCCESSFUL");
 	}
 
     }
@@ -585,7 +520,7 @@ public class Model
 	    if (success && (setSize>oldSize))
 		System.out.println("...successfully registered to key '" + key + "'");
 	    else
-		System.out.println("...appears to be duplicate; proceeding");
+		System.out.println("...UNSUCCESSFUL");
 	}
     }
 
@@ -649,13 +584,6 @@ public class Model
     public void wireBlocks()
     {
 	Iterator<Block> it = blocks.iterator();
-        int numBlocks = blocks.size();
-        if (numBlocks > 0 && this.isVerbose()) {
-            System.out.println("");
-            System.out.println("Wiring " + numBlocks + " blocks together");
-            System.out.println("--------------------");
-            System.out.println("");
-        }
 	while (it.hasNext()) {
 	    Block b = it.next();
 	    try {
@@ -670,8 +598,7 @@ public class Model
 
 
     /**
-     * Creates any missing constant (or input) and output blocks (and any
-     * required connector Signals). Also sets up any necessary limiters on Signals
+     * Creates any missing constant (or input) and output blocks
      **/
 
     public void hookUpIO()
@@ -683,14 +610,6 @@ public class Model
 	// iterate for all signals - find blocks with missing inputs or outputs
 	it = this.signals.iterator();
         Block ignored;
-
-        if (this.isVerbose()) {
-            System.out.println("");
-            System.out.println("Creating any necessary I/O connections");
-            System.out.println("--------------------------------------");
-            System.out.println("");
-        }
-
 	while (it.hasNext()) {
 	    theSignal = it.next();
 	    
@@ -745,7 +664,7 @@ public class Model
             // Deal with internal signal limits by inserting limit blocks:
 
             // 1) duplicate current signal; schedule to add to model when iteration is complete
-            // 2) append "_unlim" to original signal name & varID
+            // 2) append "_unlim" to original signal name & varid
             // 3) create downstream limit block(s)
             // 4) create downstream signal with old name; add to model
             // 5) change source varID of any destination blocks to downstream (limited) signal
@@ -758,12 +677,11 @@ public class Model
                 // this.add(limitedSignal);     // wait until iteration is done to add new limited signal to model
                 boolean OK = modifiedSignals.add(limitedSignal);
                 assert(OK);
-                limitedSignal.setDerivedFlag(); // mark as automatically generated variable
+                limitedSignal.setAutoFlag(); // mark as automatic variable
 
-                // record original metadata for signal in case of later failure
-                BlockArrayList origDests = (BlockArrayList) theSignal.getDests().clone();
-                @SuppressWarnings("unchecked")
-                ArrayList<Integer> origPorts = (ArrayList<Integer>) theSignal.getDestPortNumbers().clone();
+                // record original values for signal in case of later failure
+                BlockArrayList origDests = theSignal.getDests();
+                ArrayList<Integer> origPorts = theSignal.getDestPortNumbers();
                 String origName = theSignal.getName();
                 String origVarID = theSignal.getVarID();
 
@@ -779,15 +697,6 @@ public class Model
                 BlockLimiter limiter = new BlockLimiter( theSignal, this,
                         theSignal.getLowerLimit(), theSignal.getUpperLimit() );
 
-                // replace the source for original (unlimited) signals' destination
-                // blocks to be the newly-created limited signal
-                // Follows convention for calling signal with downstream block
-                Iterator<Block> it = origDests.iterator();
-                while (it.hasNext()) {
-                    Block b = it.next();
-                    b.replaceInput( theSignal, limitedSignal);
-                }
-
                 // following convention, tell limiter of its new output to perform hookup
                 try {
                     limiter.addOutput(limitedSignal);
@@ -798,7 +707,6 @@ public class Model
                     theSignal.destPorts = origPorts;
                     theSignal.setName(    origName  );
                     theSignal.setVarID(   origVarID );
-                    // BUG: new limitedSignal has been added to modifiedSignals list
                 }
 
                 // here on success
@@ -831,12 +739,8 @@ public class Model
 	OK = true;
 
 	// look for blocks with missing inputs & outputs, hookup if possible or gen error
-	if (this.isVerbose()) {
-            System.out.println("");
-	    System.out.println("Checking integrity of model");
-            System.out.println("---------------------------");
-            System.out.println("");
-        }
+	if (this.isVerbose())
+	    System.out.println("Looping through blocks, looking for orphan inputs & outputs.");
 
 	Iterator<Block> blockIterator = this.getBlocks().iterator();
 	while( blockIterator.hasNext()) {
@@ -900,7 +804,7 @@ public class Model
 		    Signal s = (Signal) it.next();
 		    // ignore automatically-generated signals
 		    // should just print out signals from varDefs
-		    if (!s.isDerived()) {
+		    if (!s.isAutomatic()) {
 			out.print("	<signal> <varID>");
 			out.print( s.getVarID());
 			out.print("</varID> <signalValue>");
@@ -934,15 +838,12 @@ public class Model
 
     public void initialize() throws DAVEException 
     {
-        if (!this.initialized) { // only do this once
-            
 	StringWriter strwriter = null;// used only when verbose, so we can call
 				// describeSelf(writer)
-	if (this.isVerbose()) {
+	if (this.verbose) {
 	    System.out.println();
 	    System.out.println("Method initialize() called for model '" 
 			       + this.getName() + "'");
-            System.out.println();
 	    strwriter = new StringWriter();
 	    if (strwriter == null)
 		System.err.println("Unable to create FileWriter for 'out'");
@@ -963,11 +864,8 @@ public class Model
 	    blocksNotReady = 0;
 	    blockIterator = blks.iterator();
 		
-	    if (this.verbose) {
-                System.out.println("");
-		System.out.println("Telling " + blks.size() + " non-ready blocks to update.");
-                System.out.println("");
-            }
+	    if (this.verbose)
+		System.out.println("Telling all non-ready blocks to update.");
 	    
 	    while (blockIterator.hasNext()) {
 		b = blockIterator.next();
@@ -990,11 +888,8 @@ public class Model
 
 	    // removing ready blocks
 
-	    if (this.verbose) {
-                System.out.println("");
+	    if (this.verbose)
 		System.out.println("Moving ready blocks to execution list");
-                System.out.println("");
-            }
 
             // blks is a cloned list of all previously non-ready model blocks
             // will search to see if any are ready
@@ -1002,21 +897,18 @@ public class Model
 	    while (candidates.hasNext()) {
 		b = candidates.next();
 		// check each one to see if ready
-		if (this.verbose) {
+		if (this.verbose)
 		    System.out.print("Checking to see if block '" +
 				     b.getName() + "' is ready...");
-                }
 		if (b.isReady()) {
-		    if (this.verbose) {
+		    if (this.verbose)
 			System.out.println(" yes. Adding to execution list.");
-                    }
 		    // blocks that are ready are added to executeOrder list and taken off this one
 		    executeOrder.add( b );
 		    candidates.remove();	// removes current block
-		} else {
+		} else
 		    if (this.verbose)
 			System.out.println(" no.");
-                }
 	    }
 
             // Number of not ready blocks should shrink each pass through loop
@@ -1038,11 +930,9 @@ public class Model
 	// Otherwise, believe we have success
 	this.initialized = true;
 	
-	if (this.verbose) {
-            System.out.println("");
+	if (this.verbose)
 	    System.out.println("Model '" + this.getName() + "' is initialized. Order is:");
-            System.out.println("");
-        }
+
 	try {
 	    int i = 1;
 	    blockIterator = executeOrder.iterator();
@@ -1060,14 +950,6 @@ public class Model
 	    System.err.println(e.getMessage());
             System.exit(exit_failure);
 	}
-
-        if (this.isVerbose()) {
-            System.out.println("");
-            System.out.println("Model initialized and execution order established.");
-            System.out.println("");
-        }
-        }
-
     }
 
 
@@ -1145,11 +1027,6 @@ public class Model
 
     public void cycle() throws DAVEException
     {
-        if (this.isVerbose()) {
-            System.out.println("");
-            System.out.println("Cycle() function called for model '" + this.getName() + "'");
-            System.out.println("");
-        }
 	// check to see if inputVec is null
 	if (this.inputVec == null)
 	    throw new DAVEException("Input vector is null. Did you obtain one from getInputVector() first?");
@@ -1173,12 +1050,6 @@ public class Model
 	// make sure the model is initialized - this also cycles the model
 	if (!this.initialized)
 	    try {
-                if (this.isVerbose()) {
-                    System.out.println("");
-                    System.out.println("Model execution order not yet set; calling initialize()");
-                    System.out.println("-------------------------------------------------------");
-                    System.out.println("");
-                }
 		this.initialize();
 	    } catch (Exception e) {
 		System.err.println(e.getMessage());
@@ -1265,57 +1136,4 @@ public class Model
 	System.out.println("                       Number of outputs: " + this.outputBlocks.size());
 
     }
-    
-    /**
-     * Returns all the blocks in execution sorted order; available only after call to initialize()
-     * @return BlockArrayList of sorted blocks, in appropriate order of execution
-     */
-    
-    public BlockArrayList getSortedBlocks() throws DAVEException {
-        if (executeOrder == null) {
-            throw new DAVEException("Execution order not yet determined");
-        }
-        return executeOrder;
-    }
-    
-    /**
-     * Returns all the selected blocks in execution order; available only after
-     * a call to initialize(). By default, all blocks are selected; to select
-     * blocks involved in calculating only some outputs, a call should be made to
-     * clearSelections() followed by one or more calls to selectOutputByName(). 
-     * 
-     * @return BlockArrayList of blocks involved in calculating selected outputs,
-     * in appropriate order of execution
-     * @since 0.9.4
-     */
-    
-    public BlockArrayList getSelectedBlocks() throws DAVEException {
-        BlockArrayList sortedBlocks = getSortedBlocks();
-        BlockArrayList selectedBlocks = new BlockArrayList();
-        Iterator<Block> blkIt = sortedBlocks.iterator();
-        while (blkIt.hasNext()) {
-            Block blk = blkIt.next();
-            if (blk.isSelected())
-                selectedBlocks.add(blk);
-        }
-        return selectedBlocks;
-    }
-    
-    /**
-     * Return the block that represents the final math operation for the indicated
-     * variable.
-     * @param theVarID identifies the variable whose source block is sought
-     * @return the source block, or null if not found
-     */
-    public Block getBlockByOutputVarID(String theVarID) {
-        // easiest way is to find single with proper ID, then
-        // find source block.
-        Block theBlock = null;
-        Signal theSignal = signals.findByID(theVarID);
-        if (theSignal != null) {
-            theBlock = theSignal.getSource();
-        }
-        return theBlock;
-    }
-
 }

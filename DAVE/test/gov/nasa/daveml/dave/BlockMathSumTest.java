@@ -23,7 +23,6 @@ public class BlockMathSumTest extends TestCase {
 	
 	private final double EPS = 0.000001;
 	
-    @Override
     protected void setUp() throws Exception {
     	    	
        	String routineName = "TestBlockMathProduct::setUp()";
@@ -42,8 +41,8 @@ public class BlockMathSumTest extends TestCase {
 		// first, build the upstream constant blocks and signals
 		_value1Block = new BlockMathConstant( "-3.5", _model );
 		_value2Block = new BlockMathConstant( " 2.0", _model );
-		_value1SignalID = "PB";
-		_value2SignalID = "BSPAN";
+		_value1SignalID = new String("PB");
+		_value2SignalID = new String("BSPAN");
 		_value1Signal = new Signal("PB",    _value1SignalID, "d_s", 1, _model);
 		_value2Signal = new Signal("BSPAN", _value2SignalID, "ft", 1, _model);
 		_value1Block.addOutput(_value1Signal);
@@ -80,53 +79,33 @@ public class BlockMathSumTest extends TestCase {
 			_model.initialize();
 		} catch (DAVEException e) {
 			fail("problem initializing model in " + routineName);
+			e.printStackTrace();
 		}
     }
-    
-    public void testGenCcode() {
-        _model.setCodeDialect(Model.DT_ANSI_C);
-        CodeAndVarNames result = _block.genCode();
-        assertEquals("  outputSignal = PB + BSPAN;\n", result.getCode());
-        this.checkVarNames(result);
-    }
 
-    public void testGenFcode() {
-        _model.setCodeDialect(Model.DT_FORTRAN);
-        CodeAndVarNames result = _block.genCode();
-        assertEquals("       outputSignal = PB + BSPAN\n", result.getCode());
-        this.checkVarNames(result);
-    }
-    
-    public void checkVarNames( CodeAndVarNames result ) {
-        assertEquals(3, result.getVarNames().size());
-        assertEquals("outputSignal", result.getVarName(0));
-        assertEquals("PB",           result.getVarName(1));
-        assertEquals("BSPAN",        result.getVarName(2));
-    }
+	public void testDescribeSelfWriter() {
+		try {
+			_block.describeSelf(_writer);
+		} catch (IOException e) {
+			fail("testDescribeSelfWriter of TestBlockMathSum threw unexpected exception: " 
+					+ e.getMessage() );
+		}
+		assertEquals( "Block \"plus_3\" has two inputs (PB, BSPAN)," +
+				" one output (outputSignal), value [-1.5] and is a Sum math block.", 
+				_writer.toString() );
+	}
 
-    public void testDescribeSelfWriter() {
-        try {
-                _block.describeSelf(_writer);
-        } catch (IOException e) {
-                fail("testDescribeSelfWriter of TestBlockMathSum threw unexpected exception: " 
-                                + e.getMessage() );
-        }
-        assertEquals( "Block \"plus_3\" has two inputs (PB, BSPAN)," +
-                        " one output (outputSignal), value [-1.5] and is a Sum math block.", 
-                        _writer.toString() );
-    }
+	public void testGetValue() {
+		assertEquals( -1.5, _block.getValue(), EPS );
+	}
 
-    public void testGetValue() {
-            assertEquals( -1.5, _block.getValue(), EPS );
-    }
+	public void testIsReady() {
+		assertTrue( _block.isReady() );
+	}
 
-    public void testIsReady() {
-            assertTrue( _block.isReady() );
-    }
-
-    public void testAllInputsReady() {
-            assertTrue( _block.allInputsReady() );
-    }
+	public void testAllInputsReady() {
+		assertTrue( _block.allInputsReady() );
+	}
 
     public void testMakeVerbose() {
         assertFalse( _block.isVerbose() );

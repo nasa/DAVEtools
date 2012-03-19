@@ -68,12 +68,6 @@ public class Signal
      */
 
     String myUnits;
-    
-    /**
-     *  Description of signal
-     */
-    
-    String description;
 
     /**
      *  source block for signal
@@ -164,23 +158,8 @@ public class Signal
      *  indicates this signal does not correspond to a declared varDef
      */
 
-    private boolean derived = false;
+    boolean automatic = false;
 
-    /**
-     * indicates this signal's equivalent code has been emitted by a call to 
-     * {@link genCode}
-     * 
-     */
-    
-    private boolean defined = false;
-    
-    /**
-     * general purpose marking capability; all signals initially unmarked
-     * @since 0.9.4
-     */
-    
-    private boolean marked = false;
-    
     /**
      * lower limit. Default is -Infinity (no lower limit)
      */
@@ -202,12 +181,11 @@ public class Signal
     public Signal()
     {
         ourModel = null;
-        myName =  "unnamed";
-        myVarID = "unnamed";
+        myName =  "";
+        myVarID = "";
         myUnits = "";
         source = null;
         sourcePort = 0;
-        description = "No description.";
         dests = null;
         destPorts = null;
         hasIC = false;
@@ -219,11 +197,8 @@ public class Signal
         isStateDeriv = false;
         isOutput = false;
         isStdAIAA = false;
-        derived = false;
-        defined = false;
         lowerLim = Double.NEGATIVE_INFINITY;
         upperLim = Double.POSITIVE_INFINITY;
-        marked = false;
     }
 
 
@@ -239,7 +214,7 @@ public class Signal
 
     public Signal(String signalName, Model m)
     {
-        this( signalName, Signal.toValidId(signalName), "unkn", 1, m);
+        this( signalName, signalName, "unkn", 1, m);
     }
 
 
@@ -260,11 +235,7 @@ public class Signal
         this();
         ourModel = m;
         myName = signalName;
-        if (signalName == null)
-            myName = "unnamed";
         myVarID = varID;
-        if (varID == null)
-            myVarID = "derived_signal_" + m.getNumSignals();
         myUnits = units;
         dests = new BlockArrayList(numConnects);
         destPorts = new ArrayList<Integer>(numConnects);
@@ -340,7 +311,7 @@ public class Signal
                     signalElement.getNamespace());
             Element isStdAIAAElement = signalElement.getChild("isStdAIAA",
                     signalElement.getNamespace());
-            
+
             // record findings
 
             // first three flags (input, control, disturbance) are mutually exclusive
@@ -359,28 +330,11 @@ public class Signal
             if(isOutputElement     != null) this.isOutput     = true;
             if(isStdAIAAElement    != null) this.isStdAIAA    = true;
 
-            // Look for description
-            this.description = signalElement.getChildTextNormalize("description",
-                    signalElement.getNamespace());
-            if (this.description == null)
-                this.description = "No description.";
-            
             // Search for calculation/math element
             this.handleCalculation( signalElement, m );
         } else {
             System.err.println("Error: Signal constructor called with " + name + " element.");
         }
-    }
-    
-    /**
-     * Converts String to valid XML ID by replacing spaces with underscores
-     */
-    
-    protected static String toValidId( String input ) {
-        String output = "";
-        if (input != null)
-            output = input.replace(" ", "_");
-        return output;
     }
     
     /**
@@ -452,7 +406,7 @@ public class Signal
         this.upperLim   = s.upperLim;   // upper limit to output range
         this.isOutput   = s.isOutput;   // flag to indicate this should be an output signal
         // don't copy verboseFlag
-        this.derived  = s.derived;  // indicates this does not correspond to varDef
+        this.automatic  = s.automatic;  // indicates this does not correspond to varDef
         // don't copy ready flag
         // copies list of pointers to downstream blocks
         this.dests      = new BlockArrayList( s.dests.size() );
@@ -561,6 +515,7 @@ public class Signal
                 System.err.println("Error message:" + e.getMessage() );
                 System.exit(0);
             }
+
         }
         return b;
     }
@@ -591,36 +546,12 @@ public class Signal
     /**
      *
      * <p> Set the unique varID of the signal </p>
-     * 
-     * <p> Also changes the varID of connected blocks </p>
      *
      * @param theVarID <code>String</code> to use for varID
      *
      **/
 
-    public void setVarID( String theVarID ) { 
-        // set our variable ID
-        this.myVarID = theVarID;
-        
-        // set our source blocks output var ID
-        if (this.source != null)
-            this.source.renameOutVarID();
-        
-        // set our destination blocks input varIDs
-        BlockArrayList sinks = this.getDests();
-        ArrayList<Integer> sinkPorts = this.getDestPortNumbers();
-        if ((sinks != null) && (sinkPorts != null))
-            for (int i = 0; i < sinks.size(); i++) {
-                Block blk = sinks.get(i);
-                blk.renameInVarID( sinkPorts.get(i));
-                // Special treatment for breakpoint blocks - need to 
-                // change associated varID in all function blocks too
-                if (blk instanceof BlockBP) {
-                    Signal sig = blk.getOutput();
-                    sig.setVarID(theVarID);
-                }
-            }
-    }
+    public void setVarID( String theVarID ) { this.myVarID = theVarID; }
 
 
     /**
@@ -628,74 +559,26 @@ public class Signal
      * Sets the indicator flag to show this was automatically generated
      *
      * <p>
-     *  This flag should be set for all 'derived' signals; i.e. those
+     *  This flag should be set for all 'automatic' signals; i.e. those
      *  not corresponding to varDefs in the DAVE-ML source file
      *
      **/
 
-    public void setDerivedFlag() { this.derived = true; }
-
-    
-    /**
-     * Clears the derived flag
-     */
-    
-    public void clearDerivedFlag() { this.derived = false; }
+    public void setAutoFlag() { this.automatic = true; }
 
 
     /**
      *
      * Returns the indicator flag to show this was automatically generated
      *
-     *  This flag should be set for all 'derived' signals; i.e. those
+     * <p>
+     *  This flag should be set for all 'automatic' signals; i.e. those
      *  not corresponding to varDefs in the DAVE-ML source file
      *
      **/
 
-    public boolean isDerived() { return this.derived; }
+    public boolean isAutomatic() { return this.automatic; }
 
-    /**
-     * Sets the indicator flag to show this has been defined in code
-     */
-    
-    protected void setDefinedFlag() { this.defined = true; }
-    
-    
-    /**
-     * Clears the indicator flag (unlikely instance)
-     */
-    
-    protected void clearDefinedFlag() { this.defined = false; }
-    
-    
-    /**
-     * Returns true if this signal has been encoded already
-     */
-    
-    public boolean isDefined() { return this.defined; }
-    
-    
-    /**
-     * Sets general purpose marker flag
-     * @since 0.9.4
-     */
-    
-    public void mark() { this.marked = true; }
-    
-    /**
-     * Clears the general purpose marking flag
-     * @since 0.9.4
-     */
-    
-    public void unmark() { this.marked = false; }
-    
-    /**
-     * Returns true if the signal is marked for some reason
-     * @since 0.9.4
-     */
-    
-    public boolean isMarked() { return this.marked; }
-    
     /**
      * indicates a lower limit is in force
      */
@@ -725,7 +608,7 @@ public class Signal
      * @param strValue String containing the value
      */
 
-    protected final void setLowerLimit( String strValue ) {
+    protected void setLowerLimit( String strValue ) {
         lowerLim = Double.parseDouble( strValue );
     }
 
@@ -752,7 +635,7 @@ public class Signal
      * @param strValue String containing the value
      */
 
-    protected final void setUpperLimit( String strValue ) {
+    protected void setUpperLimit( String strValue ) {
         upperLim = Double.parseDouble( strValue );
     }
 
@@ -1006,42 +889,6 @@ public class Signal
 
     public boolean isStdAIAA() { return this.isStdAIAA; }
     
-    
-    /**
-     *  Set the description directly
-     */
-    
-    public void setDescription( String newDescription ) {
-        this.description = newDescription;
-    }
-    
-    /**
-     *  Get the description field
-     */
-    
-    public String getDescription() { return this.description; }
-    
-    /**
-     * <p> Generate code for signal </p>
-     */
-    
-    public CodeAndVarNames genCode( ) {
-        CodeAndVarNames cvn = new CodeAndVarNames();
-        if (this.isDerived()) {
-            if (this.source != null) {
-                cvn.appendCode("(");
-                cvn.append(this.source.genCode());
-                cvn.appendCode(")");
-            }
-        } else {
-            cvn.appendCode(this.getVarID());
-            cvn.addVarName(this.getVarID());
-        }  
-        if (this.source != null)
-            this.setDefinedFlag(); // record that we've emitted our code
-        return cvn;
-    }
-
 
     /**
      *
@@ -1094,5 +941,4 @@ public class Signal
                     }
             }
     }
-
 }

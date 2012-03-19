@@ -5,7 +5,7 @@
 #
 
 DIRS = DAVE DAVE2SL ModelSweeper tests
-FILES = DAVEtools.jar LICENSE.html README.txt CHANGELOG.txt build.xml overview.html
+FILES = DAVEtools.jar LICENSE.html README.txt build.xml overview.html
 
 VERSTRING = 0.9.2
 

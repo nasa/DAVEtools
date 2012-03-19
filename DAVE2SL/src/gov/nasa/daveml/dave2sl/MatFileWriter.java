@@ -126,7 +126,6 @@ public class MatFileWriter extends FileWriter
 	{
 		this.modelName = modelName;
 		this.writeln("%% M file script to provide data for " + this.modelName + ".mdl model");
-		this.writeln("clear " + this.modelName + "_data; % remove any existing data structure");
 	}
 
 

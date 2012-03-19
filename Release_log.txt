@@ -87,4 +87,4 @@ package.
            have catalog support working so we don't use network if
            local DTD is available. Also fixed bug in ModelSweeper so
            it doesn't bomb if there are no checkcases defined in the
-           selected model. (0.9.2_cf33c71)
+           selected model. (0.9.2_eca8ea1)

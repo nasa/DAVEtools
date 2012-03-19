@@ -22,22 +22,14 @@ VPATH = ${EXAMPLES}:${F16_DIR}:${HL20_DIR}
 
 include Makefile.dist
 
-# this makes sure any necessary directories are added
-
-%/.d:
-	mkdir -p $(@D)
-	@touch $@
-
-test_models/%.dml : %.dml test_models/.d
+test_models/%.dml : %.dml
 	cp $< $@
 
-copy_models: test_models $(addprefix test_models/,${MODEL_LIST})
+copy_models: $(addprefix test_models/,${MODEL_LIST})
 
 
 distclean:
-	-rm -rf test_models
+	-rm -rf test_models/*
 
 .PHONY: copy_models distclean
-
-.PRECIOUS: %/.d
 

@@ -38,24 +38,16 @@ public class SignalTest extends TestCase {
 
     }  // end of setup
 
-    public void testToValidId() {
-        String input    = "what is the Matter";
-        String expected = "what_is_the_Matter";
-        assertTrue( Signal.toValidId(input).equals(expected));
-        input    = "where_is_this";
-        expected = "where_is_this";
-        assertTrue( Signal.toValidId(input).equals(expected));
-    }
 
     public void testDefaultCtor() {
-        assertTrue( (_ds.getName().equals("unnamed")));
+        assertTrue( (_ds.getName() == null ? "" == null : _ds.getName().equals("")));
         try {
             assertTrue( _ds.sourceReady() ); // should fail; no block
             fail("Expected exception.");
         } catch ( DAVEException e ) { 
             assertTrue( true );         // should throw exception
         }
-        assertTrue( (_ds.getVarID() .equals("unnamed")));
+        assertTrue( (_ds.getVarID() == null ? "" == null : _ds.getVarID().equals("")));
         assertTrue( (_ds.getUnits() == null ? "" == null : _ds.getUnits().equals("")));
         assertTrue(  _ds.getSource() == null );
         assertTrue(  _ds.getSourcePort() == 0 );
@@ -70,8 +62,7 @@ public class SignalTest extends TestCase {
         assertFalse( _ds.isInput() );
         assertFalse( _ds.isOutput() );
         assertFalse( _ds.isStdAIAA() );
-        assertFalse( _ds.isDerived() );
-        assertFalse( _ds.isDefined() );
+        assertFalse( _ds.isAutomatic() );
         assertFalse( _ds.hasLowerLimit() );
         assertFalse( _ds.hasUpperLimit() );
         assertFalse( _ds.isLimited() );
@@ -96,8 +87,7 @@ public class SignalTest extends TestCase {
         assertFalse( _fs.isInput() );
         assertFalse( _fs.isOutput() );
         assertFalse( _fs.isStdAIAA() );
-        assertFalse( _fs.isDerived() );
-        assertFalse( _fs.isDefined() );
+        assertFalse( _fs.isAutomatic() );
         assertTrue(  _fs.hasLowerLimit() );
         assertTrue(  _fs.hasUpperLimit() );
         assertTrue(  _fs.isLimited() );
@@ -143,7 +133,7 @@ public class SignalTest extends TestCase {
             fail("Exception thrown while initializing model in testSingleSignal: " + e.getMessage());
         }
 
-        assertTrue(  _ss.getVarID().equals("new_signal"));
+        assertTrue(  _ss.getVarID().equals("new signal"));
         assertTrue(  _ss.getUnits().equals("unkn"));
         assertTrue(  _ss.getSource() == _bc );
         assertTrue(  _ss.getSourcePort() == 1 );
@@ -158,8 +148,7 @@ public class SignalTest extends TestCase {
         assertFalse( _ss.isInput() );
         assertFalse( _ss.isOutput() );
         assertFalse( _ss.isStdAIAA() );
-        assertFalse( _ss.isDerived() );
-        assertFalse( _ss.isDefined() );
+        assertFalse( _ss.isAutomatic() );
         assertFalse( _ss.hasLowerLimit() );
         assertFalse( _ss.hasUpperLimit() );
         assertFalse( _ss.isLimited() );
@@ -181,56 +170,6 @@ public class SignalTest extends TestCase {
         assertTrue( dpi.hasNext() );
         Integer destPort = (Integer) dpi.next();
         assertTrue( destPort == 1 );
-        
-    }
-    
-    private void checkCode( int lang, Signal sig, String id ) {
-        CodeAndVarNames cvn;
-        _m.setCodeDialect(lang);
-        
-        // first order element
-        sig.clearDerivedFlag();
-        cvn = sig.genCode();
-        assertFalse( cvn.getVarNames() == null );
-        assertEquals( 1, cvn.getVarNames().size() );
-        assertTrue( id.equals(cvn.getVarName(0)) );
-        assertTrue( id.equals(cvn.getCode()) );
-        assertFalse( sig.isDefined() ); // only emitted var name, not def
-        sig.clearDefinedFlag();
-        
-        // derived element - since these are not hooked to any inputs, will 
-        // return "" as code and empty varNames listarry
-        sig.setDerivedFlag();
-        cvn = sig.genCode();
-        assertFalse( cvn.getVarNames() == null );
-        assertEquals( 0, cvn.getVarNames().size() );
-        assertTrue( "".equals(cvn.getCode()) );
-        assertFalse( sig.isDefined() );
-    }
-
-    private void checkCode( Signal sig, String id ){
-        checkCode( Model.DT_ANSI_C, sig, id);
-        sig.clearDefinedFlag();
-        checkCode( Model.DT_FORTRAN, sig, id);
-    }
-
-    public void testGenCode_DefaultSignal() {
-        Signal sig = _ds;
-        String id = "unnamed";
-        checkCode( sig, id );
-    }
-    
-    public void testGenCode_SingleSignal() {
-        Signal sig = _ss;
-        String id = "new_signal";
-        checkCode( sig, id );
-   }
-
-
-    public void testGenCode_FullSignal() {
-        Signal sig = _fs;
-        String id = "fulsig";
-        checkCode( sig, id );
     }
 
     public void testVerbose() {
@@ -294,7 +233,7 @@ public class SignalTest extends TestCase {
         assertFalse( s2.isInput() );
         assertFalse( s2.isOutput() );
         assertFalse( s2.isStdAIAA() );
-        assertFalse( s2.isDerived() );
+        assertFalse( s2.isAutomatic() );
         assertTrue(  s2.hasLowerLimit() );
         assertTrue(  s2.hasUpperLimit() );
         assertTrue(  s2.isLimited() );
@@ -525,7 +464,7 @@ public class SignalTest extends TestCase {
         assertEquals( 1,             abs_1.numInputs() );
         assertEquals( 1,             abs_1.numVarIDs() );
         assertTrue(                  abs_1.allInputsConnected() );
-        assertEquals( "const_1",     abs_1.getVarID(1) );
+        assertEquals( "const_-6.78_",abs_1.getVarID(1) );
         assertEquals( "dv",          abs_1.getOutputVarID() );
         assertEquals( theSignal,     abs_1.getOutput() );
         assertTrue(                  abs_1.outputConnected() );
@@ -549,9 +488,6 @@ public class SignalTest extends TestCase {
             fail("Exception thrown while getting value of signal source in testSingleElement_ctor: " 
                  + e.getMessage());
         }
-        
-        m.setCodeDialect(Model.DT_ANSI_C);
-        assertTrue( theSignal.genCode().getCode().equals("dv") );
 
     }
 
@@ -757,10 +693,6 @@ public class SignalTest extends TestCase {
             fail("Exception thrown while getting value of signal source in testSingleElement_ctor: " 
                  + e.getMessage());
         }
-        
-        m.setCodeDialect(Model.DT_ANSI_C);
-        assertTrue( beta.genCode().getCode().equals("beta") );
-        assertTrue( dv.genCode().getCode().equals("dv") );
     }
 
     public void testSignalElementWithCalculation() {
@@ -1173,7 +1105,7 @@ public class SignalTest extends TestCase {
         assertTrue(  _fs.getSourcePort() == 0 );
         assertFalse( _fs.hasSource() );
         assertFalse( _fs.hasDest() );
-        assertFalse( _fs.isDerived() );
+        assertFalse( _fs.isAutomatic() );
     }
 
     private void setFullSignalWithICMinMax( String ICValue, String minValue, String maxValue ) {
@@ -1217,7 +1149,7 @@ public class SignalTest extends TestCase {
         assertTrue(  _fs.getSourcePort() == 0 );
         assertFalse( _fs.hasSource() );
         assertFalse( _fs.hasDest() );
-        assertFalse( _fs.isDerived() );
+        assertFalse( _fs.isAutomatic() );
 
         _m.hookUpIO(); // creates & connects a constant block to an output block
             try { _m.initialize(); }

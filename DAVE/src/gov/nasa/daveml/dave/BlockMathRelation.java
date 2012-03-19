@@ -84,16 +84,19 @@ public class BlockMathRelation extends BlockMath
         this.setName( this.relationOp + "_" + m.getNumBlocks() );
         
         // take appropriate action based on type
-        if(!validateRelation()) {
-            System.err.println("Error - BlockMathRelation constructor called with" +
+        if(!validateRelation())
+            {
+                System.err.println("Error - BlockMathRelation constructor called with" +
                                    " unknown relation operator " + this.relationOp);
-        } else {
-            // look for two inputs
-            if(kids.size() != 3)
-                System.err.println("Error - <apply><[relation]/> only handles 2 arguments, not " + (kids.size()-1));
-            else
-                this.genInputsFromApply(ikid, 1);
-        }
+            }
+        else
+            {
+                // look for two inputs
+                if(kids.size() != 3)
+                    System.err.println("Error - <apply><[relation]/> only handles 2 arguments, not " + (kids.size()-1));
+                else
+                    this.genInputsFromApply(ikid, 1);
+            }
 
         //System.out.println("    BlockMathRelation constructor: " + this.getName() + " created.");
     }
@@ -107,7 +110,7 @@ public class BlockMathRelation extends BlockMath
      *
      **/
 
-    protected final boolean validateRelation( )
+    protected boolean validateRelation( )
     {
     	this.relation = UNK;
     	
@@ -122,78 +125,6 @@ public class BlockMathRelation extends BlockMath
     }
 
 
-    /**
-     * <p> Generate code equivalent of a relationship test </p>
-     */
-    
-    @Override
-    public CodeAndVarNames genCode() {
-        CodeAndVarNames cvn = new CodeAndVarNames();
-        Signal outputSig = this.getOutput();
-        
-        // check to see if we're derived variable (code fragment) or a whole statement
-        // if not derived, need preceding command and the LHS of the equation too
-        if (!outputSig.isDerived()) {
-            cvn.appendCode(indent() + outVarID + " = ");
-            cvn.addVarName(outVarID);
-        }
-        
-        if (inputs == null) {
-            cvn.appendCode(errorComment(
-                    "in BlockMathRelation genCode(): encountered null input list."));
-            return cvn;
-        }
-        
-        if (inputs.size() < 2) {
-            cvn.appendCode(errorComment(
-                    "in BlockMathRelation genFcode(): encountered input list" +
-                    " with less than the expected three elements."));
-            return cvn;
-        }
-        Signal arg1 = inputs.get(0);
-        if (arg1 == null) {
-            cvn.appendCode(errorComment(
-                    "in BlockMathRelation genFcode(): first input signal was null."));
-            return cvn;
-        }
-        Signal arg2 = inputs.get(1);
-        if (arg2 == null) {
-            cvn.appendCode(errorComment(
-            "in BlockMathRelation genFcode(): second input signal was null."));
-            return cvn;
-        }
-        cvn.append(arg1.genCode());
-        int dialect = ourModel.getCodeDialect();
-        switch(dialect) {
-            case Model.DT_ANSI_C:
-                switch (relation) {
-                    case LT:  cvn.appendCode(" < " ); break;
-                    case LEQ: cvn.appendCode(" <= "); break;
-                    case EQ:  cvn.appendCode(" == "); break;
-                    case GEQ: cvn.appendCode(" >= "); break;
-                    case GT:  cvn.appendCode(" > " ); break;
-                    case NEQ: cvn.appendCode(" != "); break;
-                }
-                break;
-            case Model.DT_FORTRAN:
-                switch (relation) {
-                    case LT:  cvn.appendCode(" .LT. "); break;
-                    case LEQ: cvn.appendCode(" .LE. "); break;
-                    case EQ:  cvn.appendCode(" .EQ. "); break;
-                    case GEQ: cvn.appendCode(" .GE. "); break;
-                    case GT:  cvn.appendCode(" .GT. "); break;
-                    case NEQ: cvn.appendCode(" .NE. "); break;
-                }
-                break;
-        }
-        cvn.append(arg2.genCode());
-        
-        // if not derived, need new line
-        if (!outputSig.isDerived())
-            cvn.appendCode(this.endLine());
-        return cvn;
-    }
-
 
     /**
      *
@@ -202,7 +133,6 @@ public class BlockMathRelation extends BlockMath
      * @throws <code>IOException</code>
      **/
 
-    @Override
     public void describeSelf(Writer writer) throws IOException
     {
         super.describeSelf(writer);
@@ -237,7 +167,6 @@ public class BlockMathRelation extends BlockMath
      *
      **/
 
-    @Override
     public void update() throws DAVEException
     {
         int numInputs;

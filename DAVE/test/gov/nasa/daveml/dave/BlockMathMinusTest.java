@@ -114,33 +114,6 @@ public class BlockMathMinusTest extends TestCase {
         }
     }
 
-    public void testGenCcode() {
-        _model.setCodeDialect(Model.DT_ANSI_C);
-        CodeAndVarNames result1 = _unaryMinusBlock.genCode();
-        assertEquals("  minusAlpha = -(-3.45);\n", result1.getCode());
-        assertEquals(1, result1.getVarNames().size());
-        assertEquals("minusAlpha", result1.getVarName(0));
-        
-        
-        CodeAndVarNames result2 = _binaryMinusBlock.genCode();
-        assertEquals("  alphaMinusBeta = (-3.45) - (+3.45);\n", result2.getCode());
-        assertEquals(1, result2.getVarNames().size());
-        assertEquals("alphaMinusBeta", result2.getVarName(0));
-    }
-
-    public void testGenFcode() {
-        _model.setCodeDialect(Model.DT_FORTRAN);
-        CodeAndVarNames result1 = _unaryMinusBlock.genCode();
-        assertEquals("       minusAlpha = -(-3.45)\n", result1.getCode());
-        assertEquals(1, result1.getVarNames().size());
-        assertEquals("minusAlpha", result1.getVarName(0));
-        
-        CodeAndVarNames result2 = _binaryMinusBlock.genCode();
-        assertEquals("       alphaMinusBeta = (-3.45) - (+3.45)\n", result2.getCode());
-        assertEquals(1, result2.getVarNames().size());
-        assertEquals("alphaMinusBeta", result2.getVarName(0));
-    }
-
     public void testDescribeSelf() {
 
         StringWriter writer  = new StringWriter();
@@ -151,7 +124,7 @@ public class BlockMathMinusTest extends TestCase {
             fail("Unexpected exception in BlockMathMinusTest::testDescribeSelf with unaryMinusBlock: "
                     + e1.getMessage() );
         }
-        assertEquals( "Block \"minus_1\" has one input (const_1)," +
+        assertEquals( "Block \"minus_1\" has one input (const_-3.45_)," +
         		" one output (minusAlpha), value [3.45] and is a Minus block.",
                 writer.toString() );
 
@@ -164,7 +137,7 @@ public class BlockMathMinusTest extends TestCase {
             fail("Unexpected exception in BlockMathMinusTest::testDescribeSelf with binaryMinusBlock: "
                     + e2.getMessage() );
         }
-        assertEquals( "Block \"minus_3\" has two inputs (const_1, const_3)," +
+        assertEquals( "Block \"minus_3\" has two inputs (const_-3.45_, const_+3.45_)," +
         		" one output (alphaMinusBeta), value [-6.9] and is a Minus block.",
                 writer.toString() );
     }

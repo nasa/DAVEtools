@@ -67,22 +67,29 @@ public class BlockMathProduct extends BlockMath
 	this.setName( blockType + "_" + m.getNumBlocks() );
 	
 	// take appropriate action based on type
-	if(blockType.equals("times")) {
-            this.genInputsFromApply(ikid, 1);
-	} else if (blockType.equals("quotient")) {
-            if(kids.size() != 3)
-                System.err.println("Error - <apply><quotient/> only handles 2 arguments, not " + (kids.size()-1));
-            else
-                this.genInputsFromApply(ikid, 1);
-	} else if (blockType.equals("divide")) {
-            if(kids.size() != 3)
-                System.err.println("Error - <apply><divide/> only handles 2 arguments, not " + (kids.size()-1));
-            else
-                this.genInputsFromApply(ikid, 1);
-	} else {
+	if(blockType.equals("times"))
+	  {
+	      this.genInputsFromApply(ikid, 1);
+	  }
+	else if (blockType.equals("quotient"))
+	    {
+		if(kids.size() != 3)
+		    System.err.println("Error - <apply><quotient/> only handles 2 arguments, not " + (kids.size()-1));
+		else
+		    this.genInputsFromApply(ikid, 1);
+	    }
+	else if (blockType.equals("divide"))
+	    {
+		if(kids.size() != 3)
+		    System.err.println("Error - <apply><divide/> only handles 2 arguments, not " + (kids.size()-1));
+		else
+		    this.genInputsFromApply(ikid, 1);
+	    }
+	else
+	  {
 	    System.err.println("Error - BlockMathProduct constructor called with" +
 			       " type element:" + blockType);
-	}
+	  }
 
 //System.out.println("    BlockMathProduct constructor: " + this.getName() + " created.");
     }
@@ -98,48 +105,12 @@ public class BlockMathProduct extends BlockMath
 
 
     /**
-     * <p> Generate code equivalent of our operation</p>
-     */
-    
-    @Override
-    public CodeAndVarNames genCode() {
-        CodeAndVarNames cvn = new CodeAndVarNames();
-        Iterator<Signal> inputSig = inputs.iterator();
-        Signal outputSig = this.getOutput();
-        // check to see if we're derived variable (code fragment) or a whole statement
-        // if not derived, need preceding command and the LHS of the equation too
-        if (!outputSig.isDerived()) {
-//            code = "// Code for variable \"" + outVarID + "\":\n";
-            cvn.appendCode(indent() + outVarID + " = ");
-            cvn.addVarName(outVarID);
-        }
-        while (inputSig.hasNext()) {
-            Signal inSig = inputSig.next();
-            cvn.append(inSig.genCode());
-            if (inputSig.hasNext()) {
-                if (this.blockType.equals("times")) 
-                    cvn.appendCode("*");
-                else if (this.blockType.equals("divide"))
-                    cvn.appendCode("/");
-                else if (this.blockType.equals("quotient"))
-                    cvn.appendCode("/");
-            }
-        }
-        // if not derived, need trailing semicolon and new line
-        if (!outputSig.isDerived())
-            cvn.appendCode(endLine());
-        return cvn;
-    }
-
-
-    /**
      *
      * <p> Generates description of self </p>
      *
      * @throws <code>IOException</code>
      **/
 
-    @Override
     public void describeSelf(Writer writer) throws IOException
     {
 	super.describeSelf(writer);
@@ -153,7 +124,6 @@ public class BlockMathProduct extends BlockMath
      *
      **/
 
-    @Override
     public void update() throws DAVEException
     {
 	Iterator<Signal> theInputs;

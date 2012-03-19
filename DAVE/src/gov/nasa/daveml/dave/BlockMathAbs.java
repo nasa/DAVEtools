@@ -43,7 +43,7 @@ public class BlockMathAbs extends BlockMath
      **/
 
     @SuppressWarnings("unchecked")
-    public BlockMathAbs( Element applyElement, Model m )
+	public BlockMathAbs( Element applyElement, Model m )
     {
 	// Initialize superblock elements
 	super("pending", "absolute value", m);
@@ -57,16 +57,19 @@ public class BlockMathAbs extends BlockMath
 	this.setName( first.getName() + "_" + m.getNumBlocks());
 	
 	// take appropriate action based on type
-	if(!first.getName().equals("abs")) {
-            System.err.println("Error - BlockMathAbs constructor called with" +
-                               " wrong type element.");
-        } else {
-            // look for single input
-            if(kids.size() > 2)
-                System.err.println("Error - <apply><abs/> only handles single arguments, not " + (kids.size()-1));
-            else
-                this.genInputsFromApply(ikid, 1);
-        }
+	if(!first.getName().equals("abs"))
+	    {
+		System.err.println("Error - BlockMathAbs constructor called with" +
+				   " wrong type element.");
+	    }
+	else
+	    {
+		// look for single input
+		if(kids.size() > 2)
+		    System.err.println("Error - <apply><abs/> only handles single arguments, not " + (kids.size()-1));
+		else
+		    this.genInputsFromApply(ikid, 1);
+	    }
 
 //System.out.println("    BlockMathAbs constructor: " + myName + " created.");
     }
@@ -79,7 +82,6 @@ public class BlockMathAbs extends BlockMath
      *
      **/
 
-    @Override
     public void update() throws DAVEException
     {
 	if (isVerbose()) {
@@ -115,46 +117,12 @@ public class BlockMathAbs extends BlockMath
     }
 
     /**
-     * <p> Generate C-code equivalent of our operation</p>
-     */
-    
-    @Override
-    public CodeAndVarNames genCode() {
-        CodeAndVarNames cvn = new CodeAndVarNames();
-        Signal input;
-        Signal outputSig = this.getOutput();
-        // check to see if we're derived variable (code fragment) or a whole statement
-        // if not derived, need preceding command and the LHS of the equation too
-        if (!outputSig.isDerived()) {
-//            code = "// Code for variable \"" + outVarID + "\":\n";
-            cvn.appendCode(indent() + outVarID + " = ");
-            cvn.addVarName(outVarID);
-        }
-        input = inputs.get(0);
-        
-        String op = "fabs";
-        if (ourModel.getCodeDialect() == Model.DT_FORTRAN)
-            op = "ABS";
-        
-        cvn.appendCode( op + "( ");
-        cvn.append(input.genCode());
-        cvn.appendCode(" )");
-        
-        // if not derived, need trailing semicolon and new line
-        if (!outputSig.isDerived())
-            cvn.appendCode(endLine());
-        return cvn;
-    }
-
-
-    /**
      *
      * <p> Generates description of self </p>
      *
      * @throws <code>IOException</code>
      **/
 
-    @Override
     public void describeSelf(Writer writer) throws IOException
     {
 	super.describeSelf(writer);

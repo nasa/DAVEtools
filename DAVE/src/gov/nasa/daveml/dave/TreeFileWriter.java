@@ -18,8 +18,6 @@ package gov.nasa.daveml.dave;
 import java.io.IOException;
 import java.io.FileWriter;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class TreeFileWriter extends FileWriter
 {
@@ -72,55 +70,11 @@ public class TreeFileWriter extends FileWriter
     {
         this.writeln("Contents of model:");
         this.writeln();
-
-        // List inputs
-
-        this.writeln("Number of inputs: " + m.getNumInputBlocks());
-        this.writeln();
-
-        int i = 1;
-        Iterator<VectorInfo> inputIterator;
-        try {
-            inputIterator = m.getInputVector().iterator();
-            while (inputIterator.hasNext()) {
-                VectorInfo input;
-                input = inputIterator.next();
-                this.write(i + " ");
-                this.write(input.getName());
-                this.writeln(" (" + input.getUnits() + ")");
-                i++;
-            }
-        } catch (DAVEException ex) {
-            this.writeln("DAVEException trying to get input vector");
-        }
-        this.writeln();
-
-        // List outputs
-        this.writeln("Number of outputs: " + m.getNumOutputBlocks());
-        this.writeln();
-        i = 1;
-        Iterator<VectorInfo> outputIterator;
-        try {
-            outputIterator = m.getOutputVector().iterator();
-            while (outputIterator.hasNext()) {
-                VectorInfo output;
-                output = outputIterator.next();
-                this.write(i + " ");
-                this.write(output.getName());
-                this.writeln(" (" + output.getUnits() + ")");
-                i++;
-            }
-        } catch (DAVEException ex) {
-            this.writeln("DAVEException trying to get output vector");
-        }
-        this.writeln();
-
-        i = 1;
         this.writeln("Number of signals: " + m.getNumSignals());
         this.writeln();
 
         // List signals & info
-        i = 1;
+        int i = 1;
         Iterator<Signal> signalIterator = m.getSignals().iterator();
         while (signalIterator.hasNext())
             {

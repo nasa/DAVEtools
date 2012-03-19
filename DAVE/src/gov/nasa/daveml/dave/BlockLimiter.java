@@ -109,7 +109,6 @@ public class BlockLimiter extends Block {
      *
      **/
 
-    @Override
     public double getValue()    { return this.value; }
 
 
@@ -119,56 +118,6 @@ public class BlockLimiter extends Block {
      **/
 
     public String getUnits() { return this.units; }
-    
-    /**
-     * <p> Generates C algorithm to limit input to output</p>
-     */
-    
-    @Override
-    public CodeAndVarNames genCode() {
-        CodeAndVarNames cvn = new CodeAndVarNames();
-        String rel;
-        Signal input;
-        Signal outputSig = this.getOutput();
-        // check to see if we're derived variable (code fragment) or a whole statement
-        // if not derived, need preceding command and the LHS of the equation too
-        if (outputSig != null)
-            if (!outputSig.isDerived()) {
-//                cvn.code = "// Code for variable \"" + outVarID + "\":\n";
-                cvn.appendCode(indent() + outVarID + " = ");
-                cvn.addVarName(outVarID);
-            }
-        input = inputs.get(0);
-        int dialect = ourModel.getCodeDialect();
-        cvn.append( input.genCode() );
-        if (this.hasLowerLimit()) {
-            cvn.appendCode(endLine());
-            rel = " < "; // default is DT_ANSI_C
-            if (dialect == Model.DT_FORTRAN)
-                rel = " .LT. ";
-            cvn.appendCode(beginIf( outVarID + rel + lowerLim.toString() ));
-            cvn.appendCode(indent() + "  " + outVarID + " = " + lowerLim.toString());
-            cvn.appendCode(endLine());
-            cvn.appendCode(endIf());
-        }
-        if (this.hasUpperLimit()) {
-            if (!this.hasLowerLimit())
-                cvn.appendCode(endLine()); // don't issue blank line
-            rel = " > "; // default is DT_ANSI_C
-            if (dialect == Model.DT_FORTRAN)
-                rel = " .GT. ";
-            cvn.appendCode(beginIf( outVarID + rel + upperLim.toString() ));
-            cvn.appendCode(indent() + "  " + outVarID + " = " + upperLim.toString());
-            cvn.appendCode(endLine());
-            cvn.appendCode(endIf());
-        }
-        // if not derived, need trailing semicolon and new line if no limits
-        if (outputSig != null)
-            if (!outputSig.isDerived())
-                if (!this.hasLowerLimit() && !this.hasUpperLimit() )
-                    cvn.appendCode(endLine());
-        return cvn;
-    }
 
 
     /**
@@ -194,7 +143,6 @@ public class BlockLimiter extends Block {
      *
      **/
 
-    @Override
     public void update() throws DAVEException
     {
         if (isVerbose()) {

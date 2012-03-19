@@ -421,7 +421,7 @@ public class BlockFuncTable extends Block
 				   + connectorName + "' with a varID of '"
 				   + iwSignalID + "' and units of '" + units + "'");
 	    connector = new Signal( connectorName, iwSignalID, units, 2, ourModel );
-	    connector.setDerivedFlag();	// note that we've created this variable
+	    connector.setAutoFlag();	// flag as an automatic variable
 	    connector.addSink( this, portNum+1 );	// hook up to new signal
 	} else {
 	    // else block - error
@@ -484,10 +484,8 @@ public class BlockFuncTable extends Block
 		System.out.print(" Looking for varID corresponding to bpID '" 
 				 + bpID + "'");
 	    if( !iVarIDIterator.hasNext() ) {
-		System.err.println("BlockFuncTable.hookUpInputs(): Unexpected end of VarID Array in Function block");
-		System.err.println("'" + this.getName() + "' while looking for bpID '" + bpID + "'.");
-		System.err.println("Check to make sure the function definition has the same independent variables");
-		System.err.println("as the tabel definition.");
+		System.err.println("BlockFuncTable.hookUpInputs(): Unexpected end of VarID Array in Function block '"
+				   + this.getName() + "' while looking for bpID '" + bpID + "'.");
 		System.exit(0);
 	    } else {
 		// get corresponding independent variable ID
@@ -740,15 +738,6 @@ public class BlockFuncTable extends Block
 	value = a + (b-a)*weight;
 	if (verbose) System.out.println(" Interpolated between " + a + " and " + b + " is value " + value);
 	return value;
-    }
-    
-    /**
-     * Returns the contents of the description field, with spaces substituted for newlines
-     * @return 
-     */
-
-    public String getDescription() {
-        return description.replace('\n', ' ');
     }
 }
 

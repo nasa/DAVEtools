@@ -24,74 +24,9 @@ import java.util.Iterator;
 
 /**
  *
- * <p>  This Block represents a simple two-position switch function.</p>
- * 
- * <p>
- * A switch has a minimum of three inputs: <code>A</code>, <code>A_case</code>, 
- * and <code>B</code> for a two-position switch.
- * These correspond to the following MathML snippet:
- * 
-<pre>
-
-    &lt;piecewise&gt;
-      &lt;piece&gt;
-        &lt;ci&gt;A&lt;/ci&gt;
-        &lt;ci&gt;A_case&lt;/ci&gt;
-      &lt;/piece&gt;
-      &lt;otherwise&gt;
-        &lt;ci&gt;B&lt;/ci&gt;
-      &lt;/otherwise&gt;
-    &lt;/piecewise&gt;
-
-</pre>
- * 
- * which emits input signal <code>A</code> if <code>A_case</code> is true
- * (non-zero); otherwise it emits <code>B</code>.
- * </p>
- * <p>
- * To implement a switch with more than two positions, such as the three-position
- * switch described in this MathML snippet:
+ * <p>  This Math block represents a switch function </p>
  *
-<pre>
-
-    &lt;piecewise&gt;
-      &lt;piece&gt;
-        &lt;ci&gt;A&lt;/ci&gt;
-        &lt;ci&gt;A_case&lt;/ci&gt;
-      &lt;/piece&gt;
-      &lt;piece&gt;
-        &lt;ci&gt;B&lt;/ci&gt;
-        &lt;ci&gt;B_case&lt;/ci&gt;
-      &lt;/piece&gt;
-      &lt;otherwise&gt;
-        &lt;ci&gt;C&lt;/ci&gt;
-      &lt;/otherwise&gt;
-    &lt;/piecewise&gt;
-
-</pre>
- *
- * then the problem has five inputs: <code>A</code>, <code>A_case</code>, 
- * <code>B</code>, <code>B_case</code>, and <code>C</code>. 
- * 
- * The output should be the first input pair whose case is true (non-zero); if no 
- * input is true, the otherwise input (</code>C</code>) should be chosen.
- * </p>
- * <p>
- * This is implemented in our {@link Model} by cascading BlockMathSwitches, one per input pair;
- * the final downstream block deals with <code>A</code> and <code>A_case</code>;
- * the 'otherwise' input is the output from an upstream block that deals with
- * <code>B</code> and <code>B_case</code>, with <code>C</code> as 
- * its otherwise block.
- * </p>
- * <p>
- * The multiple case switch is implemented this way as it is the 'lowest common
- * denominator' way of several potential software implementations 
- * (not all languages have a switch/case statement).
- * </p>
- * 
- * 
  **/
-
 public class BlockMathSwitch extends BlockMath {
 
     /**
@@ -169,11 +104,11 @@ public class BlockMathSwitch extends BlockMath {
                             + other.size() + " instead.");
                     return;
                 }
-                // process like: this.genInputsFromApply(ikid);
+                // process like:                  this.genInputsFromApply(ikid);
                 // piece has two children: output 1 and condition it is used, and
                 // otherwise has default condition.
                 // Input 1 is passed if condition is true
-                this.genInputsFromApply(pieceChildren.iterator(), 1); // input 1 & condition (input 2)
+                this.genInputsFromApply(pieceChildren.iterator(), 1);        // input 1 & condition (input 2)
 
                 if (pieces.size() <= 1) {
                     // if last piece, then input 3 is the <otherwise> child
@@ -181,11 +116,10 @@ public class BlockMathSwitch extends BlockMath {
                 } else {
                     // if not, then recurse after removing the first <piece> element
                     boolean childRemoved = this.removeFirstPiece(piecewise);
-                    if (!childRemoved) {
+                    if (!childRemoved)
                         throw new AssertionError(
-                                "Unable to remove first child from <piecewise> "
+                            "Unable to remove first child from <piecewise> "
                                 + "while trying to build an upstream switch for " + this.getName());
-                    }
                     BlockMathSwitch bms = new BlockMathSwitch(applyElement, m);
                     this.addInput(bms, 3);
                 }
@@ -194,59 +128,6 @@ public class BlockMathSwitch extends BlockMath {
 
         //System.out.println("    BlockMathSwitch constructor: " + myName + " created.");
     }
-    
-    
-    /**
-     * <p> Generate code equivalent of a two-position switch (if-then-else)</p>
-     */
-    
-    @Override
-    public CodeAndVarNames genCode() {
-        CodeAndVarNames cvn = new CodeAndVarNames();
-        Iterator<Signal> inputSig = inputs.iterator();
-        Signal outputSig = this.getOutput();
-        
-        if (inputs == null) {
-            cvn.appendCode(this.errorComment(
-                    "Encountered null input list in BlockMathSwitch genFcode"));
-            return cvn;
-        }
-        
-        if (inputs.size() < 3) {
-            cvn.appendCode(this.errorComment(
-                    "in BlockMathSwitch genFcode(): encountered input list" +
-                    " with less than the expected three elements."));
-            return cvn;
-        }
-        
-        Signal defaultInput = inputs.get(2);
-        // generate constant value in parentheses; otherwise, use varID
-        boolean defaultInputIsConst = 
-                defaultInput.source.getType().equals("BlockMathConst");
-        if (defaultInput.isDerived() && defaultInputIsConst) {
-            defaultInput.clearDerivedFlag();
-        }
-        cvn.appendCode(indent() + outVarID + " = ");
-        // one last test: don't duplicate a definition
-        if (defaultInput.isDefined()) {
-            cvn.appendCode( defaultInput.getVarID() );
-        } else {
-            cvn.append(defaultInput.genCode());
-        }
-        cvn.appendCode(endLine());
-        
-        // have to break things apart here to extract code for if statement
-        CodeAndVarNames ifCvn = inputs.get(1).genCode();
-        cvn.addVarName(ifCvn.getVarName(0));
-        cvn.appendCode(this.beginIf(ifCvn.getCode()));
-        cvn.appendCode(indent() + "  " + outVarID + " = ");
-        cvn.append(inputs.get(0).genCode());
-        cvn.appendCode(this.endLine());
-        cvn.appendCode(this.endIf());
-
-        return cvn;
-    }
-
 
     /**
      *
@@ -254,7 +135,6 @@ public class BlockMathSwitch extends BlockMath {
      *
      * @throws <code>IOException</code>
      **/
-    @Override
     public void describeSelf(Writer writer) throws IOException {
         super.describeSelf(writer);
         writer.write(" and is a Switch math block.");
@@ -267,7 +147,6 @@ public class BlockMathSwitch extends BlockMath {
      * @throws DAVEException
      *
      **/
-    @Override
     public void update() throws DAVEException {
         int numInputs;
         Iterator<Signal> theInputs;

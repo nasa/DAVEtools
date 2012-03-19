@@ -44,8 +44,10 @@ public class BlockMathConstant extends BlockMath
     public BlockMathConstant( String constantValue, Model m )
     {
 	// Initialize superblock elements
-	super("const_" + m.getNumBlocks(), "constant value", m);
+	super("const_" + constantValue + "_", "constant value", m);
+	
 	this.setValue(constantValue);
+
     }
 
 
@@ -71,7 +73,7 @@ public class BlockMathConstant extends BlockMath
      * Sets our value from a string
      */
     
-    public final void setValue( String newValue ) {
+    public void setValue( String newValue ) {
     	this.stringValue = newValue;
 
     	try {
@@ -94,31 +96,7 @@ public class BlockMathConstant extends BlockMath
     	this.stringValue = newValue.toString();
     }
     
-    /**
-     * <p> Generate C-code equivalent of our constant</p>
-     */
     
-    @Override
-    public CodeAndVarNames genCode() {
-        CodeAndVarNames cvn = new CodeAndVarNames();
-        Signal outputSig = this.getOutput();
-        // check to see if we're derived variable (code fragment) or a whole statement
-        // if not derived, need preceding command and the LHS of the equation too
-        if (!outputSig.isDerived()) {
-//            code = "// Code for variable \"" + outVarID + "\":\n";
-            cvn.appendCode(indent() + outVarID + " = ");
-            cvn.addVarName(outVarID);
-        }
-        
-        cvn.appendCode(this.getValueAsString());
-        
-        // if not derived, need trailing semicolon and new line
-        if (!outputSig.isDerived())
-            cvn.appendCode(endLine());
-        return cvn;
-    }
-
-        
     /**
      *
      * <p> Generates description of self </p>
@@ -126,7 +104,6 @@ public class BlockMathConstant extends BlockMath
      * @throws <code>IOException</code>
      **/
 
-    @Override
     public void describeSelf(Writer writer) throws IOException
     {
 	super.describeSelf(writer);
@@ -140,7 +117,6 @@ public class BlockMathConstant extends BlockMath
      *
      **/
 
-    @Override
     public void update() throws DAVEException
     {
 	if (isVerbose()) {
@@ -163,7 +139,6 @@ public class BlockMathConstant extends BlockMath
     *
     **/
 
-    @Override
    public boolean isReady()
    {
 	return true;

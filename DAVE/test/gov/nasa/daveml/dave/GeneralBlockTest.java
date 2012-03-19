@@ -100,10 +100,10 @@ public class GeneralBlockTest extends TestCase {
     }
 
     public void testRenameOutVarID() {
+        mySignal.setVarID("newName");
         Block upstreamBlock = mySignal.getSource();
         assertTrue( upstreamBlock != null );
         assertEquals( "absbeta", upstreamBlock.getOutputVarID() );
-        mySignal.setVarID("newName");
         upstreamBlock.renameOutVarID();
         assertEquals( "newName", upstreamBlock.getOutputVarID() );
     }

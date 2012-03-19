@@ -6,7 +6,6 @@ MODELS    = \
             twoD_table.dml                 \
 	    limited_variableDef.dml        \
             unary_and_binary_minus.dml     \
-            ceil_floor_min_max.dml         \
 
 #            aero_cm.dml                    \
 #            simple_aero.dml                \

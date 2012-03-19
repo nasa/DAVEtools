@@ -66,7 +66,6 @@ public class BlockOutput extends Block
      *
      **/
 
-    @Override
     public double getValue()    { return this.value; }
 
 
@@ -90,39 +89,6 @@ public class BlockOutput extends Block
         return outputs.indexOf( this ) + 1;
     }
 
-    /**
-     * Generate C-code comment about inputs
-     * @return string containing C comment description of output
-     */
-    @Override
-    public CodeAndVarNames genCode() {
-        CodeAndVarNames cvn = new CodeAndVarNames();
-        cvn.appendCode(this.wrapComment(this.genComment()));
-        cvn.addVarName(this.getInput(0).getVarID());
-        return cvn;
-    }
-
-    /**
-     * Common output documentation scheme for all code types
-     * @return string with description of input signal
-     */
-    private String genComment() {
-        String code = "";
-        Signal theSignal = this.getInput(0);
-        String inVarID = theSignal.getVarID();
-        if (theSignal != null) {
-            code = code + inVarID;
-            if (theSignal.isStdAIAA()) 
-                code = code + " (" + theSignal.getName() + ")";
-            code = code + " is a model output";
-            if (units.equalsIgnoreCase("nd"))
-                code = code + " and is non-dimensional.";
-            else
-                code = code + " with units \'" + units + "\'";
-        }
-        return code;
-    }
-
 
     /**
      *
@@ -131,7 +97,6 @@ public class BlockOutput extends Block
      * @throws <code>IOException</code>
      **/
 
-    @Override
     public void describeSelf(Writer writer) throws IOException
     {
         super.describeSelf(writer);
@@ -145,7 +110,6 @@ public class BlockOutput extends Block
      *
      **/
 
-    @Override
     public void update() throws DAVEException
     {
         if (isVerbose()) {

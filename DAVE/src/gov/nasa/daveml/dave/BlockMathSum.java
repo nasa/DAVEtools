@@ -73,43 +73,12 @@ public class BlockMathSum extends BlockMath
     }
 
     /**
-     * <p> Generate code equivalent of our operation</p>
-     */
-    
-    @Override
-    public CodeAndVarNames genCode() {
-        CodeAndVarNames cvn = new CodeAndVarNames();
-        Iterator<Signal> inputSig = inputs.iterator();
-        Signal outputSig = this.getOutput();
-        // check to see if we're derived variable (code fragment) or a whole statement
-        // if not derived, need preceding command and the LHS of the equation too
-        if (!outputSig.isDerived()) {
-//            code = "// Code for variable \"" + outVarID + "\":\n";
-            cvn.appendCode(indent() + outVarID + " = ");
-            cvn.addVarName(outVarID);
-        }
-        while (inputSig.hasNext()) {
-            Signal inSig = inputSig.next();
-            cvn.append(inSig.genCode());
-            if (inputSig.hasNext()) {
-                cvn.appendCode(" + ");
-            }
-        }
-        // if not derived, need trailing semicolon and new line
-        if (!outputSig.isDerived())
-            cvn.appendCode(endLine());
-        return cvn;
-    }
-
-        
-    /**
      *
      * <p> Generates description of self </p>
      *
      * @throws <code>IOException</code>
      **/
 
-    @Override
     public void describeSelf(Writer writer) throws IOException
     {
         super.describeSelf(writer);
@@ -123,7 +92,6 @@ public class BlockMathSum extends BlockMath
      *
      **/
 
-    @Override
     public void update() throws DAVEException
     {
         Iterator<Signal> theInputs;

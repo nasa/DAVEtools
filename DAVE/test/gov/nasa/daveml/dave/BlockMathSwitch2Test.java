@@ -86,40 +86,6 @@ public class BlockMathSwitch2Test extends TestCase {
         return _block.getValue();
     }
 
-    private void checkCode( String code ) {
-        Signal defaultInput = _block.inputs.get(2);
-        defaultInput.setDefinedFlag();
-        CodeAndVarNames cvn = _block.genCode();
-        assertEquals(code, cvn.getCode());
-    }
-    
-    public void testGenCcode() {
-        // this two-stage switch gets broken into two separate switch blocks.
-        // in normal operation, the upstream block would have it's code generated
-        // prior to this block, so we'll pretend it's output signal has previously
-        // been defined.
-        _model.setCodeDialect(Model.DT_ANSI_C);
-        String code = "";
-        String indent = "  ";
-        code = code + indent + "outputSignal = switch_6;\n";
-        code = code + indent + "if ( (switchVal < (-1)) ) {\n";
-        code = code + indent + indent + "outputSignal = (-1);\n";
-        code = code + indent + "}\n";
-        checkCode( code );
-    }
-    
-    public void testGenFcode() {
-        // see comments in GenCCode above
-        _model.setCodeDialect(Model.DT_FORTRAN);
-        String code = "";
-        String indent = "       ";
-        code = code + indent + "outputSignal = switch_6\n";
-        code = code + indent + "IF( (switchVal .LT. (-1)) ) THEN\n";
-        code = code + indent + "  outputSignal = (-1)\n";
-        code = code + indent + "ENDIF\n";
-        checkCode( code );
-    }
-
     public void testDescribeSelfWriter() {
         try {
             _block.describeSelf(_writer);
@@ -127,7 +93,7 @@ public class BlockMathSwitch2Test extends TestCase {
             fail("testDescribeSelfWriter of TestBlockMathSwitch2 threw unexpected exception: "
                     + e.getMessage());
         }
-        assertEquals("Block \"switch_2\" has three inputs (const_2, unnamed, switch_6),"
+        assertEquals("Block \"switch_2\" has three inputs (const_-1_, null, switch_6),"
                 + " one output (outputSignal), value [NaN] and is a Switch math block.",
                 _writer.toString());
     }
@@ -232,9 +198,8 @@ public class BlockMathSwitch2Test extends TestCase {
 
         BlockMathSwitch bms = null;
         bms = new BlockMathSwitch(outerApply, model);
-        try { // hook up inputs and outputs to the switch block
+        try {
             bms.addOutput(outputSignal);
-            model.wireBlocks();
         } catch (DAVEException e) {
             fail("Unexpected exception in hooking up output signal "
                     + "in TestBlockMathSwitch2.generateSampleSwitch: " + e.getMessage());

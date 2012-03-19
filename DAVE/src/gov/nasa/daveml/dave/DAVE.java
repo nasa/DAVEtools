@@ -20,18 +20,15 @@ import java.io.PrintWriter;
 import java.io.StreamTokenizer;
 import java.io.StringWriter;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-import java.util.*;
-//import org.apache.xerces.util.XMLCatalogResolver;
 import com.sun.org.apache.xerces.internal.util.XMLCatalogResolver;
 
+import java.util.*;
 
 /**
  *
@@ -187,12 +184,6 @@ public class DAVE
     int functionCount;
 
     /**
-     * Internal check-case count
-     */
-
-    int checkCaseCount;
-
-    /**
      * InputStream of input file
      */
     
@@ -245,13 +236,12 @@ public class DAVE
         this.genStatsFlag = false;
         this.noProcessingRequired = false;
         this.helpRequested = false;
-	this.checkCaseCount = 0;
         this.m = new Model(20, 20);
         
-        String date = "2011-08-01";
+        String date = "2011-01-21";
 
         // add date (now that we're under git)
-        this.myVersion = "0.9.3b (" + date + ")";
+        this.myVersion = "0.9.2 (" + date + ")";
     }
 
     
@@ -445,21 +435,8 @@ public class DAVE
         // run the model with each checkcase
         ArrayList<StaticShot> shots = checkcases.getStaticShots();
         Iterator<StaticShot> shit = shots.iterator();
-
-        if (this.isVerbose()) {
-            System.out.println("");
-            System.out.println("Verifying " + shots.size() + " check-cases");
-            System.out.println("------------------------");
-            System.out.println("");
-        }
-
         while (shit.hasNext()) {
             StaticShot shot = shit.next();
-            if (this.isVerbose()) {
-                System.out.println("");
-                System.out.println("Verifying staticShot '" + shot.getName() + "'");
-                System.out.println("");
-            }
             try {
                 VectorInfoArrayList inputVec = m.getInputVector();
                 shot.loadInputVector( inputVec );       // throws DAVEException if problem
@@ -505,24 +482,19 @@ public class DAVE
 
 
     /**
-     * Creates new {@link Signal} for each variableDef in model.
+     * Creates new {@link Signal}s for each definition found.
      **/
 
     @SuppressWarnings("unchecked") // since Element.getChildren() method returns generic List
         public void parseVariableDefs()
     {
         Signal dummySig;
-
         List<Element> variableList = root.getChildren("variableDef",this.ns);
         if (variableList.size() > 0) {
             Iterator<Element> variableIterator = variableList.iterator();
             this.varDefCount = variableList.size();
-            if (this.isVerbose()) {
-                System.out.println("");
-                System.out.println("Parsing " + varDefCount + " variable definitions");
-                System.out.println("--------------------------------");
-                System.out.println("");
-            }
+            if (this.isVerbose())
+                System.out.println("Found " + this.varDefCount + " variable definitions.");
             while (variableIterator.hasNext())
                 dummySig = new Signal(variableIterator.next(), m);
         }
@@ -547,12 +519,8 @@ public class DAVE
         if (gtdList.size() > 0) {
             Iterator gtdi = gtdList.iterator();
             this.gtDefCount = gtdList.size();
-            if (this.isVerbose()) {
-                System.out.println("");
-                System.out.println("Parsing " + gtDefCount + " table definitions");
-                System.out.println("----------------------------");
-                System.out.println("");
-            }
+            if (this.isVerbose())
+                System.out.println("Found " + this.gtDefCount + " gridded table definitions.");
             while ( gtdi.hasNext() ) 
                 try {
                     dummyFuncTable = new FuncTable( (Element) gtdi.next(), m );
@@ -583,12 +551,8 @@ public class DAVE
         if (bpList.size() > 0) {
             Iterator bpIt = bpList.iterator();
             this.bpDefCount = bpList.size();
-            if (this.isVerbose()) {
-                System.out.println("");
-                System.out.println("Parsing " + bpDefCount + " breakpoint definitions");
-                System.out.println("---------------------------------");
-                System.out.println("");
-            }
+            if (this.isVerbose())
+                System.out.println("Found " + this.bpDefCount + " breakpoint definitions.");
             while (bpIt.hasNext())
                 try {
                     ignored = new BreakpointSet( (Element) bpIt.next(), m );
@@ -620,12 +584,8 @@ public class DAVE
         if (functionList.size() > 0) {
             Iterator functionIterator = functionList.iterator();
             this.functionCount = functionList.size();
-            if (this.isVerbose()) {
-                System.out.println("");
-                System.out.println("Parsing " + functionCount + " function definitions");
-                System.out.println("-------------------------------");
-                System.out.println("");
-            }
+            if (this.isVerbose())
+                System.out.println("Found " + this.functionCount + " function definitions.");
             while (functionIterator.hasNext())
                 try {
                     ignored = new BlockFuncTable( (Element) functionIterator.next(), m );
@@ -650,13 +610,6 @@ public class DAVE
         Element checkData = root.getChild("checkData",this.ns);
         if (checkData != null) {
             this.checkcases = new CheckData( checkData.getChildren("staticShot",this.ns));
-	    this.checkCaseCount = this.checkcases.count();
-	    if (this.isVerbose()) {
-                System.out.println("");
-                System.out.println("Parsing " + checkCaseCount + " check-cases");
-                System.out.println("---------------------");
-                System.out.println("");
-            }
         }
     }
 
@@ -756,25 +709,7 @@ public class DAVE
         this.parseStopTime = System.currentTimeMillis();
 
         // Sanity check
-        boolean result = m.verifyIntegrity();
-        
-        // Initialize model
-        // This builds the exection order lists; was happening only for models with checkcases
-        try {
-            m.initialize();
-        } catch (DAVEException ex) {
-            Logger.getLogger(DAVE.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        // report results
-        if (this.isVerbose()) {
-            System.out.println("");
-            System.out.println("File parsing complete; model built.");
-            System.out.println("===================================");
-            System.out.println("");
-        }
-
-        return result;
+        return m.verifyIntegrity();
     }
 
 
@@ -784,46 +719,20 @@ public class DAVE
      * find on-line version (latest version) of DTD. When off-line will look for
      * a catalog.xml  or catalog file in the local directory or in
      * /etc/xml/catalog to find a DTD to validate the input file.
-     * 
-     * To use local DTD files for validation, suggest downloading and installing 
-     * the DAVE-ML and MathML2 DTDs in a 'schemas' subdirectory, then placing
-     * the contents below in a 'catalog.xml' file in the same directory as the 
-     * DAVE-ML model being loaded.
-     * 
-     * @return Document object with the parsed file
+     *
+     * @return
      */
-
-// Example catalog.xml file contents
-//
-// <?xml version="1.0"?>
-//  <!-- commented out to prevent network access
-//     !DOCTYPE catalog PUBLIC "-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN"
-//    "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd" 
-//   -->
-// <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
-//   <group prefer="public" xml:base="">
-//     <public
-//	 publicId="-//AIAA//DTD for Flight Dynamic Models - Functions 2.0//EN"
-//	 uri="schemas/DAVEfunc.dtd"/>
-//
-//     <public
-//	 publicId="-//W3C//DTD MathML 2.0//EN"
-//	 uri="schemas/mathml2.dtd"/>
-//
-//    </group>
-// </catalog>
 
     public Document load() throws IOException {
         Document doc = null;
-        XMLCatalogResolver cr = null;
         String directory_uri = this.base_uri.substring(0,this.base_uri.lastIndexOf('/'));
         String errorLine = "No error.";
-        boolean tryValidationFlag = true;
+        boolean tryWithValidation = true;
         int numberOfFailures = 0;
         boolean success = false;
         while (numberOfFailures < 2 && !success) {
             success = true;
-            errorLine = "Error when attempting validation...";
+            errorLine = "Unable to locate DAVEfunc.dtd file locally or from the network...";
 
             // see if we can open the file first, and deal with any exceptions
             try {
@@ -839,47 +748,15 @@ public class DAVE
             // now see if we can parse it; try with and without validation
             try {
                 // Load XML into JDOM Document
-                SAXBuilder builder = new SAXBuilder(tryValidationFlag);
-                // must turn off Xerces desire to load external DTD regardless of validation
-                builder.setFeature(
-                        "http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-                if (tryValidationFlag) {
-                    String[] catalogs = null;
-                    String xml_catalog_files = System.getenv("XML_CATALOG_FILES");
-                    if (xml_catalog_files != null)
-                        catalogs = new String[] { xml_catalog_files, "catalog.xml", "catalog", "file:/etc/xml/catalog"};
-                    else
-                        catalogs = new String[] {"catalog.xml", "catalog", "file:/etc/xml/catalog"};
-                    cr = new XMLCatalogResolver(catalogs);
-                    
-
-//                    // here to test stuff
-//                    
-//                    cr.setUseLiteralSystemId(false);
-//                    
-//                    boolean preferPublic = cr.getPreferPublic();
-//                    if (preferPublic)
-//                        System.out.println("Prefer public");
-//                    else
-//                        System.out.println("Prefer system");
-//                    
-//                    System.out.println("call to resolvePublic for DAVE-ML models gives:");
-//                    System.out.println(cr.resolvePublic("-//AIAA//DTD for Flight Dynamic Models - Functions 2.0//EN",
-//                            "http://www.daveml.org/DTDs/2p0/DAVEfunc.dtd"));
-//                    
-//                    System.out.println();
-//                    
-//                    System.out.println("call to resolvePublic for MathML2 namespace gives:");
-//                    System.out.println(cr.resolvePublic("-//W3C//DTD MathML 2.0//EN",
-//                            "http://www.w3.org/Math/DTD/mathml2/mathml2.dtd"));
-//                            
-                } else {
-                    cr = null;
+                SAXBuilder builder = new SAXBuilder(tryWithValidation);
+                if (tryWithValidation) {
+                    String[] catalogs = new String[] {"catalog.xml", "catalog", "file:/etc/xml/catalog"};
+                    XMLCatalogResolver cr = new XMLCatalogResolver(catalogs);
+                    builder.setEntityResolver(cr);
                 }
-                builder.setEntityResolver(cr);
                 doc = builder.build(_inputStream, directory_uri );
             } catch ( java.io.FileNotFoundException e) {
-                errorLine = errorLine + e.getMessage();
+                errorLine = errorLine + " (file not found)";
                 numberOfFailures++;
                 success = false;
             } catch (java.net.UnknownHostException e) {
@@ -891,42 +768,23 @@ public class DAVE
                 numberOfFailures++;
                 success = false;
             } catch (JDOMException e) {
-                errorLine = errorLine +"\n" + e.getMessage();
+                errorLine = errorLine + " (problem internal to JDOM library)";
                 numberOfFailures++;
                 success = false;
             }
-            if (numberOfFailures == 1 && !success) {
+            if (numberOfFailures == 1) {
                 System.err.println(errorLine);
                 System.err.println("Proceeding without validation.");
-                tryValidationFlag = false;
+                tryWithValidation = false;
                 _inputStream.close();
             }
         }
         if (!success && numberOfFailures >= 2) {
             _inputStream.close();
             System.err.println(errorLine);
-            System.err.println("Unable to load file successfully (tried with and without validation), aborting.");
+            System.err.println("Unable to parse file successfully (tried with and without validation), aborting.");
             System.exit(-1);
         }
-//        if (success && this.isVerbose()) {
-        if (success) {
-            System.out.println("Loaded '" + this.inputFileName + "' successfully, ");
-            org.jdom.DocType dt = doc.getDocType();
-            switch (numberOfFailures) {
-                case 0: // validated against some DTD
-                    System.out.print("Validating against '");
-                    String catalogURI = cr.resolvePublic(dt.getPublicID(), dt.getSystemID());
-                    if (catalogURI == null)
-                        System.out.print(dt.getSystemID());
-                    else
-                        System.out.print(catalogURI);
-                    System.out.println(".'");
-                    break;
-                case 1: // no validation
-                    System.out.println("WITHOUT validation.");
-            }
-        }
- 
         return doc;
     }
 
@@ -964,8 +822,6 @@ public class DAVE
         System.out.println("        Number of breakpoint definitions: " + this.bpDefCount);
         System.out.println("     Number of gridded table definitions: " + this.gtDefCount);
         System.out.println("          Number of function definitions: " + this.functionCount);
-	if (this.checkCaseCount > 0)
-	    System.out.println("        Number of check-case definitions: " + this.checkCaseCount);
         System.out.println();
         System.out.println("              Parsing took " + 
                            (this.parseStopTime - this.parseStartTime)/1000.0

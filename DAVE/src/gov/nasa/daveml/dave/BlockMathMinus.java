@@ -72,41 +72,8 @@ public class BlockMathMinus extends BlockMath
 	} else
 	    genInputsFromApply( ikid, 1 );
     }
-    
-    
-    /**
-     * <p> Generate code equivalent of our operation</p>
-     */
-    
-    @Override
-    public CodeAndVarNames genCode() {
-        CodeAndVarNames cvn = new CodeAndVarNames();
-        Signal input0, input1;
-        Signal outputSig = this.getOutput();
-        // check to see if we're derived variable (code fragment) or a whole statement
-        // if not derived, need preceding command and the LHS of the equation too
-        if (!outputSig.isDerived()) {
-//            code = "// Code for variable \"" + outVarID + "\":\n";
-            cvn.appendCode(indent() + outVarID + " = ");
-            cvn.addVarName(outVarID);
-        }
-        input0 = inputs.get(0);
-        if (inputs.size() == 1) { // unary minus
-            cvn.appendCode("-");
-            cvn.append(input0.genCode());
-        } else { // must be binary minus: input 0 less 1    
-            input1 = inputs.get(1);
-            cvn.append(input0.genCode());
-            cvn.appendCode(" - ");
-            cvn.append(input1.genCode());           
-        }
-        // if not derived, need trailing semicolon and new line
-        if (!outputSig.isDerived())
-            cvn.appendCode(endLine());
-        return cvn;
-    }
 
-    
+
     /**
      *
      * <p> Generates description of self </p>
@@ -114,7 +81,6 @@ public class BlockMathMinus extends BlockMath
      * @throws <code>IOException</code>
      **/
 
-    @Override
     public void describeSelf(Writer writer) throws IOException
     {
 	super.describeSelf(writer);
@@ -128,7 +94,6 @@ public class BlockMathMinus extends BlockMath
      *
      **/
 
-    @Override
     public void update() throws DAVEException
     {
 

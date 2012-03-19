@@ -41,19 +41,17 @@ public class BlockMathFunction extends BlockMath
      * Defined supported functions, for speed of execution
      **/
 
-    private static final int UNK    = 0;
-    private static final int SIN    = 1;
-    private static final int COS    = 2;
-    private static final int TAN    = 3;
+    private static final int UNK  = 0;
+    private static final int SIN  = 1;
+    private static final int COS  = 2;
+    private static final int TAN  = 3;
     private static final int ARCSIN = 4;
     private static final int ARCCOS = 5;
     private static final int ARCTAN = 6;
-    private static final int FLOOR  = 7;
-    private static final int CEIL   = 8;
-    private static final int POW    = 10; // double-digits implies two inputs
+    private static final int POW  = 10; // double-digits implies two inputs
 
-    String funcType;   // can be several types: "pow" is one
-    int op;            // can be several ints: 10 = POWER
+    String funcType;   // can be several types: "pow" is current only one (??)
+    int op;             // can be several ints: 10 = POWER
 
     /**
      *
@@ -116,7 +114,7 @@ public class BlockMathFunction extends BlockMath
     }
 
 
-    protected void setFunction(String functionType) throws DAVEException {
+    public void setFunction(String functionType) throws DAVEException {
     	this.funcType = functionType;
         this.setName( funcType + "_" + this.ourModel.getNumBlocks() );
         
@@ -142,12 +140,6 @@ public class BlockMathFunction extends BlockMath
         } else if (funcType.equals("arctan")) {
             this.op = ARCTAN;
             this.myType = "arctangent function";
-        } else if (funcType.equals("floor")) {
-            this.op = FLOOR;
-            this.myType = "floor function";
-        } else if (funcType.equals("ceiling")) {
-            this.op = CEIL;
-            this.myType = "ceiling function";
         } else 
            throw new DAVEException("Unrecognized operator " + this.funcType 
         		   + " in call to BlockMathFunction.setFunction() method." );
@@ -169,7 +161,6 @@ public class BlockMathFunction extends BlockMath
      * @throws <code>IOException</code>
      **/
 
-    @Override
     public void describeSelf(Writer writer) throws IOException
     {
         super.describeSelf(writer);
@@ -246,10 +237,6 @@ public class BlockMathFunction extends BlockMath
             this.value = Math.acos(theInputValue[0]); break;
         case ARCTAN:
             this.value = Math.atan(theInputValue[0]); break;
-        case FLOOR:
-            this.value = Math.floor(theInputValue[0]); break;
-        case CEIL:
-            this.value = Math.ceil(theInputValue[0]); break;
         }
 
         if (this.value == Double.NaN)

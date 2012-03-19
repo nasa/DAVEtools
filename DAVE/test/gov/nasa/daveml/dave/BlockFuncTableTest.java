@@ -208,11 +208,6 @@ public class BlockFuncTableTest extends TestCase {
 		}
 
 	}
-        
-        public void testGetDescription() {
-            String descr = _bft.getDescription();
-            assertEquals("Basic coefficient of pitching-moment as a function of angle of attack and elevator", descr);
-        }
 
 	public void testDescribeSelf() {
 		try {
@@ -282,7 +277,7 @@ public class BlockFuncTableTest extends TestCase {
     	dVarRef.setAttribute("varID", "cmt");
     	
 	   	Element descriptionElement = new Element("description");
-	   	descriptionElement.addContent("Basic coefficient of pitching-moment as a function of\nangle of " +
+	   	descriptionElement.addContent("Basic coefficient of pitching-moment as a function of angle of " +
 			      "attack and elevator");
 		
 	   	Element functionElement = new Element("function");

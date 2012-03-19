@@ -97,27 +97,21 @@ abstract public class Block
      *  our latest output value
      */
 
-    double value;
+    double  value;
 
     /**
      *  are we chatty?
      */
 
     boolean verboseFlag;
-    
-    /**
-     * selected flag
-     * @since 0.9.4
-     */
-    
-    protected boolean selectedFlag;
 
     /**
-     * possible masking object (like SLBlock)
+     *  possible masking object (like SLBlock)
      */
 
     Object mask;
-    
+
+
     /**
      *
      * Basic constructor
@@ -136,7 +130,6 @@ abstract public class Block
         this.resultsCycleCount = -1;
         this.value = Double.NaN;
         this.verboseFlag = false;
-        this.selectedFlag = true;
         this.mask = null;
     }
 
@@ -149,7 +142,7 @@ abstract public class Block
      *
      * */
 
-    public Block( Model m )
+    public Block( Model m)
     { 
         this();
         this.ourModel = m;
@@ -295,47 +288,6 @@ abstract public class Block
 
     public boolean isVerbose() { return this.verboseFlag; }
 
-    
-    /**
-     * Sets the block as 'selected'
-     * @since 0.9.4
-     */
-    
-    public void select() { selectedFlag = true; }
-    
-    /**
-     * Sets the block and all ancestors as 'selected'
-     * @since 0.9.4
-     */
-    
-    public void selectWithAncestors() {
-        this.select();
-        Iterator<Signal> sigIt = this.getInputIterator();
-        while (sigIt.hasNext()) {
-            Signal sig = sigIt.next();
-            Block ancestor = sig.getSource();
-            if (ancestor != null)
-                ancestor.selectWithAncestors();
-        }
-    }
-
-    
-    /**
-     * Unselects the block
-     * @since 0.9.4
-     */
-    
-    public void deselect() { selectedFlag = false; }
-    
-    /**
-     * Returns the status of selection
-     * @return selectedFlag
-     * @since 0.9.4
-     */
-    
-    public boolean isSelected() { return selectedFlag; }
-
-
 
     /**
      *
@@ -447,27 +399,6 @@ abstract public class Block
 
 
     /**
-     * Replace current input Signal with new input Signal;
-     * used to insert in-line limiters in Model's setUpLimiterFor() method
-     *
-     * @param oldSignal - the signal to replace
-     * @param newSignal - the signal to use instead of oldSignal
-     * @since 0.9.3
-     */
-    public void replaceInput(Signal oldSignal, Signal newSignal) {
-        // find oldSignal's varID; in not found, ignore
-
-        while (inputs.contains(oldSignal)) {
-            int oldSignalIndex = inputs.indexOf(oldSignal);
-            if (oldSignalIndex >= 0) {
-                inputs.remove(oldSignalIndex);
-                inputs.add(oldSignalIndex, newSignal);
-            }
-        }
-    }
-
-
-    /**
      *
      * Hook up output signal
      *
@@ -521,7 +452,7 @@ abstract public class Block
             sig = blk.output;
         } else {
             sig = new Signal( blk.getName(), this.ourModel );
-            sig.setDerivedFlag();  // flag as a variable we've constructed
+            sig.setAutoFlag();  // flag as an automatic variable
             try {
                 blk.addOutput(sig);
             } catch (DAVEException e) {
@@ -546,10 +477,6 @@ abstract public class Block
     {
         Block constBlock = new BlockMathConstant( constantValue, ourModel );
         this.addInput( constBlock, inPort );
-        // mark this new constant signal as 'derived' for code generators
-        // since it doesn't appear as separate varID in source model
-        Signal derivedConst = constBlock.getOutput();
-        derivedConst.setDerivedFlag();
     }
 
 
@@ -595,8 +522,8 @@ abstract public class Block
         return inVarIDs.get( portNum-1 );
     }
 
-    
-     /**
+
+    /**
      *
      * <p> Returns an iterator to loop through input signals </p>
      *
@@ -689,15 +616,6 @@ abstract public class Block
         this.outVarID = this.output.getVarID();
     }
 
-    /**
-     * Forces the variable ID of the specified input port to match the connected signal
-     */
-    
-    public void renameInVarID(Integer portNum) {
-        Signal input = this.inputs.get(portNum-1);
-        String newVarID = input.myVarID;
-        this.inVarIDs.set(portNum-1, newVarID);
-    }
 
 
     /**
@@ -917,138 +835,30 @@ abstract public class Block
     {
         Signal s = this.getOutput();
         if (s == null) {        // output not yet filled
-            String theOutVarID = this.getOutputVarID();
-            if (theOutVarID == null) // no output to hook up
+            String outVarID = this.getOutputVarID();
+            if (outVarID == null) // no output to hook up
                 return false;
             else {
-                s = ourModel.getSignals().findByID( theOutVarID );
+                s = ourModel.getSignals().findByID( outVarID );
                 try {
                     this.addOutput(s);
                 } catch (DAVEException e) {
                     System.err.println("Unexpected error in verifyOutputs for block '" 
-                                       + this.getName() + "': unable to add signal named '" + theOutVarID + "'.");
+                                       + this.getName() + "': unable to add signal named '" + outVarID + "'.");
+                    e.printStackTrace();
                     System.exit(0);
                 }
             }
         }
         return (s == null);
     }
-    
-    /**
-     * Generate C-code equivalent of our operation
-     * @since 0.9.4
-     */
-    
-    public CodeAndVarNames genCode() {
-        return new CodeAndVarNames(
-                wrapComment("WARNING -- " +
-                "code generator not available for variable \"" + 
-                outVarID + "\" whose type is \"" + this.myType + "\"")); 
-    }
 
-    /**
-     * Generate appropriate indentation spaces
-     * @since 0.9.4
-     */
-    
-    public String indent() {
-        String indent = "";
-        int dialect = ourModel.getCodeDialect();
-        switch (dialect) {
-            case Model.DT_ANSI_C:
-                indent = "  ";
-                break;
-            case Model.DT_FORTRAN:
-                indent = "       ";
-                break;
-        }
-        return indent;
-    }
-    
-    /**
-     * Wrap message in appropriate dialect
-     * @since 0.9.4
-     */
-    
-    public String wrapComment( String comment ) {
-        String wrappedComment = "";
-        int dialect = ourModel.getCodeDialect();
-        switch (dialect) {
-            case Model.DT_ANSI_C:
-                wrappedComment = "/* " + comment + " */";
-                break;
-            case Model.DT_FORTRAN:
-                wrappedComment = "!  " + comment;
-                break;
-        }
-        wrappedComment += "\n";
-        return wrappedComment;
-    }
-    
-    
-    /**
-     * Wrap error message in appropriate dialect
-     * @since 0.9.4
-     */
-    
-    public String errorComment( String errMsg ) {
-        return this.wrapComment( "ERROR: " + errMsg );
-    }
-    
-    /**
-     * Add appropriate statement-ending characters
-     * @since 0.9.4
-     */
-    
-    public String endLine() {
-        String lineEnd = "\n";
-        if (ourModel.getCodeDialect() == Model.DT_ANSI_C)
-            lineEnd = ";\n";
-        return lineEnd;
-    }
-    
-    /**
-     * Generate appropriate if statement for given language
-     * @since 0.9.4
-     */
-    
-    public String beginIf( String condition ) {
-        String ifStart = "";
-        int dialect = ourModel.getCodeDialect();
-        switch (dialect) {
-            case Model.DT_ANSI_C:
-                ifStart = indent() + "if ( " + condition + " ) {\n";
-                break;
-            case Model.DT_FORTRAN:
-                ifStart = indent() + "IF( " + condition + " ) THEN\n";
-                break;
-        }
-        return ifStart;
-    }
-
-    /**
-     * Generate appropriate if statement ending for given language
-     * @since 0.9.4
-     */
-    
-    public String endIf() {
-        String ifEnd = "";
-        int dialect = ourModel.getCodeDialect();
-        switch (dialect) {
-            case Model.DT_ANSI_C:
-                ifEnd = indent() + "}\n";
-                break;
-            case Model.DT_FORTRAN:
-                ifEnd = indent() + "ENDIF\n";
-                break;
-        }
-        return ifEnd;
-    }
 
 
     /**
      *
-     * Generates brief description on output stream
+     * <p> Generates brief description on output stream </p>
+     *
      * @param writer FileWriter to use
      *
      **/
@@ -1100,13 +910,7 @@ abstract public class Block
             Iterator<Signal> sigIt = this.getInputIterator();
             while (sigIt.hasNext()) {
                 Signal sig = sigIt.next();
-                if (sig != null) {
-                    String theName = sig.getName();
-                    if (theName == null)
-                        writer.write("Unnamed signal");
-                    else
-                        writer.write(theName);
-                }
+                writer.write(sig.getName());
                 if (sigIt.hasNext())
                     writer.write(", ");
             }
@@ -1151,13 +955,7 @@ abstract public class Block
 
         if (numOutputs > 0) {
             Signal sig = this.getOutput();
-            if (sig != null) {
-                String theName = sig.getName();
-                if (theName == null)
-                    writer.write("Unnamed signal");
-                else
-                    writer.write(theName);
-            }
+            writer.write(sig.getName());
             writer.write("), ");
         }
 
@@ -1166,7 +964,9 @@ abstract public class Block
 
 
     /**
+     *
      * Updates the output value of the block.
+     *
      **/
 
     abstract public void update() throws DAVEException; // updates value of block

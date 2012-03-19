@@ -152,7 +152,6 @@ public class SLBlock
         } else if (b instanceof BlockFuncTable)     { mdlHeight=50; mdlWidth=50; xPad=0; yPad=0;
         } else if (b instanceof BlockInput)         { mdlHeight=14; mdlWidth=30; xPad=0; yPad=8;
         } else if (b instanceof BlockOutput)        { mdlHeight=14; mdlWidth=30; xPad=0; yPad=0;
-        } else if (b instanceof BlockMathConstant)  { mdlHeight=30; mdlWidth=60; xPad=0; yPad=0;
         }
 
         // Adjust height for blocks with more than one input
@@ -186,7 +185,6 @@ public class SLBlock
         } else if (this.block instanceof BlockMathConstant)  { writeMforConst(    writer, x, y );
         } else if (this.block instanceof BlockMathFunction)  { writeMforFunc(     writer, x, y );
         } else if (this.block instanceof BlockMathMinus)     { writeMforMinus(    writer, x, y );
-        } else if (this.block instanceof BlockMathMinmax)    { writeMforMinmax(   writer, x, y );
         } else if (this.block instanceof BlockMathProduct)   { writeMforMult(     writer, x, y );
         } else if (this.block instanceof BlockMathRelation ) { writeMforRelation( writer, x, y );
         } else if (this.block instanceof BlockMathSum)       { writeMforSum(      writer, x, y );
@@ -222,9 +220,8 @@ public class SLBlock
             lowerLim = Double.toString(bl.getLowerLimit());
         if ( bl.hasUpperLimit() )
             upperLim = Double.toString(bl.getUpperLimit());
-        String paramString = "'ShowName','off',"
-                + "'LowerLimit','" + lowerLim + "','UpperLimit','" + upperLim + "',"
-                + "'AttributesFormatString','%<LowerLimit> to %<UpperLimit>',"
+        String paramString = "'ShowName','off','LowerLimit','" + lowerLim
+                + "','UpperLimit','" + upperLim + "',"
                 + this.createPositionString(x,y);
         writer.addBuiltInBlock("Saturate", this.getName(), paramString);
     }
@@ -377,12 +374,6 @@ public class SLBlock
         if(funcType.equals("power")) {
             blockType = "Math";
             operatorType = "pow";
-        } else if (funcType.equals("floor")) {
-            blockType = "Rounding";
-            operatorType = "floor";
-        } else if (funcType.equals("ceiling")) {
-            blockType = "Rounding";
-            operatorType = "ceil";
         } else {
             blockType = "Trigonometry";
             operatorType = funcType;
@@ -420,31 +411,6 @@ public class SLBlock
             paramString = "'IconShape','rectangular','Inputs','+-',";
             paramString += this.createPositionString(x,y);
             writer.addBuiltInBlock("Sum", this.getName(), paramString);
-        }
-    }
-
-    /**
-     *
-     * Generates add_block command for Min-max block
-     *
-     **/
-
-    public void writeMforMinmax( SLFileWriter writer, int x, int y )
-        throws IOException
-    {
-        String paramString;
-        BlockMathMinmax bmm = (BlockMathMinmax) this.block;
-        int numArgs = bmm.numInputs();
-        if (numArgs == 1) {
-            paramString = "'Gain','1'," + this.createPositionString(x,y);
-            writer.addBuiltInBlock("Gain", this.getName(), paramString);
-        }
-        if (numArgs >= 2) {
-//            paramString = "'Ports',[" + numArgs + ",1],";
-            paramString = this.createPositionString(x,y);
-            paramString += ",'Function','" + bmm.getFuncType() + "'";
-            paramString += ",'Inputs', '" + numArgs + "'";
-            writer.addBuiltInBlock("MinMax", this.getName(), paramString);
         }
     }
 

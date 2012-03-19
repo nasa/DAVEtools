@@ -1,50 +1,68 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<!-- this now uses the nbbuild.xml script that is created by NetBeans -->
 <project name="DAVE" default="jar" basedir=".">
-  <description>Builds, tests and runs the project DAVE.</description>
-
-  <import file="nbbuild.xml"/>
-
   <property name="build.dir"      location="bin"/>
-  <property name="dist.dir"       location="dist"/>
   <property name="build.prod.dir" location="${build.dir}/prod"/>
   <property name="build.test.dir" location="${build.dir}/test"/>
   <property name="src.dir"        location="src"/>
   <property name="test.dir"       location="test"/>
   <property name="vendor.lib.dir" location="vendor/lib"/>
-  <property name="jar.file"       location="${dist.dir}/${ant.project.name}.jar"/>
-
+  <property name="jar.file"       location="DAVE.jar"/>
   <path id="project.classpath">
     <pathelement location="${build.prod.dir}"/>
+    <pathelement location="${build.test.dir}"/>
     <fileset dir="${vendor.lib.dir}">
       <include name="*.jar"/>
     </fileset>
   </path>
 
-  <path id="test.classpath">
-    <pathelement location="${project.classpath}"/>
-    <pathelement location="${build.test.dir}"/>
-    <fileset dir="${vendor.lib.dir}">
-      <include name="junit/junit*.jar"/>
-      <include name="junit4/junit*.jar"/>
-    </fileset>
-  </path>
+  <target name="prepare">
+    <mkdir dir="${build.prod.dir}"/>
+    <mkdir dir="${build.test.dir}"/>
+  </target>
 
+  <target name="compile" depends="prepare">
+    <javac srcdir="${src.dir}" destdir="${build.prod.dir}"
+	   debug="true" debuglevel="lines, vars, source"
+	   includeAntRunTime="false">
+      <classpath refid="project.classpath"/>
+      <compilerarg value="-Xlint"/>
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile">
+    <jar jarfile="${jar.file}">
+      <fileset dir="${build.prod.dir}"/>
+      <zipgroupfileset dir="${vendor.lib.dir}" includes="jdom*.jar, xerces*.jar"/>
+      <manifest>
+	<attribute name="Main-Class" value="gov.nasa.daveml.dave.DAVE"/>
+      </manifest>
+    </jar>
+  </target>
+
+  <target name="compile-tests" depends="compile">
+    <javac srcdir="${test.dir}" destdir="${build.test.dir}"
+	   debug="true" debuglevel="lines, vars, source"
+	   includeAntRunTime="false">
+      <classpath refid="project.classpath"/>
+    </javac>
+  </target>
+
+  <target name="test" depends="compile-tests">
+    <junit haltonfailure="yes">
+      <classpath refid="project.classpath"/>
+      <formatter type="brief" usefile="false"/>
+      <batchtest>
+	<fileset dir="${build.test.dir}">
+	  <include name="**/*Test*.class"/>
+	  <exclude name="**/TestDAVE.class"/>
+	</fileset>
+      </batchtest>
+    </junit>
+  </target>
 
   <target name="clean">
     <delete dir="${build.dir}"/>
     <delete file="${jar.file}"/>
     <delete file="tempFile.txt"/>
   </target>
-
-  <!-- from hint found at http://www.coderanch.com/t/419419/vc/there-way-netbeans-include-external -->
-  <target name="-post-jar">
-    <jar jarfile="${dist.jar}" update="true">
-      <zipfileset src="${dist.jar}" includes="**/*.class" />
-      <zipfileset src="${file.reference.jdom-1.1.1.jar}" includes="**/*.class" />
-      <zipfileset src="${file.reference.resolver-1.2.jar}" includes="**/*.class" />
-      <zipfileset src="${file.reference.xerces-2.9.0.jar}" includes="**/*.class" />
-    </jar>
-  </target>
-
 </project>

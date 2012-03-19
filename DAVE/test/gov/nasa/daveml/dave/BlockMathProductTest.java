@@ -86,54 +86,6 @@ public class BlockMathProductTest extends TestCase {
         assertEquals("times", _block.getBlockType());
     }
 
-    public void testGenCcode() {
-        // check with multiply operations
-        _model.setCodeDialect(Model.DT_ANSI_C);
-        CodeAndVarNames result = _block.genCode();
-        assertEquals("  outputSignal = PB*BSPAN;\n", result.getCode());
-        this.checkVarNames(result);
-        
-        // check with divide operation
-        _block.blockType = "divide";
-        result = _block.genCode();
-        assertEquals("  outputSignal = PB/BSPAN;\n", result.getCode());
-        this.checkVarNames(result);
-        
-        // check with quotient operation
-        _block.blockType = "quotient";
-        result = _block.genCode();
-        assertEquals("  outputSignal = PB/BSPAN;\n", result.getCode());
-        this.checkVarNames(result);
-    }
-
-    public void testGenFcode() {
-        // check with multiply operations
-        _model.setCodeDialect(Model.DT_FORTRAN);
-        CodeAndVarNames result = _block.genCode();
-        assertEquals("       outputSignal = PB*BSPAN\n", result.getCode());
-        this.checkVarNames(result);
-        
-        // check with divide operation
-        _block.blockType = "divide";
-        result = _block.genCode();
-        assertEquals("       outputSignal = PB/BSPAN\n", result.getCode());
-        this.checkVarNames(result);
-        
-        // check with quotient operation
-        _block.blockType = "quotient";
-        result = _block.genCode();
-        assertEquals("       outputSignal = PB/BSPAN\n", result.getCode());
-        this.checkVarNames(result);
-    }
-    
-    private void checkVarNames(CodeAndVarNames result) {
-        assertEquals(3, result.getVarNames().size());
-        assertEquals("outputSignal", result.getVarName(0));
-        assertEquals("PB",           result.getVarName(1));
-        assertEquals("BSPAN",        result.getVarName(2));        
-    }
-
-
     public void testDescribeSelfFileWriter() {
         try {
             _block.describeSelf(_writer);

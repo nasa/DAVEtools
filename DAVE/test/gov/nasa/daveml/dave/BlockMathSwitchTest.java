@@ -83,30 +83,6 @@ public class BlockMathSwitchTest extends TestCase {
         // check result
         return _block.getValue();
     }
-    
-    public void testGenCcode() {
-        _model.setCodeDialect(Model.DT_ANSI_C);
-        String code = "";
-        String indent = "  ";
-        code = code + indent + "outputSignal = (1);\n";
-        code = code + indent + "if ( (switchVal < (0)) ) {\n";
-        code = code + indent + indent + "outputSignal = (-1);\n";
-        code = code + indent + "}\n";
-        CodeAndVarNames cvn = _block.genCode();
-        assertEquals(code, cvn.getCode());
-    }
-    
-    public void testGenFcode() {
-        _model.setCodeDialect(Model.DT_FORTRAN);
-        String code = "";
-        String indent = "       ";
-        code = code + indent + "outputSignal = (1)\n";
-        code = code + indent + "IF( (switchVal .LT. (0)) ) THEN\n";
-        code = code + indent + "  outputSignal = (-1)\n";
-        code = code + indent + "ENDIF\n";
-        CodeAndVarNames cvn = _block.genCode();
-        assertEquals(code, cvn.getCode());
-    }
 
     public void testDescribeSelfWriter() {
         try {
@@ -115,12 +91,12 @@ public class BlockMathSwitchTest extends TestCase {
             fail("testDescribeSelfWriter of TestBlockMathSwitch threw unexpected exception: "
                     + e.getMessage());
         }
-        assertEquals("Block \"switch_2\" has three inputs (const_2, unnamed, const_5),"
+        assertEquals("Block \"switch_2\" has three inputs (const_-1_, null, const_1_),"
                 + " one output (outputSignal), value [NaN] and is a Switch math block.",
                 _writer.toString());
     }
 
-    private BlockMathSwitch generateSampleSwitch(Model model) {
+    public static BlockMathSwitch generateSampleSwitch(Model model) {
 
         // Generate a BlockMathSwitch block (and associated wiring) for
         // a switch that outputs -1 if switchVal is less than 0 and +1 otherwise
@@ -140,7 +116,7 @@ public class BlockMathSwitchTest extends TestCase {
         //          </piecewise>
         //        </apply>
 
-        Block  swValueBlock;
+        Block swValueBlock;
         String swValueSignalID;
         Signal swValueSignal;
         Signal outputSignal;
@@ -177,24 +153,24 @@ public class BlockMathSwitchTest extends TestCase {
         //     </apply>
 
         Element minusOne = new Element("cn");
-        minusOne.addContent("-1");                  //     <cn>-1</cn>
+        minusOne.addContent("-1");                //     <cn>-1</cn>
 
-        Element piece = new Element("piece");       //   <piece>
-        piece.addContent(minusOne);                 //     <cn>-1</cn>
-        piece.addContent(innerApply);               //     <apply>
-                                                    //       <lt/>
-                                                    //       <ci>switchVal</ci>
-                                                    //       <cn>0</cn>
-                                                    //     </apply>
-                                                    //   </piece>
+        Element piece = new Element("piece");    //   <piece>
+        piece.addContent(minusOne);               //     <cn>-1</cn>
+        piece.addContent(innerApply);             //     <apply>
+        //       <lt/>
+        //       <ci>switchVal</ci>
+        //       <cn>0</cn>
+        //     </apply>
+        //   </piece>
 
         Element one = new Element("cn");
-        one.addContent("1");                        //     <cn>1</cn>
+        one.addContent("1");                      //     <cn>1</cn>
 
         Element otherwise = new Element("otherwise");
-        otherwise.addContent(one);                  //   <otherwise>
-                                                    //     <cn>1</cn>
-                                                    //   </otherwise>
+        otherwise.addContent(one);                //   <otherwise>
+        //     <cn>1</cn>
+        //   </otherwise>
 
         Element piecewise = new Element("piecewise");
         piecewise.addContent(piece);
@@ -206,9 +182,8 @@ public class BlockMathSwitchTest extends TestCase {
 
         BlockMathSwitch bms = null;
         bms = new BlockMathSwitch(outerApply, model);
-        try { // hook up inputs and outputs to the switch
+        try {
             bms.addOutput(outputSignal);
-            _model.wireBlocks();
         } catch (DAVEException e) {
             fail("Unexpected exception in hooking up output signal "
                     + "in TestBlockMathSwitch.generateSampleSwitch: " + e.getMessage());
