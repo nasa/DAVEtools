@@ -3,6 +3,7 @@
 DAVEtools 0.9.4 beta README
 ===========================
 Bruce Jackson, NASA Langley Research Center <bruce.jackson@nasa.gov>
+Version 2, 2012-03-20
 :TOC:
 
 Introduction
@@ -112,14 +113,14 @@ working directory:
     "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd" 
 -->
 <catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
-  <group prefer="public" xml:base="">
+  <group prefer="public" xml:base="schemas">
     <public
 	publicId="-//AIAA//DTD for Flight Dynamic Models - Functions 2.0//EN"
-	uri="schemas/DAVEfunc.dtd"/>
+	uri="DAVEfunc.dtd"/>
 
-    <public
-	publicId="-//W3C//DTD MathML 2.0//EN"
-	uri="schemas/mathml2.dtd"/>
+    <rewriteSystem
+	systemIdStartString="http://www.w3.org/Math/DTD/"
+	uri=""/>
 
   </group>
 </catalog>
@@ -129,8 +130,8 @@ Continuing with this example, the working directory contents should be
 something like what is shown below. The working directory contains a
 model file, +F106_aero.dml+ and the +catalog.xml+ file, and a
 +schemas+ subdirectory, which is expanded below to show its
-contents. Note that all the files in +schemas+ were extracted from the
-+mathml2.tgz+ tarball except for +DAVEfunc.dtd+:
+contents. Note that all the files in +schemas/mathml2+ were extracted
+from the +mathml2.tgz+ tarball:
 
 .Example working directory structure
 ....
@@ -138,27 +139,28 @@ F106_aero.dml
 catalog.xml
 schemas/
     DAVEfunc.dtd
-    html/
-        lat1.ent
-        special.ent
-        symbol.ent
-    iso8879/
-        isoamsa.ent
-        .
-        .
-        .
-        isotech.ent
-    iso9573-13/
-        isoamsa.ent
-        .
-        .
-        .
-        isotech.ent
-    mathml/
-        mmlalias.ent
-        mmlextra.ent
-    mathml2-qname-1.mod
-    mathmla2.dtd
+    mathml2/
+        html/
+            lat1.ent
+            special.ent
+            symbol.ent
+        iso8879/
+            isoamsa.ent
+            .
+            .
+            .
+            isotech.ent
+        iso9573-13/
+            isoamsa.ent
+            .
+            .
+            .
+            isotech.ent
+        mathml/
+            mmlalias.ent
+            mmlextra.ent
+        mathml2-qname-1.mod
+        mathml2.dtd
 ....
 
 

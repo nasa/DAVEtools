@@ -4,7 +4,7 @@
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
 <meta name="generator" content="AsciiDoc 8.6.5" />
-<title>DAVEtools 0.9.3 beta README</title>
+<title>DAVEtools 0.9.4 beta README</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -712,8 +712,10 @@ asciidoc.install(3);
 </head>
 <body class="article">
 <div id="header">
-<h1>DAVEtools 0.9.3 beta README</h1>
+<h1>DAVEtools 0.9.4 beta README</h1>
 <span id="author">Bruce Jackson, NASA Langley Research Center &lt;bruce.jackson@nasa.gov&gt;</span><br />
+<span id="revnumber">version 2,</span>
+<span id="revdate">2012-03-20</span>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
   <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
@@ -794,6 +796,24 @@ DAVE2SL
 </p>
 </dd>
 <dt class="hdlist1">
+DAVE2OTIS
+</dt>
+<dd>
+<p>
+        Generates an OTIS4 input deck (<strong>.dat) and scenario file
+        (</strong>.inl)
+</p>
+</dd>
+<dt class="hdlist1">
+DAVE2POST
+</dt>
+<dd>
+<p>
+        Generates appropriate POST II table (<strong>.pos2) and model (</strong>.f)
+        files.
+</p>
+</dd>
+<dt class="hdlist1">
 ModelSweeper
 </dt>
 <dd>
@@ -856,14 +876,14 @@ working directory:</p></div>
     "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd"
 --&gt;
 &lt;catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog"&gt;
-  &lt;group prefer="public" xml:base=""&gt;
+  &lt;group prefer="public" xml:base="schemas"&gt;
     &lt;public
         publicId="-//AIAA//DTD for Flight Dynamic Models - Functions 2.0//EN"
-        uri="schemas/DAVEfunc.dtd"/&gt;
+        uri="DAVEfunc.dtd"/&gt;
 
-    &lt;public
-        publicId="-//W3C//DTD MathML 2.0//EN"
-        uri="schemas/mathml2.dtd"/&gt;
+    &lt;rewriteSystem
+        systemIdStartString="http://www.w3.org/Math/DTD/"
+        uri=""/&gt;
 
   &lt;/group&gt;
 &lt;/catalog&gt;</tt></pre>
@@ -872,8 +892,8 @@ working directory:</p></div>
 something like what is shown below. The working directory contains a
 model file, <tt>F106_aero.dml</tt> and the <tt>catalog.xml</tt> file, and a
 <tt>schemas</tt> subdirectory, which is expanded below to show its
-contents. Note that all the files in <tt>schemas</tt> were extracted from the
-<tt>mathml2.tgz</tt> tarball except for <tt>DAVEfunc.dtd</tt>:</p></div>
+contents. Note that all the files in <tt>schemas/mathml2</tt> were extracted
+from the <tt>mathml2.tgz</tt> tarball:</p></div>
 <div class="literalblock">
 <div class="title">Example working directory structure</div>
 <div class="content">
@@ -881,27 +901,28 @@ contents. Note that all the files in <tt>schemas</tt> were extracted from the
 catalog.xml
 schemas/
     DAVEfunc.dtd
-    html/
-        lat1.ent
-        special.ent
-        symbol.ent
-    iso8879/
-        isoamsa.ent
-        .
-        .
-        .
-        isotech.ent
-    iso9573-13/
-        isoamsa.ent
-        .
-        .
-        .
-        isotech.ent
-    mathml/
-        mmlalias.ent
-        mmlextra.ent
-    mathml2-qname-1.mod
-    mathmla2.dtd</tt></pre>
+    mathml2/
+        html/
+            lat1.ent
+            special.ent
+            symbol.ent
+        iso8879/
+            isoamsa.ent
+            .
+            .
+            .
+            isotech.ent
+        iso9573-13/
+            isoamsa.ent
+            .
+            .
+            .
+            isotech.ent
+        mathml/
+            mmlalias.ent
+            mmlextra.ent
+        mathml2-qname-1.mod
+        mathml2.dtd</tt></pre>
 </div></div>
 </div>
 </div>
@@ -974,6 +995,10 @@ to define these aliases in your <tt>.cshrc</tt> or <tt>.bashrc</tt> file:</p></d
 gov.nasa.daveml.dave.DAVE"</tt><br />
 <tt>alias <strong>dave2sl</strong>="java -cp <em>path_to/DAVEtools.jar</em>
 gov.nasa.daveml.dave2sl.DAVE2SL"</tt><br />
+<tt>alias <strong>dave2post</strong>="java -cp <em>path_to/DAVEtools.jar</em>
+gov.nasa.daveml.dave2post.DAVE2POST"</tt><br />
+<tt>alias <strong>dave2otis</strong>="java -cp <em>path_to/DAVEtools.jar</em>
+gov.nasa.daveml.dave2otis.DAVE2OTIS"</tt><br />
 <tt>alias <strong>sweep</strong>="java -cp <em>path_to/DAVEtools.jar</em>
 gov.nasa.daveml.sweeper.ModelSweeperUI"</tt><br /></p></div>
 </td>
@@ -2062,6 +2087,29 @@ Method update() called for output block 'aeroBodyMomentCoefficient_Roll'
 Verified 25 of 25 embedded checkcases.</tt></pre>
 </div></div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_using_dave2post_or_dave2otis">Using DAVE2POST or DAVE2OTIS</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Both of these tools are invoked similar to DAVE2SL:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ dave2post HL20_aero.dml</tt></pre>
+</div></div>
+<div class="paragraph"><p>will generate two POST-II input files: <tt>HL20_aero.pos2</tt> will contain
+data tables in POST-II format, and <tt>HL20_aero.f</tt> will contain an aero
+model snippet in Fortran, suitable for inclusion in POST-II.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><tt>$ dave2otis HL20_aero.dml</tt></pre>
+</div></div>
+<div class="paragraph"><p>likewise generates two OTIS4 input files: <tt>HL20_aero.dat</tt> will contain
+data tables in OTIS4 format, and <tt>HL20_aero.inl</tt> is the input file for
+OTIS4 operation (six-dof). Some manual editing of this file will be
+needed before execution by OTIS4, including setting the type of
+simulation (2DOF, 3DOF, etc) and setting the necessary initial state
+values.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -4025,6 +4073,18 @@ yRZ2TAgXAAAAAElFTkSuQmCC" />
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
+V 0.9.4
+</dt>
+<dd>
+<p>
+Added new utilities: DAVE2POST, to generate POST-II input
+        decks and code sections; and DAVE2OTIS, to generate OTIS4
+        input decks.  Added FORTRAN and C code snippet writers, to
+        support these.  Added selectionFlag to Block and
+        selectOutput(), getSelectedBlocks() to Model
+</p>
+</dd>
+<dt class="hdlist1">
 V 0.9.3
 </dt>
 <dd>
@@ -4094,7 +4154,8 @@ Changed to support the default DAVE-ML namespace (xmlns);
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2011-07-27 10:32:29 EDT
+Version 2<br />
+Last updated 2012-03-20 10:34:31 EDT
 </div>
 </div>
 </body>
