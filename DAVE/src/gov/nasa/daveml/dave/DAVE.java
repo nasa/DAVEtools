@@ -175,10 +175,10 @@ public class DAVE {
         this.checkCaseCount = 0;
         this.m = new Model(20, 20);
 
-        String date = "2011-08-01";
+        String date = "2012-07-19";
 
         // add date (now that we're under git)
-        this.myVersion = "0.9.3b (" + date + ")";
+        this.myVersion = "0.9.4 (" + date + ")";
     }
 
     /**

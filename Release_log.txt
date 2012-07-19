@@ -74,34 +74,14 @@ package.
 	InSitu <corinne.ilvedson@insitu.com> and Bruce Hildreth, SAIC
 	<bruce.hildreth@saic.com> 
 
-2010-10-04 Version 0.9.0: adds ModelSweeper and fixes piecewise bug;
-           posted on branch website (0.9.0_2e51c2e)
+2010-10-04 Posted version 0.9.0 on branch website (0.9.0_2e51c2e)
 
-2011-01-07 Version 0.9.1: adds support for RC4's minValue and maxValue
-           attributes on variableDefs. Also posted on branch
-           website. (0.9.1_29584eb)
+2011-01-07 Posted version 0.9.1 on branch website (0.9.1_29584eb)
 
-2011-01-24 Version 0.9.2: fixes several bugs including lack of support
-           for binary minus, incorrect return codes, and inability to
-           handle anonymous (unnamed) table data in Simulink. Also
-           have catalog support working so we don't use network if
-           local DTD is available. Also fixed bug in ModelSweeper so
-           it doesn't bomb if there are no checkcases defined in the
-           selected model. (0.9.2_cf33c71)
+2011-01-24 Posted version 0.9.2 on branch website (0.9.2_cf33c71)
 
-2011-08-03 Version 0.9.3: added tally of checkcases to DAVE's
-	statistics summary (when used with the -c option). Added
-	support for UML diagram generation (with two open-source
-	packages) for DAVEtools development. Separated this change log
-	from the readme file. Fixed some annoyances related to missing
-	DTDs and/or network being unavailable. Added support for
-	MathML 'max', 'min', 'ceiling', and 'floor' elements.
+2011-08-03 Broke DAVEtools separately out of main DAVE/Tools
+	repository and posted on GitHub (bjax/DAVEtools).
 
-2012-07-19 Version 0.9.4: added new utilities: DAVE2POST, to generate
-	POST-II input decks and code sections; and DAVE2OTIS, to
-	generate OTIS4 input decks.  Added FORTRAN and C code snippet
-	writers, to support these.  Added selectionFlag to Block and
-	selectOutput(), getSelectedBlocks() to Model.  Tweaked tests
-	to run under Windows XP. Upgraded for use with NetBeans 7.1.1
-	and Java SE 1.6. Fixed incompatibility with Matlab/Simulink
-	2011b.
+2011-07-19 Posted version 0.9.4 on branch website and GitHub
+
