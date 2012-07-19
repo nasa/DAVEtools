@@ -47,15 +47,17 @@ How to prepare for a release or other distribution
     $ git checkout develop
     $ git merge --no-ff release/0.9.x
 
-18. Merge back into master and tag with version number
+18. Merge back into master
     $ git checkout master
     $ git merge --no-ff release/0.9.x
     $ git tag -a 0.9.x
 
-19. Put the new DAVEtools zip file on the DSCB Products website.
+19. Run 'ant dist' to create a zip file
 
-20. Copy the README/README.html into DAVEtools/index.html on the
+20. Put the new DAVEtools zip file on the DSCB Products website.
+
+21. Copy the README/README.html into DAVEtools/index.html on the
     daveml.org website
 
-20. Publish notices on daveml.org website; announce on sim-stds@nasa.gov
+22. Publish notices on daveml.org website; announce on sim-stds@nasa.gov
 
