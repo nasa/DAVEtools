@@ -1,9 +1,9 @@
 // This file can be turned into XHTML using AsciiDoc
 
-DAVEtools 0.9.4 beta README
-===========================
+DAVEtools 0.9.4 README
+======================
 Bruce Jackson, NASA Langley Research Center <bruce.jackson@nasa.gov>
-Version 2, 2012-03-20
+Version 3, 2012-07-19
 :TOC:
 
 Introduction
@@ -485,7 +485,7 @@ V 0.9.4:: Added new utilities: DAVE2POST, to generate POST-II input
 	support these.  Added selectionFlag to Block and
 	selectOutput(), getSelectedBlocks() to Model.  Tweaked tests to 
         run under Windows XP. Upgraded for use with NetBeans 7.1.1
-        and Java SE 1.6.
+        and Java SE 1.6. Fixed incompatibility with Matlab/Simulink 2011b.
 
 V 0.9.3:: Added tally of checkcases to DAVE's statistics summary (when
 	used with the -c option). Added support for UML diagram

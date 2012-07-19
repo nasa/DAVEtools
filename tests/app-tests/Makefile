@@ -31,7 +31,7 @@ include Makefile.dist
 test_models/%.dml : %.dml test_models/.d
 	cp $< $@
 
-copy_models: test_models $(addprefix test_models/,${MODEL_LIST})
+copy_models: $(addprefix test_models/,${MODEL_LIST})
 
 
 distclean:
