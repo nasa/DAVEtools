@@ -7,8 +7,6 @@
 //  Copyright (c) 2007 United States Government as represented by LAR-17460-1. No copyright is
 //  claimed in the United States under Title 17, U.S. Code. All Other Rights Reserved.
 //
-//  since @0.9.4
-//
 //  Main class file of DAVE-ML to OTIS4 utility
 
 package gov.nasa.daveml.dave2otis;
@@ -26,7 +24,7 @@ import java.util.logging.Logger;
  * <p>
  * Utility program to convert <b>D</b>igital <b>A</b>erospace
  * <b>V</b>ehicle <b>E</b>xchange <b>M</b>arkup <b>L</b>anguage
- * (<b>DAVE-ML</b>) models into OTIS4 source files
+ * (<b>DAVE-ML</b>) models into OTIS4 source files.
  *<p>
  * <b>DAVE-ML</b> is part of AIAA standard S-119 for
  * encoding dynamic flight vehicle models for exchange between
@@ -42,7 +40,7 @@ import java.util.logging.Logger;
  * </ul>
  *
  * @author Bruce Jackson {@link <mailto:bruce.jackson@nasa.gov>}
- * @version 0.9
+ * @since 0.9.4
  *
  **/
 public class DAVE2OTIS extends DAVE {

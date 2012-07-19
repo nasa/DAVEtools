@@ -16,7 +16,7 @@ MODELS_DIR= ${DAVE_DIR}/Tech/Models
 SCHEMA_DIR= ${DAVE_DIR}/Schema
 EXAMPLES  = ${SCHEMA_DIR}/Examples
 F16_DIR   = ${MODELS_DIR}/F-16
-HL20_DIR  = ${PROJECTS}/HL-20/Sim_models/DAVE
+HL20_DIR  = ${PROJECTS}/HL20/Sim/DAVE
 
 VPATH = ${EXAMPLES}:${F16_DIR}:${HL20_DIR}
 
@@ -31,7 +31,7 @@ include Makefile.dist
 test_models/%.dml : %.dml test_models/.d
 	cp $< $@
 
-copy_models: test_models $(addprefix test_models/,${MODEL_LIST})
+copy_models: $(addprefix test_models/,${MODEL_LIST})
 
 
 distclean:
