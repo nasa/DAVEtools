@@ -1,6 +1,13 @@
 CHANGE LOG for DAVEtools
 
-V 0.9.4: Added DAVE2POST utility
+V 0.9.4: Added new utilities: DAVE2POST, to generate POST-II input
+	decks and code sections; and DAVE2OTIS, to generate OTIS4
+	input decks.  Added FORTRAN and C code snippet writers, to
+	support these.  Added selectionFlag to Block and
+	selectOutput(), getSelectedBlocks() to Model.  Tweaked tests
+	to run under Windows XP. Upgraded for use with NetBeans 7.1.1
+	and Java SE 1.6. Fixed incompatibility with Matlab/Simulink
+	2011b.
 
 V 0.9.3: Added tally of checkcases to DAVE's statistics summary (when
 	used with the -c option). Added support for UML diagram

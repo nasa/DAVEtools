@@ -1,59 +1,61 @@
 How to prepare for a release or other distribution
 
 060425 Written EBJ
+120719 Updated considerably
 
-1.  Edit build.xml; change major_ver, full_ver strings as
+1.  Create a new release branch from the 'develop' branch:
+    $ git checkout -b release/0.9.x
+
+2.  Edit build.xml; change major_ver, full_ver strings as
     appropriate.
 
-1a. Edit dist.make and change VERSTRING as appropriate.
+3.  Edit dist.make and change VERSTRING as appropriate.
 
-2.  Edit DAVE/src/gov/nasa/daveml/dave/DAVE.java; change this.myVersion
+4.  Edit DAVE/src/gov/nasa/daveml/dave/DAVE.java; change this.myVersion
     in DAVE constructor as appropriate (until we automate this)
 
-3.  Edit overview.html; update 'revision history' section
+5.  Edit overview.html; update 'revision history' section
 
-4.  Update CHANGELOG.txt and README/README.txt summary of changes; run
+6.  Update CHANGELOG.txt and README/README.txt summary of changes; run
     make in README directory
 
-5.  'ant distclean'
+7.  'ant distclean'
 
-6.  'ant doc'
+8.  'ant doc'
 
-7.  Look at docs, verify version number in title, etc.
+9.  Look at docs, verify version number in title, etc.
 
-8.  'ant test' & 'ant app-test'; ensure successful testing
+10. 'ant test' & 'ant app-test'; ensure successful testing
 
-9.  Update README/README.txt asciidoc to fix version number; review bug
-    list to see if any are resolved; update the list of changes
+11. Review TODO.txt list to see if any are resolved; update the list
+    of changes
 
-10.  Review and edit TODO if required.
+12. 'ant dist' to create .zip file
 
-11. 'ant distclean'
-
-12. Check into repository ('git comment -a -m') with appropriate comment
-
-13. 'git push central master' on development machine
-
-14. Send that file to another machine and verify 'ant doc', 'ant test'
+13. Send that file to another machine and verify 'ant doc', 'ant test'
     and 'ant app-test' work.
 
-=== stop here if alpha or beta version ===
+14. Final pass through README.txt to reflect changes
 
-15. Run 'ant dist' to create a new distribution in ../dist; add it to
-    repository
+15. Add line to Release_log.txt about posting new version to branch
+    website
 
-16. Update Release_log.txt to reflect changes
+16. A final 'git commit' in the release branch to record the
+    updates.
 
-17. A final 'git commit' will record the updates.
+17. Merge back into develop using 
+    $ git checkout develop
+    $ git merge --no-ff release/0.9.x
 
-18. Copy the revised DAVEtools.html page to DAVEML.org
+18. Merge back into master and tag with version number
+    $ git checkout master
+    $ git merge --no-ff release/0.9.x
+    $ git tag -a 0.9.x
 
-19. 'git tag -m"Tag version 0.9.x" V0.9x [HEAD?]' and 'git push central master'
+19. Put the new DAVEtools zip file on the DSCB Products website.
 
-20. Put the new DAVEtools zip file on the DSCB Products website.
+20. Copy the README/README.html into DAVEtools/index.html on the
+    daveml.org website
 
-21. Copy the README/README.txt into DAVEtools/index.txt on the
-    daveml.org website and create a new html using the makefile there; upload
-
-21. Publish notices on daveml.org website; announce on sim-stds@nasa.gov
+20. Publish notices on daveml.org website; announce on sim-stds@nasa.gov
 
