@@ -317,7 +317,7 @@ public class SLFileWriter extends FileWriter
 
 		// Open the parent diagram and adjust size
 		this.writeln("open_system('" + modelName + "');");
-		this.writeln("set_param(gcs,'Location', ["
+		this.writeln("set_param('" + modelName + "','Location', ["
 				+  windowHorzOffset + ", "
 				+  windowVertOffset + ", "
 				+ (windowHorzOffset + 2*subsysVertCL) + ", "
