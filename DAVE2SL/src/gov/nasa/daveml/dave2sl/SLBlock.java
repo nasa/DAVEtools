@@ -488,7 +488,7 @@ public class SLBlock
         if(relationOp.equals("eq"))  paramString += "'=='";
         if(relationOp.equals("geq")) paramString += "'>='";
         if(relationOp.equals("gt"))  paramString += "'>'";
-        if(relationOp.equals("neq")) paramString += "~='";
+        if(relationOp.equals("neq")) paramString += "'~='";
         writer.addBuiltInBlock("RelationalOperator", this.getName(), paramString);
     }
 
