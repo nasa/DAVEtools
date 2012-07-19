@@ -1,5 +1,5 @@
 /**
- * <p>Creates creation, setup and verification scripts to generate a
+ * <p>Generates creation, setup and verification scripts to generate a
  * Simulink(R) model from a DAVE-ML file.</p>
  *
  * <p>
