@@ -3,7 +3,7 @@
 DAVEtools 0.9.4 README
 ======================
 Bruce Jackson, NASA Langley Research Center <bruce.jackson@nasa.gov>
-Version 3, 2012-07-19
+README Version 4, 2012-10-09
 :TOC:
 
 Introduction
@@ -210,7 +210,7 @@ Usage: java DAVE [options] DAVE-ML_document
     --debug    (-d)    generate debugging information
     --eval     (-e)    do prompted model I/O evaluation
     --list     (-l)    output text description to optional output file
-    --internal (-i)    generate internal checkcase values
+    --internal (-i)    show intermediate results in calcs and checkcases
 ----
 
 Verify and count elements in a DAVE-ML file 
@@ -478,6 +478,12 @@ http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html.
 
 Changes since V 0.9
 -------------------
+
+V 0.9.5:: Changed behavior of -i flag to DAVE; in addition to creating
+        an XML snippet with internal values for any checkcase
+        successfully passed, will spit out useful intermediate values
+        if used with the -e (evaluate) flag.
+
 
 V 0.9.4:: Added new utilities: DAVE2POST, to generate POST-II input
 	decks and code sections; and DAVE2OTIS, to generate OTIS4

@@ -1332,4 +1332,35 @@ public class Model
         return theBlock;
     }
 
+    /**
+     * <p> Builds &amp; returns the current values of all variables </p>
+     *
+     * @throws DAVEException
+     **/
+
+     public VectorInfoArrayList getInternalsVector() throws DAVEException {
+        VectorInfoArrayList internalsVec = new VectorInfoArrayList();
+        Iterator<?> allBlks = this.blocks.iterator();
+        while (allBlks.hasNext()) {
+            Block theBlk = (Block) allBlks.next();
+            if (theBlk != null) {
+                Signal theSignal = theBlk.getOutput();
+                if (theSignal != null) {
+                    if (!theSignal.isDerived()) {
+                        String theName = theSignal.getName();
+                        if (!theName.contentEquals("unnamed")) {
+                            String theUnits = theSignal.getUnits();
+                            double theValue = theSignal.sourceValue();
+                            VectorInfo vi = new VectorInfo(theName, theUnits, theBlk, false);
+                            vi.setValue( theValue );
+                            internalsVec.add( vi );
+                        }
+                    }
+                }
+            }
+        }
+	return internalsVec;
+    }
+
+
 }
