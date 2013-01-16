@@ -39,11 +39,12 @@ public class BlockMathSum extends BlockMath
      * @param applyElement Reference to <code>org.jdom.Element</code>
      * containing "apply" element
      * @param m         The parent <code>Model</code>
+     * @throws DAVEException
      *
      **/
 
     @SuppressWarnings("unchecked")
-    public BlockMathSum( Element applyElement, Model m )
+    public BlockMathSum( Element applyElement, Model m ) throws DAVEException
     {
         // Initialize superblock elements
         super("pending", "summing", m);
@@ -58,16 +59,13 @@ public class BlockMathSum extends BlockMath
         this.setName( blockType + "_" + m.getNumBlocks() );
         
         // take appropriate action based on type
-        if(!blockType.equals("plus"))
-            {
-                System.err.println("Error - BlockMathSum constructor called with" +
-                                   " type element:" + blockType);
-            }
-        else
-            {
-                //System.out.println("   BlockMathSum constructor called with " + kids.size() + "elements.");
-                this.genInputsFromApply(ikid, 1);
-            }
+        if(!blockType.equals("plus")) {
+          System.err.println("Error - BlockMathSum constructor called with" +
+                             " type element:" + blockType);
+        } else {
+            //System.out.println("   BlockMathSum constructor called with " + kids.size() + "elements.");
+            this.genInputsFromApply(ikid, 1); // may throw DAVEException
+        }
 
         //System.out.println("    BlockMathSum constructor: " + this.getName() + " created.");
     }

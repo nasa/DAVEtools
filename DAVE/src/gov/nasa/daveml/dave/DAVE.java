@@ -459,7 +459,14 @@ public class DAVE {
                 System.out.println("");
             }
             while (variableIterator.hasNext()) {
-                dummySig = new Signal(variableIterator.next(), m);
+                try {
+                    dummySig = new Signal(variableIterator.next(), m);
+                } catch (DAVEException ex) {
+                    System.err.println("Exception thrown while parsing variableDefs: " +
+                            ex.getLocalizedMessage());
+                    System.err.println("aborting further parsing.");
+                    
+                }
             }
         }
     }

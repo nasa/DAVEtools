@@ -99,11 +99,13 @@ abstract public class BlockMath extends Block
      * @param applyElement Reference to <code>org.jdom.Element</code>
      * containing "apply" element
      * @param m		The parent <code>Model</code>
+     * @throws DAVEException if problems were encountered
      *
      **/
 
     @SuppressWarnings("unchecked")
 	public static BlockMath factory( Element applyElement, Model m)
+           throws DAVEException
     {
 //System.out.println("    BlockMath factory called.");
 	// Parse parts of the Apply element
@@ -156,8 +158,8 @@ abstract public class BlockMath extends Block
 	if( theType.equals("csymbol") )
 	    return new BlockMathFunctionExtension( applyElement, m);
 
-	System.err.println("DAVE's BlockMath factory() method doesn't recognize \""
-                + theType + "\" math element encountered during parsing, sorry...");
+	System.err.println("DAVE's BlockMath factory() method doesn't allow a <"
+                + theType + "> element directly after an <apply> element.");
 	return null;
     }
 
@@ -167,10 +169,12 @@ abstract public class BlockMath extends Block
      * 
      * @param ikid List <code>Iterator</code> for elements of top-level &lt;apply&gt;.
      * @param inputPortNumber <code>Int</code> with 1-based input number
+     * @throws DAVEException
      *
      **/
 
-    public void genInputsFromApply( Iterator<Element> ikid, int inputPortNumber )
+    public void genInputsFromApply( Iterator<Element> ikid, int inputPortNumber ) 
+            throws DAVEException
     {
 	int i = inputPortNumber;
 	while( ikid.hasNext() ) {	    
@@ -192,6 +196,7 @@ abstract public class BlockMath extends Block
                 this.addConstInput(constantValue, i);		// Create and hook up constant block
             } else if( name.equals("apply") ) { // recurse
                 this.addVarID(i, "");				// placeholder - no longer needed
+                // next throws DAVEException if bad syntax in <apply>  
                 Signal s = new Signal(in, ourModel);		// Signal constructor recognizes <apply>...
                                                                 // .. and will call our BlockMath.factory() ...
                 if( s!= null )	 {				// .. and creates upstream blocks & signals

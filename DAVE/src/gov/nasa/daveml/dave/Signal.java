@@ -16,14 +16,15 @@ package gov.nasa.daveml.dave;
  *
  */
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.Namespace;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.io.FileWriter;
-import java.io.IOException;
 
 /**
  * Object representing each "variable" in a model implementation algorithm.
@@ -293,15 +294,20 @@ public class Signal
      * belong. Any new blocks or signals are
      * <b>add</b>ed to <code>Model</code> as they are created,
      * including <b>this</b> object.
+     * 
+     * @throws DAVEException if syntax error is found in top-level apply element
      *
      **/
 
-    public Signal(Element signalElement, Model m)
+    public Signal(Element signalElement, Model m) throws DAVEException
     {
         this(signalElement.getAttributeValue("name" ), m);
         String name = signalElement.getName();
         if(name.equals("apply")) {
-        	this.handleApply(signalElement, m);
+        	Block b = this.handleApply(signalElement, m);
+                if (b == null) {
+                    throw new DAVEException("illegal syntax in <apply> element");
+                }
         } else if (name.equals("variableDef") ) { // not an apply element - should check to make sure it is a varDef?
             myVarID = signalElement.getAttributeValue("varID");
             myUnits = signalElement.getAttributeValue("units");
@@ -403,6 +409,7 @@ public class Signal
                 if (apply != null) {
                 	if (verboseFlag)
                 		System.out.println("...with an apply element");
+                        
                     this.handleApply( apply, m );
                 }                    
             } else { // here if math == null
@@ -549,16 +556,29 @@ public class Signal
 
     private Block handleApply( Element applyElement, Model m )
     {
-        Block b = BlockMath.factory(applyElement, m);
-        if(b == null)
-            System.err.println("Null block returned.");
+        Block b = null;
+        try {
+            b = BlockMath.factory(applyElement, m);
+        } catch (DAVEException e) {
+            System.err.println("Unable to process apply element found in calculations for '" +
+                    this.getName() + ".'");
+            System.err.println("Error: " + e.getMessage() );
+            System.exit(0);
+        }
+        if(b == null) {
+            String errmsg = "Encountered illegal element following <apply> in math calculation.";
+            System.err.println(errmsg);
+            if (this.verboseFlag) {
+                System.out.println(errmsg);
+            }
+        }
         else {
             try {
                 b.addOutput(this);
             } catch (DAVEException e) {
                 System.err.println("Unable to add signal '" + this.getName() 
                                    + "' as input to block '" + b.getName() + "'.");
-                System.err.println("Error message:" + e.getMessage() );
+                System.err.println("Error: " + e.getMessage() );
                 System.exit(0);
             }
         }
