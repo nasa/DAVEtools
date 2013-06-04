@@ -3,8 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.7" />
-<title>DAVEtools 0.9.4 beta README</title>
+<meta name="generator" content="AsciiDoc 8.6.8" />
+<title>DAVEtools 0.9.5 README</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -87,10 +87,14 @@ ul, ol, li > p {
 ul > li     { color: #aaa; }
 ul > li > * { color: black; }
 
-pre {
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
   padding: 0;
   margin: 0;
 }
+
 
 #author {
   color: #527bbd;
@@ -415,12 +419,6 @@ div.unbreakable { page-break-inside: avoid; }
  *
  * */
 
-tt {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
-}
-
 div.tableblock {
   margin-top: 1.0em;
   margin-bottom: 1.5em;
@@ -453,12 +451,6 @@ div.tableblock > table[frame="vsides"] {
  * html5 specific
  *
  * */
-
-.monospaced {
-  font-family: "Courier New", Courier, monospace;
-  font-size: inherit;
-  color: navy;
-}
 
 table.tableblock {
   margin-top: 1.0em;
@@ -539,6 +531,8 @@ body.manpage div.sectionbody {
 @media print {
   body.manpage div#toc { display: none; }
 }
+
+
 </style>
 <script type="text/javascript">
 /*<![CDATA[*/
@@ -737,10 +731,10 @@ asciidoc.install(3);
 </head>
 <body class="article">
 <div id="header">
-<h1>DAVEtools 0.9.4 beta README</h1>
+<h1>DAVEtools 0.9.5 README</h1>
 <span id="author">Bruce Jackson, NASA Langley Research Center &lt;bruce.jackson@nasa.gov&gt;</span><br />
-<span id="revnumber">version 2,</span>
-<span id="revdate">2012-03-20</span>
+<span id="revnumber">version 5,</span>
+<span id="revdate">2013-06-04</span>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
   <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
@@ -792,7 +786,7 @@ Plot a 3-D response surface for any output, based on any two inputs
 <div class="sect1">
 <h2 id="_components">Components</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>DAVEtools includes three products in one <tt>DAVEtools.jar</tt> file</p></div>
+<div class="paragraph"><p>DAVEtools includes three products in one <code>DAVEtools.jar</code> file</p></div>
 <div class="dlist"><div class="title">DAVEtools.jar contains:</div><dl>
 <dt class="hdlist1">
 DAVE
@@ -800,7 +794,7 @@ DAVE
 <dd>
 <p>
         Parses a DAVE-ML file (running any embedded verification
-        tests) and creates a <tt>Model</tt> object representing the model
+        tests) and creates a <code>Model</code> object representing the model
         defined in the DAVE-ML source file. Also can be used to
         provide information about the model and set inputs/get outputs
         from the model.
@@ -853,7 +847,7 @@ ModelSweeper
 </div>
 </div>
 <div class="sect1">
-<h2 id="_catalogs_parsing_validating_against_a_local_copy_of_tt_davefunc_dtd_tt">Catalogs: Parsing/validating against a local copy of <tt>DAVEfunc.dtd</tt></h2>
+<h2 id="_catalogs_parsing_validating_against_a_local_copy_of_code_davefunc_dtd_code">Catalogs: Parsing/validating against a local copy of <code>DAVEfunc.dtd</code></h2>
 <div class="sectionbody">
 <div class="paragraph"><p>One of the less attractive features of working with XML files is
 dealing with the appropriate Document Type Definition (DTD) or XML
@@ -863,10 +857,10 @@ rules of grammar for that type of XML file.</p></div>
 reasons which are out-of-scope of this document. However, DTD rules
 are powerful enough to provide adequate validation of a DAVE-ML
 file.</p></div>
-<div class="paragraph"><p>These rules are in the <tt>DAVEfunc.dtd</tt>, available for download from
+<div class="paragraph"><p>These rules are in the <code>DAVEfunc.dtd</code>, available for download from
 <a href="http://daveml.org/DTDs/index.html">this page</a>. This file should be placed
 somewhere convenient for you; you might consider putting it in a
-central <tt>XML/DTD</tt> directory on your computer. Unfortunately, there is
+central <code>XML/DTD</code> directory on your computer. Unfortunately, there is
 no clear consensus on where to place such local copies, and there are
 several competing mechanisms available to notify XML-based parsers
 (such as used by DAVEtool) where to find appropriate files. The one we
@@ -875,27 +869,27 @@ recommend is
 Catalogs</a>.</p></div>
 <div class="paragraph"><p>If you don&#8217;t want to download the DTD and set up a catalog file,
 DAVEtools will use information found in the DAVE-ML model file (such
-as <tt>F106.dml</tt>) to try to fetch the latest DTD over the network at
+as <code>F106.dml</code>) to try to fetch the latest DTD over the network at
 run-time.  This is much slower than having a local copy of the DTD but
 it avoids having to manually download newer copies as the DAVE-ML
 specification evolves. If you don&#8217;t have a network connection, the
 DAVEtools will still work but should advise you that the model was
 successfully parsed without validation.</p></div>
 <div class="paragraph"><p>If you do want to do <em>local</em> validation, after downloading
-<tt>DAVEfunc.dtd</tt> somewhere convenient, you will also want to download
-the tarball <tt>mathml2.tgz</tt> MathML2 DTD set from
-<a href="http://www.w3.org/Math/DTD/">http://www.w3.org/Math/DTD/</a>.  The <tt>mathml2.dtd</tt> has several related
+<code>DAVEfunc.dtd</code> somewhere convenient, you will also want to download
+the tarball <code>mathml2.tgz</code> MathML2 DTD set from
+<a href="http://www.w3.org/Math/DTD/">http://www.w3.org/Math/DTD/</a>.  The <code>mathml2.dtd</code> has several related
 parts which need to be stored in a particular directory structure
 (shown later).</p></div>
 <div class="paragraph"><p>Next, you need to define an <strong>XML catalog</strong> file which will tell DAVEtools
 where to find a local copy of these DTDs.</p></div>
-<div class="paragraph"><p>In the example <tt>catalog.xml</tt> file listing below, it is assumed that
-the DTDs have been stored in a <tt>schemas</tt> subdirectory under the
+<div class="paragraph"><p>In the example <code>catalog.xml</code> file listing below, it is assumed that
+the DTDs have been stored in a <code>schemas</code> subdirectory under the
 working directory:</p></div>
 <div class="literalblock">
-<div class="title">Example <tt>catalog.xml</tt> file</div>
+<div class="title">Example <code>catalog.xml</code> file</div>
 <div class="content">
-<pre><tt>&lt;?xml version="1.0"?&gt;
+<pre><code>&lt;?xml version="1.0"?&gt;
 &lt;!-- commented out to prevent network access
      !DOCTYPE catalog PUBLIC "-//OASIS//DTD Entity Resolution XML Catalog V1.0//EN"
     "http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd"
@@ -911,18 +905,18 @@ working directory:</p></div>
         uri=""/&gt;
 
   &lt;/group&gt;
-&lt;/catalog&gt;</tt></pre>
+&lt;/catalog&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>Continuing with this example, the working directory contents should be
 something like what is shown below. The working directory contains a
-model file, <tt>F106_aero.dml</tt> and the <tt>catalog.xml</tt> file, and a
-<tt>schemas</tt> subdirectory, which is expanded below to show its
-contents. Note that all the files in <tt>schemas/mathml2</tt> were extracted
-from the <tt>mathml2.tgz</tt> tarball:</p></div>
+model file, <code>F106_aero.dml</code> and the <code>catalog.xml</code> file, and a
+<code>schemas</code> subdirectory, which is expanded below to show its
+contents. Note that all the files in <code>schemas/mathml2</code> were extracted
+from the <code>mathml2.tgz</code> tarball:</p></div>
 <div class="literalblock">
 <div class="title">Example working directory structure</div>
 <div class="content">
-<pre><tt>F106_aero.dml
+<pre><code>F106_aero.dml
 catalog.xml
 schemas/
     DAVEfunc.dtd
@@ -947,7 +941,7 @@ schemas/
             mmlalias.ent
             mmlextra.ent
         mathml2-qname-1.mod
-        mathml2.dtd</tt></pre>
+        mathml2.dtd</code></pre>
 </div></div>
 </div>
 </div>
@@ -1015,17 +1009,17 @@ PAr9L8j/96+U/w3yCoCXW14B8HLLvwDd67nwZIEPdgAAAABJRU5ErkJggg==" />
 <td class="content">
 <div class="title">Command aliases</div>
 <div class="paragraph"><p>For the following examples (and for general daily use) it is helpful
-to define these aliases in your <tt>.cshrc</tt> or <tt>.bashrc</tt> file:</p></div>
-<div class="paragraph"><p><tt>alias <strong>dave</strong>="java -cp <em>path_to/DAVEtools.jar</em>
-gov.nasa.daveml.dave.DAVE"</tt><br />
-<tt>alias <strong>dave2sl</strong>="java -cp <em>path_to/DAVEtools.jar</em>
-gov.nasa.daveml.dave2sl.DAVE2SL"</tt><br />
-<tt>alias <strong>dave2post</strong>="java -cp <em>path_to/DAVEtools.jar</em>
-gov.nasa.daveml.dave2post.DAVE2POST"</tt><br />
-<tt>alias <strong>dave2otis</strong>="java -cp <em>path_to/DAVEtools.jar</em>
-gov.nasa.daveml.dave2otis.DAVE2OTIS"</tt><br />
-<tt>alias <strong>sweep</strong>="java -cp <em>path_to/DAVEtools.jar</em>
-gov.nasa.daveml.sweeper.ModelSweeperUI"</tt><br /></p></div>
+to define these aliases in your <code>.cshrc</code> or <code>.bashrc</code> file:</p></div>
+<div class="paragraph"><p><code>alias <strong>dave</strong>="java -cp <em>path_to/DAVEtools.jar</em>
+gov.nasa.daveml.dave.DAVE"</code><br />
+<code>alias <strong>dave2sl</strong>="java -cp <em>path_to/DAVEtools.jar</em>
+gov.nasa.daveml.dave2sl.DAVE2SL"</code><br />
+<code>alias <strong>dave2post</strong>="java -cp <em>path_to/DAVEtools.jar</em>
+gov.nasa.daveml.dave2post.DAVE2POST"</code><br />
+<code>alias <strong>dave2otis</strong>="java -cp <em>path_to/DAVEtools.jar</em>
+gov.nasa.daveml.dave2otis.DAVE2OTIS"</code><br />
+<code>alias <strong>sweep</strong>="java -cp <em>path_to/DAVEtools.jar</em>
+gov.nasa.daveml.sweeper.ModelSweeperUI"</code><br /></p></div>
 </td>
 </tr></table>
 </div>
@@ -1033,7 +1027,7 @@ gov.nasa.daveml.sweeper.ModelSweeperUI"</tt><br /></p></div>
 <h3 id="_simple_help">Simple help</h3>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ dave -h
+<pre><code>$ dave -h
 Usage: java DAVE [options] DAVE-ML_document
 
   where options is one or more of the following:
@@ -1043,7 +1037,7 @@ Usage: java DAVE [options] DAVE-ML_document
     --debug    (-d)    generate debugging information
     --eval     (-e)    do prompted model I/O evaluation
     --list     (-l)    output text description to optional output file
-    --internal (-i)    generate internal checkcase values</tt></pre>
+    --internal (-i)    show intermediate results in calcs and checkcases</code></pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1052,7 +1046,7 @@ Usage: java DAVE [options] DAVE-ML_document
 aero model is available <a href="http://daveml.org/examples/index.html#HL-20">here</a>).</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ dave -c HL20_aero.dml
+<pre><code>$ dave -c HL20_aero.dml
 Verified 25 of 25 embedded checkcases.
 File parsing statistics:
           Number of variable definitions: 361
@@ -1071,16 +1065,16 @@ Implementation statistics:
                   Number of signal lines: 741
                         Number of blocks: 751
                         Number of inputs: 16
-                       Number of outputs: 10</tt></pre>
+                       Number of outputs: 10</code></pre>
 </div></div>
 </div>
 <div class="sect2">
 <h3 id="_create_a_simulink_174_model">Create a Simulink&#174; model</h3>
 <div class="paragraph"><p>From a command line, the HL-20 aero model creation, verification and
-data setup scripts are generated with <tt>dave2sl</tt>:</p></div>
+data setup scripts are generated with <code>dave2sl</code>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ dave2sl HL20_aero.dml
+<pre><code>$ dave2sl HL20_aero.dml
 Parsing input file...
 Parsing successful.
 Running verification of internal model...
@@ -1089,33 +1083,33 @@ Creating MATLAB/Simulink representation...
 Simulink model written.
 Checkcase data found, generating verification script...
 Verification script written.
-Wrote both model creation and model setup scripts for HL20_aero.</tt></pre>
+Wrote both model creation and model setup scripts for HL20_aero.</code></pre>
 </div></div>
 <div class="paragraph"><p>This creates three files:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<tt>HL20_aero_setup.m</tt> - loads data into the Matlab&#174; workspace in an
-                        <tt>HL20_aero_data</tt> structure
+<code>HL20_aero_setup.m</code> - loads data into the Matlab&#174; workspace in an
+                        <code>HL20_aero_data</code> structure
 </p>
 </li>
 <li>
 <p>
-<tt>HL20_aero_verify.m</tt> - a script that verifies the resulting
+<code>HL20_aero_verify.m</code> - a script that verifies the resulting
                         Simulink&#174; model
 </p>
 </li>
 <li>
 <p>
-<tt>HL20_aero_create.m</tt> - a script that builds the <tt>HL20_aero</tt>
+<code>HL20_aero_create.m</code> - a script that builds the <code>HL20_aero</code>
                         Simulink&#174; model
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>Invoking the <tt>HL20_aero_create.m</tt> script at a Matlab&#174; prompt yields</p></div>
+<div class="paragraph"><p>Invoking the <code>HL20_aero_create.m</code> script at a Matlab&#174; prompt yields</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>                            &lt; M A T L A B (R) &gt;
+<pre><code>                            &lt; M A T L A B (R) &gt;
                   Copyright 1984-2010 The MathWorks, Inc.
                 Version 7.11.0.584 (R2010b) 64-bit (maci64)
                               August 16, 2010
@@ -1155,7 +1149,7 @@ Running 25 verification cases for HL20_aero:
 All cases passed: model "HL20_aero" verified.
 
 "HL20_aero" model verified and saved.
-&gt;&gt;</tt></pre>
+&gt;&gt;</code></pre>
 </div></div>
 <div class="paragraph"><p>This results in a Simulink&#174; model, which can be inserted into other
 Simulink diagrams. The underlying details are a bit messy, but
@@ -1957,12 +1951,12 @@ GhowxI+yqn0AAAAASUVORK5CYII=" />
 <div class="sect2">
 <h3 id="_exercising_a_dave_ml_model_with_matlab_174">Exercising a DAVE-ML model with Matlab&#174;</h3>
 <div class="paragraph"><p>Even if Simulink&#174; is not licensed, the DAVE-ML model can still be
-used through Matlab&#174; <tt>.m</tt> scripting. An example script is
+used through Matlab&#174; <code>.m</code> scripting. An example script is
 <a href="dave_demo.html">here</a>. Shown below is an example of the demo
 script in action.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>&gt;&gt; dave_demo
+<pre><code>&gt;&gt; dave_demo
 Inputs:
                      angleOfAttack (       deg):      0.0000e+00
                    angleOfSideslip (       deg):      0.0000e+00
@@ -1991,13 +1985,13 @@ Outputs:
         aeroBodyForceCoefficient_Y (        nd):      0.0000e+00
      aeroBodyMomentCoefficient_Yaw (        nd):      0.0000e+00
     aeroBodyMomentCoefficient_Roll (        nd):      0.0000e+00
-&gt;&gt;</tt></pre>
+&gt;&gt;</code></pre>
 </div></div>
 </div>
 <div class="sect2">
 <h3 id="_see_all_the_dirty_details">See all the dirty details</h3>
 <div class="paragraph"><p>Again using the <a href="http://daveml.org/examples/HL20_aero.dml.zip">HL-20 aero model</a>
-the <tt>-d</tt> flag gives a blow-by-blow as the model is realized and then
+the <code>-d</code> flag gives a blow-by-blow as the model is realized and then
 exercised with checkcases.</p></div>
 <div class="admonitionblock">
 <table><tr>
@@ -2052,12 +2046,12 @@ VVWRnKx/Jlpt3eVy2QCKu9C68AFr9o0spwd0Oh1ZYggCIlNaiQktiXdhZgKQABcp3ci7LMtM7B0J
 fsAErJoAYItG1mdr+hfvVlACtHDIXkploYXbHvQOikDEe6/ZmjFmAhf9ZvJxOk2Qol88W4kYz32S
 GNQfHLG+TyMTkAVEr88xQfVnkBg7GAKixSIykDYQsL21/wFkW/B5QqT9lwAAAABJRU5ErkJggg==" />
 </td>
-<td class="content">the <tt>-d</tt> option will generate a LONG, LONG listing!</td>
+<td class="content">the <code>-d</code> option will generate a LONG, LONG listing!</td>
 </tr></table>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ dave -d HL20_aero.dml
+<pre><code>$ dave -d HL20_aero.dml
 Loaded 'HL20_aero.dml' successfully,
 validating against 'file:/Users/bjax/xml/DTDs/DAVE-ML-2.0/DAVEfunc.dtd.'
 Root element has 'http://daveml.org/2010/DAVEML' default namespace.
@@ -2109,7 +2103,7 @@ Method update() called for output block 'aeroBodyMomentCoefficient_Yaw'
 
 Method update() called for output block 'aeroBodyMomentCoefficient_Roll'
  Input value is 0.0
-Verified 25 of 25 embedded checkcases.</tt></pre>
+Verified 25 of 25 embedded checkcases.</code></pre>
 </div></div>
 </div>
 </div>
@@ -2120,17 +2114,17 @@ Verified 25 of 25 embedded checkcases.</tt></pre>
 <div class="paragraph"><p>Both of these tools are invoked similar to DAVE2SL:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ dave2post HL20_aero.dml</tt></pre>
+<pre><code>$ dave2post HL20_aero.dml</code></pre>
 </div></div>
-<div class="paragraph"><p>will generate two POST-II input files: <tt>HL20_aero.pos2</tt> will contain
-data tables in POST-II format, and <tt>HL20_aero.f</tt> will contain an aero
+<div class="paragraph"><p>will generate two POST-II input files: <code>HL20_aero.pos2</code> will contain
+data tables in POST-II format, and <code>HL20_aero.f</code> will contain an aero
 model snippet in Fortran, suitable for inclusion in POST-II.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ dave2otis HL20_aero.dml</tt></pre>
+<pre><code>$ dave2otis HL20_aero.dml</code></pre>
 </div></div>
-<div class="paragraph"><p>likewise generates two OTIS4 input files: <tt>HL20_aero.dat</tt> will contain
-data tables in OTIS4 format, and <tt>HL20_aero.inl</tt> is the input file for
+<div class="paragraph"><p>likewise generates two OTIS4 input files: <code>HL20_aero.dat</code> will contain
+data tables in OTIS4 format, and <code>HL20_aero.inl</code> is the input file for
 OTIS4 operation (six-dof). Some manual editing of this file will be
 needed before execution by OTIS4, including setting the type of
 simulation (2DOF, 3DOF, etc) and setting the necessary initial state
@@ -2145,7 +2139,7 @@ values.</p></div>
 surface</a> of a DAVE-ML output signal as a function of two inputs.</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><tt>$ sweep</tt></pre>
+<pre><code>$ sweep</code></pre>
 </div></div>
 <div class="paragraph"><p>will bring up a GUI that allows one to select the input model and
 examine the response surface for a particular input, as shown below.</p></div>
@@ -4098,6 +4092,18 @@ yRZ2TAgXAAAAAElFTkSuQmCC" />
 <div class="sectionbody">
 <div class="dlist"><dl>
 <dt class="hdlist1">
+V 0.9.5
+</dt>
+<dd>
+<p>
+Changed behavior of -i flag to DAVE; in addition to creating
+        an XML snippet with internal values for any checkcase
+        successfully passed, will spit out useful intermediate values
+        if used with the -e (evaluate) flag. Also fixed a bug in
+        creation of N-d tables with dimensions greater than 4.
+</p>
+</dd>
+<dt class="hdlist1">
 V 0.9.4
 </dt>
 <dd>
@@ -4106,9 +4112,11 @@ Added new utilities: DAVE2POST, to generate POST-II input
         decks and code sections; and DAVE2OTIS, to generate OTIS4
         input decks.  Added FORTRAN and C code snippet writers, to
         support these.  Added selectionFlag to Block and
-        selectOutput(), getSelectedBlocks() to Model.  Tweaked tests to
-        run under Windows XP. Upgraded for use with NetBeans 7.1.1
-        and Java SE 1.6.
+        selectOutput(), getSelectedBlocks() to Model.  Tweaked tests
+        to run under Windows XP. Upgraded for use with NetBeans 7.1.1
+        and Java SE 1.6. Fixed incompatibility with Matlab/Simulink
+        2011b. Bug fix for inequality comparison operator in Simulink
+        block.
 </p>
 </dd>
 <dt class="hdlist1">
@@ -4181,8 +4189,8 @@ Changed to support the default DAVE-ML namespace (xmlns);
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 2<br />
-Last updated 2012-03-20 13:01:55 US Eastern Daylight Time
+Version 5<br />
+Last updated 2013-06-04 16:37:23 EDT
 </div>
 </div>
 </body>

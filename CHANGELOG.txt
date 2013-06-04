@@ -1,5 +1,10 @@
 CHANGE LOG for DAVEtools
 
+V 0.9.5: Fixed bug in creating tables with dimensions larger than
+	4. Changed behavior of -i flag to DAVE when used in
+	conjunction with -e (evaluate) flag: will spit out
+	intermediate values to command line.
+
 V 0.9.4: Added new utilities: DAVE2POST, to generate POST-II input
 	decks and code sections; and DAVE2OTIS, to generate OTIS4
 	input decks.  Added FORTRAN and C code snippet writers, to

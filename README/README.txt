@@ -1,9 +1,9 @@
 // This file can be turned into XHTML using AsciiDoc
 
-DAVEtools 0.9.4 README
+DAVEtools 0.9.5 README
 ======================
 Bruce Jackson, NASA Langley Research Center <bruce.jackson@nasa.gov>
-README Version 4, 2012-10-09
+README Version 5, 2013-06-04
 :TOC:
 
 Introduction
@@ -482,8 +482,8 @@ Changes since V 0.9
 V 0.9.5:: Changed behavior of -i flag to DAVE; in addition to creating
         an XML snippet with internal values for any checkcase
         successfully passed, will spit out useful intermediate values
-        if used with the -e (evaluate) flag.
-
+        if used with the -e (evaluate) flag. Also fixed a bug in
+        creation of N-d tables with dimensions greater than 4.
 
 V 0.9.4:: Added new utilities: DAVE2POST, to generate POST-II input
 	decks and code sections; and DAVE2OTIS, to generate OTIS4

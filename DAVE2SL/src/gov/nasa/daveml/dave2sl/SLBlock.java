@@ -282,7 +282,7 @@ public class SLBlock
             + MDLNameList.convertToMDLString(ft.getGTID());
         String maskValues = "{";
         if (numDim > 4)
-            maskValues += "'More...'";          // numDimsPopupSelect
+            maskValues += "'More...',";         // numDimsPopupSelect
         else
             maskValues += "'" + numDim + "',";
         maskValues += "'" + numDim + "',"       // explicitNuumDims
