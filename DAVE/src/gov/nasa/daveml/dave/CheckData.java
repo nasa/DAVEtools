@@ -50,8 +50,9 @@ public class CheckData
     {
 	staticShots = new ArrayList<StaticShot>( 20);
 	Iterator<Element> ssit = shots.iterator();
-	while (ssit.hasNext())
+	while (ssit.hasNext()) {
 	    staticShots.add( new StaticShot( ssit.next() ) );
+        }
     }
 
 

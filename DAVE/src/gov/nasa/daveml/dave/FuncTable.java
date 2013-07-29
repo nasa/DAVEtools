@@ -20,7 +20,6 @@ package gov.nasa.daveml.dave;
 import java.io.IOException;
 import java.io.Writer;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -285,25 +284,27 @@ public class FuncTable
     protected void parseBPIDsFromTableDef( Element gtd )
     {
     	Element breakpointRefs = gtd.getChild("breakpointRefs", this.ns);
-    	if (breakpointRefs == null) // try again without namespace
-    		breakpointRefs = gtd.getChild("breakpointRefs");
+    	if (breakpointRefs == null) { // try again without namespace
+            breakpointRefs = gtd.getChild("breakpointRefs");
+        }
     	
     	if (breakpointRefs != null) {
-    		List<Element>     bpRefs = breakpointRefs.getChildren("bpRef",this.ns);
-    		if (bpRefs == null)
-    			// try again without namespace
-    			bpRefs = breakpointRefs.getChildren("bpRef");
+            List<Element> bpRefs = breakpointRefs.getChildren("bpRef",this.ns);
+            if (bpRefs == null) {
+                // try again without namespace
+                bpRefs = breakpointRefs.getChildren("bpRef");
+            }
+            // even if still null, no need to throw exception - we 
+            // silently use null for breakpointIDs, setDimensions.
 
-    		// even if still null, no need to throw exception - we silently use null for breakpointIDs, setDimensions.
+            Iterator<Element> bpRefIterator   = bpRefs.iterator();
 
-    		Iterator<Element> bpRefIterator   = bpRefs.iterator();
-
-    		while (bpRefIterator.hasNext()) {
-    			// get ID of breakpoint identifier
-    			Element bpRefElement = bpRefIterator.next();
-    			String bpName = bpRefElement.getAttributeValue("bpID");
-    			this.bpIDs.add( bpName );
-    		}
+            while (bpRefIterator.hasNext()) {
+                // get ID of breakpoint identifier
+                Element bpRefElement = bpRefIterator.next();
+                String bpName = bpRefElement.getAttributeValue("bpID");
+                this.bpIDs.add( bpName );
+            }
     	}
         // set our dimensions by resolving breakpoint IDs
         
@@ -325,8 +326,9 @@ public class FuncTable
     public void addBPID( int portNum, String bpID )
     {
         // increase length of array if necessary
-        while(bpIDs.size() < portNum)
+        while(bpIDs.size() < portNum) {
             bpIDs.add("");
+        }
         bpIDs.set(portNum-1, bpID);
     }
 
@@ -404,8 +406,9 @@ public class FuncTable
      **/
 
     public int size() { 
-        if (this.functionValues == null) 
+        if (this.functionValues == null) {
             return 0;
+        }
         return this.functionValues.size(); 
     }
 
@@ -417,8 +420,9 @@ public class FuncTable
      **/
 
     public int numDim() { 
-        if (myDimensions == null)
+        if (myDimensions == null) {
             return 0;
+        }
         return this.myDimensions.length; 
     }
 
@@ -463,7 +467,6 @@ public class FuncTable
     protected int printTable( Writer writer, ArrayList<Double> table, int[] dims, int startIndex)
         throws IOException
     {
- 
         int offset;
         int i;
         String newline = System.getProperty("line.separator");
@@ -478,37 +481,40 @@ public class FuncTable
             case 0:     // shouldn't happen
                 return 0;
             case 1:
-                for ( i = 0; i < dims[0]; i++)
-                    {
+                for ( i = 0; i < dims[0]; i++) {
                         Double theValue = table.get(i+startIndex);
                         String valueStr = form.format( theValue );
                         writer.write( valueStr );
-                        if( i < dims[0]-1) writer.write(", ");
-                    }
+                        if( i < dims[0]-1) {
+                            writer.write(", ");
+                        }
+                }
                 return i;
             case 2:
-                for ( i = 0; i < dims[0]; i++)
-                    {
-                        int[] newDims = new int[1];
-                        newDims[0] = dims[1];
-                        offset = printTable( writer, table, newDims, startIndex );
-                        if( i < dims[0]-1) writer.write(", ");
-                        writer.write(newline);
-                        startIndex = startIndex + offset;
+                for ( i = 0; i < dims[0]; i++) {
+                    int[] newDims = new int[1];
+                    newDims[0] = dims[1];
+                    offset = printTable( writer, table, newDims, startIndex );
+                    if( i < dims[0]-1) {
+                        writer.write(", ");
                     }
+                    writer.write(newline);
+                    startIndex = startIndex + offset;
+                }
                 return startIndex;
             default:
-                for ( i = 0; i < dims[0]; i++ )
-                    {
-                        int[] newDims = new int[1];
-                        newDims[0] = dims[1];
-                        //System.out.println(" For dimension " + dims.length + " layer " + i);
-                        //System.out.println();
-                        offset = printTable( writer, table, newDims, startIndex );
-                        if( i < dims[0]-1) writer.write(", ");
-                        writer.write(newline);
-                        startIndex = startIndex + offset;
+                for ( i = 0; i < dims[0]; i++ ) {
+                    int[] newDims = new int[1];
+                    newDims[0] = dims[1];
+                    //System.out.println(" For dimension " + dims.length + " layer " + i);
+                    //System.out.println();
+                    offset = printTable( writer, table, newDims, startIndex );
+                    if( i < dims[0]-1) {
+                        writer.write(", ");
                     }
+                    writer.write(newline);
+                    startIndex = startIndex + offset;
+                }
                 return startIndex;
             }
     }
@@ -546,27 +552,34 @@ public class FuncTable
             System.out.print("  getting point '" + this.tableName + "[");
             for (i = 0; i < indices.length ; i++) {
                 System.out.print(" " + indices[i]);
-                if (i < indices.length-1) System.out.print(",");
+                if (i < indices.length-1) {
+                    System.out.print(",");
+                }
             }
             System.out.println(" ]'");
         }
 
         for (i = indices.length-1 ; i >= 0; i--) {      // 3, 2, 1, 0
-            if (verbose) System.out.println("  getPt: i " + i);
+            if (verbose) {
+                System.out.println("  getPt: i " + i);
+            }
             offset += indices[i]*mult;
             mult   *= this.myDimensions[i];
-            if (verbose)
+            if (verbose) {
                 System.out.println("   getPt: offset " + offset + " mult " + mult);
+            }
         }
         Double value = functionValues.get(offset);
         double val = value.doubleValue();
-        if (verbose) System.out.println("  returned value " + val);
+        if (verbose) {
+            System.out.println("  returned value " + val);
+        }
         return val;
     }
 
 
 	public String getDescription() {
-		return this.description;
+            return this.description;
 	}
 }
 

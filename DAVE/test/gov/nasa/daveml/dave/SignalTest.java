@@ -1,9 +1,9 @@
 package gov.nasa.daveml.dave;
 
-import org.jdom.Element;
-import junit.framework.*;
 import java.util.ArrayList;
 import java.util.Iterator;
+import junit.framework.*;
+import org.jdom.Element;
 
 
 
@@ -512,7 +512,13 @@ public class SignalTest extends TestCase {
         // use new model empty of blocks and signals
         Model m = new Model(3,3);
                 
-        Signal theSignal = new Signal(calcVarDef, m); // this creates single upstream BlockMathAbs named "abs_1"
+        Signal theSignal;
+        theSignal = null;
+        try { // this creates single upstream BlockMathAbs named "abs_1"
+            theSignal = new Signal(calcVarDef, m);
+        } catch (DAVEException e) {
+            fail("Unexpected exception");
+        }
         assertTrue(  theSignal != null );
         assertTrue(  theSignal.hasSource() );
         assertFalse( theSignal.hasDest() );
@@ -618,15 +624,29 @@ public class SignalTest extends TestCase {
         constVarDef.setAttribute(  "units", "deg" );
         constVarDef.setAttribute( "initialValue", "-6.78" );
                 
-        // this wire will lead from a const block that is created by model.hookUpIO()
-        Signal beta = new Signal( constVarDef, m);
+        Signal beta;
+        beta = null;
+        try { // this wire will lead from a const block that is created by model.hookUpIO()
+            beta = new Signal( constVarDef, m);
+        } catch (DAVEException e) {
+            fail("Unexpected exception while adding signal 'beta' in " +
+                    "testSignalElementWithBlockConstant_ctor: " +
+                    e.getMessage());
+        }
         assertTrue(  beta != null );
         assertFalse( beta.hasSource() );
         assertFalse( beta.hasDest() );
         assertTrue(  beta.hasIC() );
                 
-        // this creates single upstream BlockMathAbs named "abs_1"
-        Signal dv = new Signal( calcVarDef, m ); 
+        Signal dv;
+        dv = null;
+        try { // this creates single upstream BlockMathAbs named "abs_1"
+            dv = new Signal( calcVarDef, m );
+        } catch (DAVEException e) {
+            fail("Unexpected exception while adding signal 'dv' in " +
+                    "testSignalElementWithBlockConstants_ctor: " +
+                    e.getMessage());
+        }
         assertTrue(  dv != null );
         assertTrue(  dv.hasSource() );
         assertFalse( dv.hasDest() );
@@ -881,7 +901,15 @@ public class SignalTest extends TestCase {
         arg1VarDef.setAttribute(  "initialValue", a.toString() );
 
         // this wire will lead from a const block that is created by model.hookUpIO()
-        Signal aSig = new Signal( arg1VarDef, m);
+        Signal aSig;
+        aSig = null;
+        try {
+            aSig = new Signal( arg1VarDef, m);
+        } catch (DAVEException e) {
+            fail("Unexpected exception while adding signal 'aSig' in " +
+                    "buildModelWithCalculationATimeBAndMinMaxLimits: " +
+                    e.getMessage() );
+        }
         assertTrue(  aSig != null );
         assertFalse( aSig.hasSource() );
         assertFalse( aSig.hasDest() );
@@ -895,14 +923,30 @@ public class SignalTest extends TestCase {
         arg2VarDef.setAttribute(  "initialValue", b.toString() );
 
         // this wire will lead from a const block that is created by model.hookUpIO()
-        Signal bSig = new Signal( arg2VarDef, m);
+        Signal bSig;
+        bSig = null;
+        try {
+            bSig = new Signal( arg2VarDef, m);
+        } catch (DAVEException e) {
+             fail("Unexpected exception while adding signal 'bSig' in " +
+                    "buildModelWithCalculationATimeBAndMinMaxLimits: " +
+                    e.getMessage() );
+       }
         assertTrue(  bSig != null );
         assertFalse( bSig.hasSource() );
         assertFalse( bSig.hasDest() );
         assertTrue(  bSig.hasIC() );
 
         // this creates single upstream BlockMathProduct named "times_1"
-        Signal dv = new Signal( calcVarDef, m );
+        Signal dv;
+        dv = null;
+        try {
+            dv = new Signal( calcVarDef, m );
+        } catch (DAVEException e) {
+            fail("Unexpected exception while adding signal 'dv' in " +
+                    "buildModelWithCalculationATimeBAndMinMaxLimits: " +
+                    e.getMessage() );
+        }
         assertTrue(  dv != null );
         assertTrue(  dv.hasSource() );
         assertFalse( dv.hasDest() );
@@ -1090,12 +1134,15 @@ public class SignalTest extends TestCase {
         String icString = null;
         String minString = null;
         String maxString = null;
-        if (ic != null)
+        if (ic != null) {
             icString = ic.toString();
-        if (min != null)
+        }
+        if (min != null) {
             minString = min.toString();
-        if (max != null)
+        }
+        if (max != null) {
             maxString = max.toString();
+        }
         setFullSignalWithICMinMax(icString, minString, maxString);
         // the original signal now has a limiter block downstream of it
         BlockArrayList dests = _fs.getDests();
@@ -1107,10 +1154,12 @@ public class SignalTest extends TestCase {
         BlockLimiter limBlk = (BlockLimiter) blk;
         assertTrue( (min == null) ^ limBlk.hasLowerLimit() );
         assertTrue( (max == null) ^ limBlk.hasUpperLimit() );
-        if (min != null)
+        if (min != null) {
             assertEquals(min, limBlk.getLowerLimit(), eps);
-        if (max != null)
+        }
+        if (max != null) {
             assertEquals(max, limBlk.getUpperLimit(), eps);
+        }
 
         try {
             outputs = _m.getOutputVector();
@@ -1151,8 +1200,9 @@ public class SignalTest extends TestCase {
         Element calcVarDef; // varDef with calculation component
         Element flag1 = new Element(flagValue1);
         Element flag2 = null;
-        if (flagValue2 != null)
+        if (flagValue2 != null) {
             flag2 = new Element(flagValue2);
+        }
 
         calcVarDef = new Element("variableDef");
         calcVarDef.setAttribute( "name", "theVar" );
@@ -1160,12 +1210,18 @@ public class SignalTest extends TestCase {
         calcVarDef.setAttribute( "units", "deg" );
         calcVarDef.addContent( theDesc1 );
         calcVarDef.addContent( flag1 );
-        if (flagValue2 != null)
+        if (flagValue2 != null) {
             calcVarDef.addContent( flag2 );
+        }
 
-        _fs = new Signal(calcVarDef, _m); // this creates single upstream BlockMathAbs named "abs_1"
+        try {
+            _fs = new Signal(calcVarDef, _m); // this creates single upstream BlockMathAbs named "abs_1"
+        } catch (DAVEException e) {
+            fail("Unexpected exception");
+        }
 
         // test all but flag values
+        assertNotNull( _fs );
         assertEquals( "theVar", _fs.getName()  );
         assertEquals( "dv",     _fs.getVarID() );
         assertEquals( "deg",    _fs.getUnits() );
@@ -1197,19 +1253,27 @@ public class SignalTest extends TestCase {
         varDef.setAttribute( "name", "theVar" );
         varDef.setAttribute( "varID", "dv" );
         varDef.setAttribute( "units", "deg" );
-        if(ICValue != null)
+        if(ICValue != null) {
             varDef.setAttribute("initialValue", ICValue );
-        if(minValue != null)
+        }
+        if(minValue != null) {
             varDef.setAttribute("minValue", minValue);
-        if(maxValue != null)
+        }
+        if(maxValue != null) {
             varDef.setAttribute("maxValue", maxValue);
+        }
         varDef.addContent( theDesc1 );
         varDef.addContent( new Element("isOutput") );
 
         // this will create a const block and an output block after calling model.hookUpIO()
-        _fs = new Signal(varDef, _m); // this creates single upstream BlockMathAbs named "abs_1"
+        try {
+            _fs = new Signal(varDef, _m);
+        } catch (DAVEException e) {
+            fail("Unexpected exception");
+        }
 
         // test all but flag values
+        assertNotNull( _fs );
         assertEquals( "theVar", _fs.getName()  );
         assertEquals( "dv",     _fs.getVarID() );
         assertEquals( "deg",    _fs.getUnits() );

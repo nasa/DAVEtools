@@ -15,8 +15,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.HashSet;
+import java.util.Iterator;
 
 /**
  *
@@ -162,8 +162,9 @@ public class SLBlock
         int numInputs = this.block.numInputs();
         if (numInputs > 1) {
             int minHt = 24 + 15*(numInputs-1);
-            if (minHt > mdlHeight)
+            if (minHt > mdlHeight) {
                 mdlHeight = minHt;
+            }
         }
     }
 
@@ -218,10 +219,12 @@ public class SLBlock
         // Map to Simulink symbol for infinite limits
         String lowerLim = "-Inf";
         String upperLim = "Inf";
-        if ( bl.hasLowerLimit() )
+        if ( bl.hasLowerLimit() ) {
             lowerLim = Double.toString(bl.getLowerLimit());
-        if ( bl.hasUpperLimit() )
+        }
+        if ( bl.hasUpperLimit() ) {
             upperLim = Double.toString(bl.getUpperLimit());
+        }
         String paramString = "'ShowName','off',"
                 + "'LowerLimit','" + lowerLim + "','UpperLimit','" + upperLim + "',"
                 + "'AttributesFormatString','%<LowerLimit> to %<UpperLimit>',"
@@ -239,25 +242,19 @@ public class SLBlock
         throws IOException
     {
         //              BreakpointSet bpSet = ((BlockBP) this.getBlock()).getBPset();
-        String blockType = "simulink/Lookup Tables/PreLookup Index Search";
-        String paramString =  "'FontSize',10," +  this.createPositionString(x,y);
+        String blockType = "built-in/PreLookup";
+	String pts_vec = "'" +  ourDiagram.model.getName() + "_data." +
+                       MDLNameList.convertToMDLString(this.getName()) + "_pts',";
+        String paramString =  "'FontSize',10," +  this.createPositionString(x,y) + "," +
+	    "'BreakpointsData'," + pts_vec + 
+            "'BeginIndexSearchUsingPreviousIndexResult','on'," + 
+	    "'ExtrapMethod','Linear','DiagnosticForOutOfRangeInput',";
+        if (this.ourDiagram.getWarnOnClip()) {
+            paramString += "'Warning'";          // rangeErrorMode
+	} else {
+            paramString += "'None'";
+	}
         writer.addBlock(blockType, this.getName(), paramString);
-
-        writer.writeln("pts_vec = '" +  ourDiagram.model.getName() + "_data." 
-                       + MDLNameList.convertToMDLString(this.getName()) + "_pts';");
-        String maskValues = "{pts_vec,"
-            + "'Binary Search',"                // searchMode
-            + "'on',"                           // cacheBpFlag
-            + "'off',"                          // outputFlag
-            + "'uint32',"                       // IndexTypeFlag
-            + "'Linear Extrapolation',";        // extrapMode
-        if (this.ourDiagram.getWarnOnClip())
-            maskValues += "'Warning'";          // rangeErrorMode
-        else
-            maskValues += "'None'";
-        maskValues += "}";
-        writer.setParam(this.getName(),"MaskValues",maskValues);
-        writer.writeln("clear pts_vec");
     }
 
 
@@ -271,30 +268,19 @@ public class SLBlock
         throws IOException
     {
         BlockFuncTable bft = (BlockFuncTable) this.getBlock();
-        bft.reorderInputsForMDL();
         FuncTable ft = bft.getFunctionTableDef();
         int numDim = ft.numDim();
-        String blockType = "simulink/Lookup Tables/Interpolation (n-D) using PreLookup";
-        String paramString =  "'FontSize',10," + this.createPositionString(x,y);
+        String blockType = "built-in/Interpolation_n-D";
+        String tableName = "'" + ourDiagram.model.getName() + "_data." 
+            + MDLNameList.convertToMDLString(ft.getGTID()) + "',";
+        String paramString =  "'FontSize',10," + this.createPositionString(x,y) + "," +
+	    "'NumberOfTableDimensions','" + numDim + "'," +
+	    "'Table'," + tableName + "'ExtrapMethod','clip'";
+        if (this.ourDiagram.getWarnOnClip()) {
+            paramString += ",'DiagnosticForOutOfRangeInput','Warning'";         // rangeErrorMode
+	}
         writer.addBlock(blockType, this.getName(), paramString);
 
-        String tableName = ourDiagram.model.getName() + "_data." 
-            + MDLNameList.convertToMDLString(ft.getGTID());
-        String maskValues = "{";
-        if (numDim > 4)
-            maskValues += "'More...',";         // numDimsPopupSelect
-        else
-            maskValues += "'" + numDim + "',";
-        maskValues += "'" + numDim + "',"       // explicitNuumDims
-            + "'" + tableName + "',"                    // table
-            + "'Linear',"                       // interpMethod
-            + "'None - Clip',";                 // extrapMethod
-        if (this.ourDiagram.getWarnOnClip())
-            maskValues += "'Warning',";         // rangeErrorMode
-        else
-            maskValues += "'None',";
-        maskValues += "'0'}";                   // NumSelectionDims
-        writer.setParam(this.getName(),"MaskValues",maskValues);
     }
 
     /**
@@ -387,12 +373,14 @@ public class SLBlock
             blockType = "Trigonometry";
             operatorType = funcType;
             // map MathML2 operators to Simulink function names
-            if(funcType.equals("arcsin"))
+            if(funcType.equals("arcsin")) {
                 operatorType = "asin";
-            if(funcType.equals("arccos"))
+            }
+            if(funcType.equals("arccos")) {
                 operatorType = "acos";
-            if(funcType.equals("arctan"))
-                operatorType = "atan";
+            }
+            if(funcType.equals("arctan")) {
+                operatorType = "atan";}
         }
 
         //      String paramString = "'Inputs'," + this.getBlock().numInputs() + ","
@@ -460,10 +448,11 @@ public class SLBlock
         BlockMathProduct bmp = (BlockMathProduct) this.getBlock();
         String blockType = bmp.getBlockType();
         String inputs;
-        if(blockType.equals("times"))
+        if(blockType.equals("times")) {
             inputs = "'" + this.getBlock().numInputs() + "'";
-        else
+        } else {
             inputs = "'*/'";
+        }
         String paramString = "'Multiplication','Element-wise(.*)',"
             + "'SaturateOnIntegerOverflow','on','Inputs'," + inputs 
             + "," + this.createPositionString(x,y);
@@ -483,12 +472,12 @@ public class SLBlock
         BlockMathRelation bmr = (BlockMathRelation) this.getBlock();
         String relationOp = bmr.getRelationOp();
         String paramString = this.createPositionString(x,y) + ",'Operator',";
-        if(relationOp.equals("lt"))  paramString += "'<'";
-        if(relationOp.equals("leq")) paramString += "'<='";
-        if(relationOp.equals("eq"))  paramString += "'=='";
-        if(relationOp.equals("geq")) paramString += "'>='";
-        if(relationOp.equals("gt"))  paramString += "'>'";
-        if(relationOp.equals("neq")) paramString += "'~='";
+        if(relationOp.equals("lt"))  {paramString += "'<'";  }
+        if(relationOp.equals("leq")) {paramString += "'<='"; }
+        if(relationOp.equals("eq"))  {paramString += "'=='"; } 
+        if(relationOp.equals("geq")) {paramString += "'>='"; }
+        if(relationOp.equals("gt"))  {paramString += "'>'";  }
+        if(relationOp.equals("neq")) {paramString += "'~='"; }
         writer.addBuiltInBlock("RelationalOperator", this.getName(), paramString);
     }
 
@@ -503,8 +492,9 @@ public class SLBlock
         throws IOException
     {
         String signs = "";
-        for( int i = 0; i< this.getBlock().numInputs(); i++ ) 
-            signs = signs+"+";
+        for( int i = 0; i< this.getBlock().numInputs(); i++ ) {
+            signs = signs + "+";
+        }
         String paramString = "'IconShape','rectangular','Inputs','" + signs + "',";
         paramString += this.createPositionString(x,y);
         writer.addBuiltInBlock("Sum", this.getName(), paramString);
@@ -578,27 +568,29 @@ public class SLBlock
             FuncTable ft = bft.getFunctionTableDef();
             String tableName = MDLNameList.convertToMDLString(ft.getGTID());
 
-            // see if already written - only one copy allowed with same name
+            // Note - rows & columns get interchanged to match Matlab convention
+            // See if already written - only one copy allowed with same name
             if (!this.writtenTables.contains( tableName )) {
-                writer.writeln("%% Block \"" + this.getName() + "\" wishes to save the following data:");
-                writer.writeMatrix( ourDiagram.model.getName() + "_data." + tableName, 
-                                    ft.getValues(),
-                                    ft.getDimensions());
+                writer.writeln("%% Block \"" + this.getName() + 
+                        "\" wishes to save the following data:");
+                writer.writeMatrix( ourDiagram.model.getName() + "_data." + 
+                        tableName, ft.getValues(), ft.getDimensions());
                 this.writtenTables.add( tableName );
             } else {
-                writer.writeln("%% Block \"" + this.getName() + "\" did not duplicate '" + tableName + "'.");
+                writer.writeln("%% Block \"" + this.getName() + 
+                        "\" did not duplicate '" + tableName + "'.");
             }         
         } else if (this.block instanceof BlockBP) {
             BreakpointSet bpSet = ((BlockBP) this.getBlock()).getBPset();
-            writer.writeln("%% Block \"" + this.getName() + "\" wishes to save the following breakpoint vector:");
-            writer.writeln( ourDiagram.model.getName() + "_data." 
-                            + MDLNameList.convertToMDLString(this.getName())+ "_pts = ["
-                            + bpSet.values() + "];");
-
+            writer.writeln("%% Block \"" + this.getName() + 
+                    "\" wishes to save the following breakpoint vector:");
+            writer.writeln( ourDiagram.model.getName() + "_data." +
+                    MDLNameList.convertToMDLString(this.getName()) + 
+                    "_pts = [" + bpSet.values() + "];");
         } else {
-            writer.writeln("%% Block \"" + this.getName() + "\" has no data to save.");
+            writer.writeln("%% Block \"" + this.getName() + 
+                    "\" has no data to save.");
         }
-
     }
 
 
@@ -655,8 +647,9 @@ public class SLBlock
     public void makeVerbose() 
     { 
         this.verboseFlag = true; 
-        if (this.block != null )
+        if (this.block != null ) {
             this.block.makeVerbose();
+        }
     }
 
 
@@ -678,8 +671,9 @@ public class SLBlock
     public void silence() 
     { 
         this.verboseFlag = false; 
-        if (this.block != null)
+        if (this.block != null) {
             this.block.silence();
+        }
     }
 
 
@@ -710,7 +704,7 @@ public class SLBlock
 
     private void findChildren(String prefix)
     {
-        Signal sig = null;
+        Signal sig;
         BlockArrayList blks;
         Block kid;
 
@@ -762,11 +756,11 @@ public class SLBlock
 
     public int setPosition( int minimumRow, int minimumCol, String prefix )
     {
-        Block kid = null;
+        Block kid;
 
         //System.out.print(prefix + "Setting position of " + myName + " and kids. Original row was " + this.myRow);     
-        if (this.myRow == 0)  this.myRow = minimumRow;          // don't go lower, but...
-        if (minimumCol > this.myCol)  this.myCol = minimumCol;  // ... can slide right
+        if (this.myRow == 0) { this.myRow = minimumRow; }          // don't go lower, but...
+        if (minimumCol > this.myCol) { this.myCol = minimumCol; }  // ... can slide right
 
         this.rowDepthOfChildren = myRow;
 
@@ -784,7 +778,9 @@ public class SLBlock
                 }
                 int returnedRow =
                     kidSLBlock.setPosition( this.rowDepthOfChildren + offset, this.myCol + 1, (prefix + " ") );
-                if ( this.rowDepthOfChildren < returnedRow ) this.rowDepthOfChildren = returnedRow;
+                if ( this.rowDepthOfChildren < returnedRow ) {
+                    this.rowDepthOfChildren = returnedRow;
+                }
 
                 //System.out.println(prefix + "row depth of children set to " + this.rowDepthOfChildren);
                 offset = 1;     // after first iteration, step down each time
@@ -792,10 +788,11 @@ public class SLBlock
 
         //System.out.println(prefix + "Position of block " + myName + ": (" + myRow + "," + myCol + "); returning depth " + this.rowDepthOfChildren);
 
-        if ( myRow > this.rowDepthOfChildren )
+        if ( myRow > this.rowDepthOfChildren ) {
             return myRow;
-        else
+        } else {
             return this.rowDepthOfChildren;
+        }
     }
 
 
@@ -827,7 +824,6 @@ public class SLBlock
         //                         theRow + "," + theCol + "].");
         myRow = theRow; 
         myCol = theCol; 
-        return; 
     }
 
 
@@ -839,7 +835,7 @@ public class SLBlock
 
     public int findChildrensFarthestColumn()
     {
-        Block kid = null;
+        Block kid;
 
         int farthest = this.myCol;
         for (Iterator<Block> ikid = children.iterator(); ikid.hasNext(); )
@@ -851,7 +847,7 @@ public class SLBlock
                     System.exit(0);
                 }
                 int kidsCol = kidSLBlock.findChildrensFarthestColumn();
-                if(kidsCol > farthest) farthest = kidsCol;
+                if(kidsCol > farthest) { farthest = kidsCol; }
             }
         return farthest;
     }
@@ -865,7 +861,7 @@ public class SLBlock
 
     public int findChildrensDeepestRow()
     {
-        Block kid = null;
+        Block kid;
 
         int deepest = this.myRow;
         for(Iterator<Block> ikid = children.iterator(); ikid.hasNext(); )
@@ -877,7 +873,7 @@ public class SLBlock
                     System.exit(0);
                 }
                 int kidsRow = kidSLBlock.findChildrensDeepestRow();
-                if(kidsRow > deepest) deepest = kidsRow;
+                if(kidsRow > deepest) { deepest = kidsRow; }
             }
         return deepest;
     }
@@ -909,7 +905,7 @@ public class SLBlock
 	    for ( i = 0; i < dims[0]; i++) {
 		Double theValue = table.get(i+startIndex);
 		writer.write( theValue.toString() );
-		if( i < dims[0]-1) writer.write(", ");
+		if( i < dims[0]-1) { writer.write(", "); }
 	    }
 	    return i;
 	case 2:
@@ -917,7 +913,7 @@ public class SLBlock
 		int[] newDims = new int[1];
 		newDims[0] = dims[1];
 		offset = printTable( writer, table, newDims, startIndex );
-		if( i < dims[0]-1) writer.write(", ");
+		if( i < dims[0]-1) { writer.write(", "); }
 		writer.write("\n");
 		startIndex = startIndex + offset;
 	    }
@@ -929,7 +925,7 @@ public class SLBlock
 		//System.out.println(" For dimension " + dims.length + " layer " + i);
 		//System.out.println();
 		offset = printTable( writer, table, newDims, startIndex );
-		if( i < dims[0]-1) writer.write(", ");
+		if( i < dims[0]-1) { writer.write(", "); }
 		writer.write("\n");
 		startIndex = startIndex + offset;
 	    }

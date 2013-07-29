@@ -40,7 +40,7 @@ public class BlockBP extends Block
      *
      * @param bpID  the ID of the associated breakpoint set to reference
      * @param ourName <code>String</code> with our name
-     * @param inSignal upstream <code>Signal</code> we normalize
+     * @param inSignal <code>Signal</code> wire that connects to independent variable source
      * @param outSignal <code>Signal</code> wire that connects to function table block
      * @param m Our parent <code>Model</code>
      *
@@ -61,14 +61,15 @@ public class BlockBP extends Block
 	    throw new DAVEException("BlockBP constructor: Unable to find breakpoint set with ID '" + bpID + "'.");
 	}
 
-	// register with breakpoint set
-	this.bpSet.register( this );
+                   
+        // register with breakpoint set
+        this.bpSet.register( this );
 
-	// register with model
-	m.register( this );
+        // register with model
+        ourModel.register( this );
 
-	// Connect to upstream signal
-	inSignal.addSink( this, 1 );
+        // Connect to upstream signal
+        inSignal.addSink( this, 1 );
 
 	// Connect to downstream signal
 	try {
@@ -95,8 +96,9 @@ public class BlockBP extends Block
      *
      **/
 
-    public void update() throws DAVEException
-    {
+    @Override
+    public void update() throws DAVEException {
+    
 	Signal theInput;
 	double inputValue;
 	double bpValue;
@@ -106,62 +108,73 @@ public class BlockBP extends Block
 
 	if (isVerbose()) {
 	    System.out.println();
-	    System.out.println("Method update() called for breakpoint block '" + this.getName() + "'");
+	    System.out.println("Method update() called for breakpoint block '" + 
+                    this.getName() + "'");
 	}
 
 	this.value = Double.NaN;	// to flag when not successfully calculated
 	
 	// Check to see if only one input
-	if (this.inputs.size() < 1)
-	    throw new DAVEException("Breakpoint block " + this.myName + " has no input.");
-
-	if (this.inputs.size() > 1)
-	    throw new DAVEException("Breakpoint block " + this.myName + " has more than one input.");
-
+	if (this.inputs.size() < 1) {
+	    throw new DAVEException("Breakpoint block " + this.myName + 
+                    " has no input.");
+        }
+	if (this.inputs.size() > 1) {
+	    throw new DAVEException("Breakpoint block " + this.myName + 
+                    " has more than one input.");
+        }
 	// Check to see that the sole input is non-null
 	theInput = this.inputs.get(0);
-	if (theInput == null)
-	    throw new DAVEException("Breakpoint block " + this.myName + " found unexpected null pointer for its input.");
-
+	if (theInput == null) {
+	    throw new DAVEException("Breakpoint block " + this.myName + 
+                    " found unexpected null pointer for its input.");
+        }
 	// see if single input variable is ready
 	if (!theInput.sourceReady()) {
-	    if (this.isVerbose())
-		System.out.println(" Upstream signal '" + theInput.getName() + "' is not ready.");
+	    if (this.isVerbose()) {
+		System.out.println(" Upstream signal '" + theInput.getName() + 
+                        "' is not ready.");
+            }
 	    return;
 	}
 
 	// get single input variable value
 	inputValue = theInput.sourceValue();
-	if (this.isVerbose())
+	if (this.isVerbose()) {
 	    System.out.println(" Input value is " + inputValue);
-
+        }
 	// calculate index-and-fraction
 
 	// find nearest breakpoint
 	Iterator<Double> bpIt = this.bpSet.values().iterator();
-	if (!bpIt.hasNext())
-	    throw new DAVEException("Breakpoint block " + this.myName + " has no breakpoints.");
+	if (!bpIt.hasNext()) {
+	    throw new DAVEException("Breakpoint block " + this.myName + 
+                    " has no breakpoints.");
+        }
 
 	bpValue = (bpIt.next()).doubleValue();	// get 0 index value
 	prevValue = bpValue;
 
-	if (this.isVerbose())
+	if (this.isVerbose()) {
 	    System.out.println(" 0-index breakpoint set value is " + prevValue);
+        }
 
 	// pathological case - lowest breakpoint value above inputValue
 	if (bpValue > inputValue) {
 	    this.value = 0;
 	    frac = 0;
-	    if (this.isVerbose())
-		System.out.println(" Input value of " + inputValue + 
-				   " is lower than lowest breakpoint set entry of " + bpValue);
-	}
-	else	// search for breakpoint just higher than inputValue
+	    if (this.isVerbose()) {
+		System.out.println(" Input value of " + inputValue +
+                        " is lower than lowest breakpoint set entry of " + 
+                        bpValue);
+            }
+	} else {	// search for breakpoint just higher than inputValue
 	    while (bpIt.hasNext()) {
 		bpValue = (bpIt.next()).doubleValue();
-		if (this.isVerbose())
-		    System.out.println(" Found next bp value of " + bpValue 
-				       + "; prev bp is " + prevValue);
+		if (this.isVerbose()) {
+		    System.out.println(" Found next bp value of " + bpValue +
+				       "; prev bp is " + prevValue);
+                }
 		if (bpValue > inputValue) {
 		    this.value = (double) index;
 		    frac = (inputValue - prevValue)/(bpValue - prevValue);
@@ -177,6 +190,7 @@ public class BlockBP extends Block
 		    prevValue = bpValue;
 		}
 	    }
+        }  // else clause
 
 	// pathological case - highest breakpoint below inputValue
 	if (bpValue <= inputValue) {
@@ -189,7 +203,9 @@ public class BlockBP extends Block
 
 	// save answer
 	this.value = this.value + frac;
-	if (isVerbose()) System.out.println(" Index-and-weight set to " + this.value);
+	if (isVerbose()) { 
+            System.out.println(" Index-and-weight set to " + this.value);
+        }
     }
 
     /**
@@ -198,8 +214,7 @@ public class BlockBP extends Block
      *
      **/
 
-    public int length()
-    {
+    public int length() {
 	return this.bpSet.length();
     }
 

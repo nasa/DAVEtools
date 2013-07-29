@@ -15,8 +15,8 @@ package gov.nasa.daveml.dave;
  *
  */
 
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *

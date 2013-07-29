@@ -16,8 +16,8 @@ How to prepare for a release or other distribution
 
 5.  Edit overview.html; update 'revision history' section
 
-6.  Update CHANGELOG.txt and README/README.txt summary of changes; run
-    make in README directory
+6.  Update README/README.txt summary of changes; run make in README
+    directory
 
 7.  Run 'ant distclean'
 

@@ -16,12 +16,11 @@ package gov.nasa.daveml.dave;
  *
  **/
 
-import org.jdom.Element;
-
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
+import org.jdom.Element;
 
 /**
  *
@@ -52,7 +51,7 @@ public class BlockMathProduct extends BlockMath
      **/
 
     @SuppressWarnings("unchecked")
-	public BlockMathProduct( Element applyElement, Model m )
+    public BlockMathProduct( Element applyElement, Model m )
     {
 	// Initialize superblock elements
 	super("pending", "product", m);
@@ -70,20 +69,23 @@ public class BlockMathProduct extends BlockMath
 	if(blockType.equals("times")) {
             this.genInputsFromApply(ikid, 1);
 	} else if (blockType.equals("quotient")) {
-            if(kids.size() != 3)
-                System.err.println("Error - <apply><quotient/> only handles 2 arguments, not " + (kids.size()-1));
-            else
+            if(kids.size() != 3) {
+                System.err.println("Error - <apply><quotient/> only handles 2 arguments, not " + 
+                        (kids.size()-1));
+            } else {
                 this.genInputsFromApply(ikid, 1);
+            }
 	} else if (blockType.equals("divide")) {
-            if(kids.size() != 3)
-                System.err.println("Error - <apply><divide/> only handles 2 arguments, not " + (kids.size()-1));
-            else
-                this.genInputsFromApply(ikid, 1);
-	} else {
-	    System.err.println("Error - BlockMathProduct constructor called with" +
-			       " type element:" + blockType);
-	}
-
+                if(kids.size() != 3) {
+                    System.err.println("Error - <apply><divide/> only handles 2 arguments, not " + 
+                            (kids.size()-1));
+                } else {
+                    this.genInputsFromApply(ikid, 1);
+                }
+        } else {
+            System.err.println("Error - BlockMathProduct constructor called with" +
+                    " type element:" + blockType);
+        }
 //System.out.println("    BlockMathProduct constructor: " + this.getName() + " created.");
     }
 
@@ -117,17 +119,19 @@ public class BlockMathProduct extends BlockMath
             Signal inSig = inputSig.next();
             cvn.append(inSig.genCode());
             if (inputSig.hasNext()) {
-                if (this.blockType.equals("times")) 
+                if (this.blockType.equals("times")) {
                     cvn.appendCode("*");
-                else if (this.blockType.equals("divide"))
+                } else if (this.blockType.equals("divide")) {
                     cvn.appendCode("/");
-                else if (this.blockType.equals("quotient"))
+                } else if (this.blockType.equals("quotient")) {
                     cvn.appendCode("/");
+                }
             }
         }
         // if not derived, need trailing semicolon and new line
-        if (!outputSig.isDerived())
+        if (!outputSig.isDerived()) {
             cvn.appendCode(endLine());
+        }
         return cvn;
     }
 
@@ -176,21 +180,26 @@ public class BlockMathProduct extends BlockMath
 	while (theInputs.hasNext()) {
 	    theInput = theInputs.next();
 	    if (!theInput.sourceReady()) {
-		if (verbose)
-		    System.out.println(" Upstream signal '" + theInput.getName() + "' is not ready.");
+		if (verbose) {
+		    System.out.println(" Upstream signal '" + 
+                            theInput.getName() + "' is not ready.");
+                }
 		return;
 	    } else {
 		inputVals[index] = theInput.sourceValue();
-		if (verbose)
-		    System.out.println(" Input #" + index + " value is " + inputVals[index]);
+		if (verbose) {
+		    System.out.println(" Input #" + index + " value is " + 
+                            inputVals[index]);
+                }
 	    }
 	    index++;
 	}
 
 	if( this.blockType.equals("times")) {
 	    this.value = 1.0;
-	    for(int i = 0; i<inputVals.length; i++)
+	    for(int i = 0; i<inputVals.length; i++) {
 		this.value *= inputVals[i];
+            }
 	} else {
 	    this.value = inputVals[0]/inputVals[1];
 	}

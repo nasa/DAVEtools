@@ -16,10 +16,9 @@ package gov.nasa.daveml.dave;
  *
  **/
 
-import org.jdom.Element;
-
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
+import org.jdom.Element;
 
 /**
  *
@@ -117,28 +116,35 @@ abstract public class BlockMath extends Block
 	String theType = first.getName();
 	
 	// take appropriate action based on type
-	if(theType.equals("abs")) 
+	if(theType.equals("abs")) {
 	    return new BlockMathAbs( applyElement, m );
+        }
 	if( theType.equals("lt" ) ||
 	    theType.equals("leq") ||
 	    theType.equals("eq" ) ||
 	    theType.equals("geq") ||
 	    theType.equals("gt" ) ||
-	    theType.equals("neq") )
+	    theType.equals("neq") ) {
 	    return new BlockMathRelation( applyElement, m );
-	if(theType.equals("minus"))
+        }
+	if(theType.equals("minus")) {
 	    return new BlockMathMinus( applyElement, m );
-	if(theType.equals("piecewise")) 
+        }
+	if(theType.equals("piecewise")) {
 	    return new BlockMathSwitch( applyElement, m );
-	if(theType.equals("plus"))
+        }
+	if(theType.equals("plus")) {
 	    return new BlockMathSum( applyElement, m );
+        }
 	if( theType.equals("times") ||
 	    theType.equals("quotient") ||
-	    theType.equals("divide") )
+	    theType.equals("divide") ) {
 	    return new BlockMathProduct( applyElement, m );
+        }
         if( theType.equals("max"    ) ||
-            theType.equals("min"    ) )
+            theType.equals("min"    ) ) {
             return new BlockMathMinmax( applyElement, m );
+        }
 	if( theType.equals("power"  ) ||
 	    theType.equals("sin"    ) ||
 	    theType.equals("cos"    ) ||
@@ -147,7 +153,7 @@ abstract public class BlockMath extends Block
 	    theType.equals("arccos" ) ||
 	    theType.equals("arctan" ) ||
             theType.equals("ceiling") ||
-            theType.equals("floor"  ) )
+            theType.equals("floor"  ) ) {
 		try {
 			return new BlockMathFunction( applyElement, m);
 		} catch (DAVEException e) {
@@ -155,8 +161,10 @@ abstract public class BlockMath extends Block
 					+ theType + "' - which is unrecognized. Aborting...");
 			System.exit(-1);
 		}
-	if( theType.equals("csymbol") )
+        }
+	if( theType.equals("csymbol") ) {
 	    return new BlockMathFunctionExtension( applyElement, m);
+        }
 
 	System.err.println("DAVE's BlockMath factory() method doesn't allow a <"
                 + theType + "> element directly after an <apply> element.");
@@ -169,12 +177,10 @@ abstract public class BlockMath extends Block
      * 
      * @param ikid List <code>Iterator</code> for elements of top-level &lt;apply&gt;.
      * @param inputPortNumber <code>Int</code> with 1-based input number
-     * @throws DAVEException
      *
      **/
 
     public void genInputsFromApply( Iterator<Element> ikid, int inputPortNumber ) 
-            throws DAVEException
     {
 	int i = inputPortNumber;
 	while( ikid.hasNext() ) {	    
@@ -196,15 +202,22 @@ abstract public class BlockMath extends Block
                 this.addConstInput(constantValue, i);		// Create and hook up constant block
             } else if( name.equals("apply") ) { // recurse
                 this.addVarID(i, "");				// placeholder - no longer needed
-                // next throws DAVEException if bad syntax in <apply>  
-                Signal s = new Signal(in, ourModel);		// Signal constructor recognizes <apply>...
-                                                                // .. and will call our BlockMath.factory() ...
-                if( s!= null )	 {				// .. and creates upstream blocks & signals
+                // next throws DAVEException if bad syntax in <apply>. Catch and abend here
+                // so we don't have to change the many calling routines.
+                Signal s = null;
+                try {
+                    s = new Signal(in, ourModel);       // Signal constructor recognizes <apply>...
+                } catch (DAVEException e) {
+                    System.err.println("Bad syntax while parsing <apply> in element '" +
+                            in.getName() + "'. Aborting.");
+                }
+                                                        // .. and will call our BlockMath.factory() ...
+                if( s!= null )	 {			// .. and creates upstream blocks & signals
                     s.addSink(this,i);			// hook us up as output of new signal path
                     s.setDerivedFlag();	// Note that this is a newly-created signal not part of orig model
-                }
-                else
+                } else {
                     System.err.println("Null signal returned when creating recursive math element.");
+                }
             } else {
                 System.err.println("BlockMath didn't find usable element (something like 'apply', 'ci' or 'cn'),"
                                    + " instead found: " + in.getName());

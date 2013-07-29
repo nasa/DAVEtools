@@ -17,12 +17,11 @@ package gov.nasa.daveml.dave;
  *
  **/
 
-import org.jdom.Element;
-
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
+import org.jdom.Element;
 
 /**
  *
@@ -53,12 +52,13 @@ public class BlockMathMinus extends BlockMath
 
         // should be either two or three children for unary or binary minus;
         // first is the minus flag element
-        if( kids.size() < 2)
+        if( kids.size() < 2) {
             System.err.println("Warning - <apply><minus/></apply> found; need one or two arguments.");
+        }
 
-        if (kids.size() > 3)
+        if (kids.size() > 3) {
             System.err.println("Warning - <apply><minus/> construct with more than two arguments; truncating.");
-
+        }
 	Iterator<Element> ikid = kids.iterator();
 
 	// first element should be our type; also use for name
@@ -69,8 +69,9 @@ public class BlockMathMinus extends BlockMath
 	if(!first.getName().equals("minus"))  {
 	    System.err.println("Error - BlockMathMinus constructor called with" +
 			       " wrong type element.");
-	} else
+	} else {
 	    genInputsFromApply( ikid, 1 );
+        }
     }
     
     
@@ -101,8 +102,9 @@ public class BlockMathMinus extends BlockMath
             cvn.append(input1.genCode());           
         }
         // if not derived, need trailing semicolon and new line
-        if (!outputSig.isDerived())
+        if (!outputSig.isDerived()) {
             cvn.appendCode(endLine());
+        }
         return cvn;
     }
 
@@ -139,26 +141,31 @@ public class BlockMathMinus extends BlockMath
 
         int numInputs = this.inputs.size();
 	// Check to see if only one input
-	if (numInputs < 1)
-	    throw new DAVEException("Minus block " + this.myName + " has no input.");
-
-	if (numInputs > 2)
-	    throw new DAVEException("Minus block " + this.myName + " has more than two inputs.");
-
+	if (numInputs < 1) {
+	    throw new DAVEException("Minus block " + this.myName + 
+                    " has no input.");
+        }
+	if (numInputs > 2) {
+	    throw new DAVEException("Minus block " + this.myName + 
+                    " has more than two inputs.");
+        }
         if (numInputs == 1) { // unary minus block
 
             // see if single input variable is ready
             Signal theInput = this.inputs.get(0);
             if (!theInput.sourceReady()) {
-                if (this.isVerbose())
-                    System.out.println(" Upstream signal '" + theInput.getName() + "' is not ready.");
+                if (this.isVerbose()) {
+                    System.out.println(" Upstream signal '" + 
+                            theInput.getName() + "' is not ready.");
+                }
                 return;
             }
 
             // get single input variable value
             double inputValue = theInput.sourceValue();
-            if (this.isVerbose())
+            if (this.isVerbose()) {
                 System.out.println(" Input value is " + inputValue);
+            }
 
             // Calculate output
             this.value = -inputValue;
@@ -169,26 +176,30 @@ public class BlockMathMinus extends BlockMath
             Signal minuend = this.inputs.get(0);
             assert(minuend != null);
             if (!minuend.sourceReady()) {
-                if (this.isVerbose())
-                    System.out.println(" Upstream signal '" + minuend.getName() + "' is not ready.");
+                if (this.isVerbose()) {
+                    System.out.println(" Upstream signal '" + 
+                            minuend.getName() + "' is not ready.");
+                }
                 return;
             }
 
             Signal subtrahend = this.inputs.get(1);
             assert(subtrahend != null);
             if (!subtrahend.sourceReady()) {
-                if (this.isVerbose())
-                    System.out.println(" Upstream signal '" + subtrahend.getName() + "' is not ready.");
+                if (this.isVerbose()) {
+                    System.out.println(" Upstream signal '" + 
+                            subtrahend.getName() + "' is not ready.");
+                }
                 return;
             }
 
             // get both input variable values
             double minuendValue = minuend.sourceValue();
             double subtrahendValue = subtrahend.sourceValue();
-            if (this.isVerbose())
+            if (this.isVerbose()) {
                 System.out.println(" Minuend value is " + minuendValue + ";"
                               + " subtrahend value is " + subtrahendValue);
-
+            }
             // Calculate output
             this.value = minuendValue - subtrahendValue;
         }

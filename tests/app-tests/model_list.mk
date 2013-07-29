@@ -11,6 +11,7 @@ MODEL_LIST    = \
             basic_functions.dml            \
             ceil_floor_min_max.dml         \
             comparison_functions.dml       \
+            fiveD_table.dml                \
             limited_variableDef.dml        \
             simple_aero.dml                \
             simplest_aero.dml              \

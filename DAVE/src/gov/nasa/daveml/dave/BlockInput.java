@@ -96,13 +96,15 @@ public class BlockInput extends Block {
         if (theSignal != null) {
             cvn.addVarName(outVarID);
             code += outVarID;
-            if (theSignal.isStdAIAA()) 
+            if (theSignal.isStdAIAA()) {
                 code += " (" + theSignal.getName() + ")";
+            }
             code += " is a model input";
-            if (units.equalsIgnoreCase("nd"))
+            if (units.equalsIgnoreCase("nd")) {
                 code += " and is non-dimensional.";
-            else
+            } else {
                 code += " with units \'" + units + "\'";
+            }
         }
         cvn.appendCode(this.wrapComment(code));
         return cvn;

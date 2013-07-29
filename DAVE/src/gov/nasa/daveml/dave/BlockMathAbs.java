@@ -16,12 +16,11 @@ package gov.nasa.daveml.dave;
  *
  **/
 
-import org.jdom.Element;
-
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
+import org.jdom.Element;
 
 /**
  *
@@ -62,10 +61,11 @@ public class BlockMathAbs extends BlockMath
                                " wrong type element.");
         } else {
             // look for single input
-            if(kids.size() > 2)
+            if(kids.size() > 2) {
                 System.err.println("Error - <apply><abs/> only handles single arguments, not " + (kids.size()-1));
-            else
+            } else {
                 this.genInputsFromApply(ikid, 1);
+            }
         }
 
 //System.out.println("    BlockMathAbs constructor: " + myName + " created.");
@@ -88,25 +88,26 @@ public class BlockMathAbs extends BlockMath
 	}
 	
 	// Check to see if only one input
-	if (this.inputs.size() < 1)
+	if (this.inputs.size() < 1) {
 	    throw new DAVEException("Abs block " + this.myName + " has no input.");
-
-	if (this.inputs.size() > 1)
+        }
+	if (this.inputs.size() > 1) {
 	    throw new DAVEException("Abs block " + this.myName + " has more than one input.");
-
+        }
 	// see if single input variable is ready
 	Signal theInput = this.inputs.get(0);
 	if (!theInput.sourceReady()) {
-	    if (this.isVerbose())
+	    if (this.isVerbose()) {
 		System.out.println(" Upstream signal '" + theInput.getName() + "' is not ready.");
+            }
 	    return;
 	}
 
 	// get single input variable value
 	double inputValue = theInput.sourceValue();
-	if (this.isVerbose())
+	if (this.isVerbose()) {
 	    System.out.println(" Input value is " + inputValue);
-
+        }
 	// record current cycle counter
 	resultsCycleCount = ourModel.getCycleCounter();
 
@@ -133,16 +134,17 @@ public class BlockMathAbs extends BlockMath
         input = inputs.get(0);
         
         String op = "fabs";
-        if (ourModel.getCodeDialect() == Model.DT_FORTRAN)
+        if (ourModel.getCodeDialect() == Model.DT_FORTRAN) {
             op = "ABS";
-        
+        }
         cvn.appendCode( op + "( ");
         cvn.append(input.genCode());
         cvn.appendCode(" )");
         
         // if not derived, need trailing semicolon and new line
-        if (!outputSig.isDerived())
+        if (!outputSig.isDerived()) {
             cvn.appendCode(endLine());
+        }
         return cvn;
     }
 

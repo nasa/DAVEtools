@@ -16,12 +16,11 @@ package gov.nasa.daveml.dave;
  *
  **/
 
-import org.jdom.Element;
-
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
+import org.jdom.Element;
 
 
 /**
@@ -89,10 +88,12 @@ public class BlockMathRelation extends BlockMath
                                    " unknown relation operator " + this.relationOp);
         } else {
             // look for two inputs
-            if(kids.size() != 3)
-                System.err.println("Error - <apply><[relation]/> only handles 2 arguments, not " + (kids.size()-1));
-            else
+            if(kids.size() != 3) {
+                System.err.println("Error - <apply><[relation]/> only handles 2 arguments, not " + 
+                        (kids.size()-1));
+            } else {
                 this.genInputsFromApply(ikid, 1);
+            }
         }
 
         //System.out.println("    BlockMathRelation constructor: " + this.getName() + " created.");
@@ -111,12 +112,12 @@ public class BlockMathRelation extends BlockMath
     {
     	this.relation = UNK;
     	
-        if (this.relationOp.equals("lt" ))  this.relation = LT;
-        if (this.relationOp.equals("leq"))  this.relation = LEQ;
-        if (this.relationOp.equals("eq" ))  this.relation = EQ;
-        if (this.relationOp.equals("geq"))  this.relation = GEQ;
-        if (this.relationOp.equals("gt" ))  this.relation = GT;
-        if (this.relationOp.equals("neq"))  this.relation = NEQ;
+        if (this.relationOp.equals("lt" )) { this.relation = LT;   }
+        if (this.relationOp.equals("leq")) { this.relation = LEQ;  }
+        if (this.relationOp.equals("eq" )) { this.relation = EQ;   }
+        if (this.relationOp.equals("geq")) { this.relation = GEQ;  }
+        if (this.relationOp.equals("gt" )) { this.relation = GT;   }
+        if (this.relationOp.equals("neq")) { this.relation = NEQ;  }
 
         return (this.relation != UNK);
     }
@@ -189,8 +190,9 @@ public class BlockMathRelation extends BlockMath
         cvn.append(arg2.genCode());
         
         // if not derived, need new line
-        if (!outputSig.isDerived())
+        if (!outputSig.isDerived()) {
             cvn.appendCode(this.endLine());
+        }
         return cvn;
     }
 
@@ -256,9 +258,10 @@ public class BlockMathRelation extends BlockMath
 
         // sanity check to see if we have exact number of inputs
         numInputs = this.inputs.size();
-        if (numInputs != requiredInputs)
-            throw new DAVEException("Number of inputs to '" + this.getName() 
-                                    + "' wrong - should be " + requiredInputs + ".");
+        if (numInputs != requiredInputs) {
+            throw new DAVEException("Number of inputs to '" + this.getName() +
+                    "' wrong - should be " + requiredInputs + ".");
+        }
 
         // allocate memory for the input values
         theInputValue = new double[requiredInputs];
@@ -269,8 +272,10 @@ public class BlockMathRelation extends BlockMath
         while (theInputs.hasNext()) {
             theInput = theInputs.next();
             if (!theInput.sourceReady()) {
-                if (verbose)
-                    System.out.println(" Upstream signal '" + theInput.getName() + "' is not ready.");
+                if (verbose) {
+                    System.out.println(" Upstream signal '" + 
+                            theInput.getName() + "' is not ready.");
+                }
                 return;
             } else {
                 theInputValue[index] = theInput.sourceValue();
@@ -282,21 +287,27 @@ public class BlockMathRelation extends BlockMath
         this.value = Double.NaN;
         switch (this.relation) {
         case LT:
-            if (theInputValue[0] <  theInputValue[1]) this.value = 1.0; else this.value = 0.0; break;
+            this.value = (theInputValue[0] <  theInputValue[1] ? 1.0 : 0.0); 
+            break;
         case LEQ:
-            if (theInputValue[0] <= theInputValue[1]) this.value = 1.0; else this.value = 0.0; break;
+            this.value = (theInputValue[0] <= theInputValue[1] ? 1.0 : 0.0); 
+            break;
         case EQ:
-            if (theInputValue[0] == theInputValue[1]) this.value = 1.0; else this.value = 0.0; break;
+            this.value = (theInputValue[0] == theInputValue[1] ? 1.0 : 0.0);
+            break;
         case GEQ:
-            if (theInputValue[0] >= theInputValue[1]) this.value = 1.0; else this.value = 0.0; break;
+            this.value = (theInputValue[0] >= theInputValue[1] ? 1.0 : 0.0);
+            break;
         case GT:
-            if (theInputValue[0] >  theInputValue[1]) this.value = 1.0; else this.value = 0.0; break;
+            this.value = (theInputValue[0] >  theInputValue[1] ? 1.0 : 0.0);
+            break;
         case NEQ:
-            if (theInputValue[0] != theInputValue[1]) this.value = 1.0; else this.value = 0.0; break;
+            this.value = (theInputValue[0] != theInputValue[1] ? 1.0 : 0.0);
+            break;
         }
-        if (this.value == Double.NaN)
+        if (this.value == Double.NaN) {
             throw new DAVEException("Unrecognized operator " + this.relationOp + " in block " + this.getName());
-
+        }
         // record current cycle counter
         resultsCycleCount = ourModel.getCycleCounter();
     }

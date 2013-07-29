@@ -14,13 +14,12 @@ package gov.nasa.daveml.dave;
  * <p> 031211 Bruce Jackson <mailto:bruce.jackson@nasa.gov> </p>
  *
  **/
-import org.jdom.Element;
-import org.jdom.Namespace;
-
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
+import org.jdom.Element;
+import org.jdom.Namespace;
 
 /**
  *
