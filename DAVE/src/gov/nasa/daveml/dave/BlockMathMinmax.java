@@ -1,4 +1,4 @@
-// BlockMathSum
+// BlockMathMinmax
 //
 //  Part of DAVE-ML utility suite, written by Bruce Jackson, NASA LaRC
 //  <bruce.jackson@nasa.gov>
@@ -16,12 +16,11 @@ package gov.nasa.daveml.dave;
  *
  **/
 
-import org.jdom.Element;
-
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
+import org.jdom.Element;
 
 /**
  *
@@ -96,9 +95,10 @@ public class BlockMathMinmax extends BlockMath
         } else if (funcType.equals("max")) {
             this.op = MAX;
             this.myType = "maximum selector";
-        } else 
-           throw new DAVEException("Unrecognized operator " + this.funcType 
-        		   + " in call to BlockMathMinMax.setFunction() method." );
+        } else {
+           throw new DAVEException("Unrecognized operator " + this.funcType +
+        		   " in call to BlockMathMinMax.setFunction() method." );
+        }
     }
     
     
@@ -131,6 +131,7 @@ public class BlockMathMinmax extends BlockMath
      *
      **/
 
+    @Override
     public void update() throws DAVEException
     {
         Iterator<Signal> theInputs;
@@ -153,13 +154,17 @@ public class BlockMathMinmax extends BlockMath
         while (theInputs.hasNext()) {
             theInput = theInputs.next();
             if (!theInput.sourceReady()) {
-                if (verbose)
-                    System.out.println(" Upstream signal '" + theInput.getName() + "' is not ready.");
+                if (verbose) {
+                    System.out.println(" Upstream signal '" + theInput.getName() + 
+                            "' is not ready.");
+                }
                 return;
             } else {
                 inputVals[index] = theInput.sourceValue();
-                if (verbose)
-                    System.out.println(" Input #" + index + " value is " + inputVals[index]);
+                if (verbose) {
+                    System.out.println(" Input #" + index + " value is " + 
+                            inputVals[index]);
+                }
             }
             index++;
         }
@@ -181,9 +186,10 @@ public class BlockMathMinmax extends BlockMath
             }
         }
 
-        if (this.value == Double.NaN)
-            throw new DAVEException("Unrecognized operator " + this.funcType + " in block " + this.getName());
-
+        if (this.value == Double.NaN) {
+            throw new DAVEException("Unrecognized operator " + this.funcType + 
+                    " in block " + this.getName());
+        }
 
         // record current cycle counter
         resultsCycleCount = ourModel.getCycleCounter();

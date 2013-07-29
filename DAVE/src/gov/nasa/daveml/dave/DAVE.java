@@ -175,10 +175,10 @@ public class DAVE {
         this.checkCaseCount = 0;
         this.m = new Model(20, 20);
 
-        String date = "2012-07-19";
+        String date = "2013-07-29";
 
         // add date (now that we're under git)
-        this.myVersion = "0.9.4 (" + date + ")";
+        this.myVersion = "0.9.6 (" + date + ")";
     }
 
     /**
@@ -459,7 +459,14 @@ public class DAVE {
                 System.out.println("");
             }
             while (variableIterator.hasNext()) {
-                dummySig = new Signal(variableIterator.next(), m);
+                try {
+                    dummySig = new Signal(variableIterator.next(), m);
+                } catch (DAVEException ex) {
+                    System.err.println("Exception thrown while parsing variableDefs: " +
+                            ex.getLocalizedMessage());
+                    System.err.println("aborting further parsing.");
+                    
+                }
             }
         }
     }
@@ -1085,6 +1092,36 @@ public class DAVE {
 
     /**
      *
+     * Reports contents of model internals vector to user on
+     * <code>stdout</code>.
+     *
+     * @param outVec A
+     * <code>VectorInfoArrayList</code> listing output names and values
+     *
+     *
+     */
+    public void listInternals(VectorInfoArrayList outVec) {
+        System.out.println();
+        System.out.println("Intermediate values are:");
+        Iterator<VectorInfo> it = outVec.iterator();
+        while (it.hasNext()) {
+            VectorInfo vi = it.next();
+            System.out.print("  " + vi.getName() + " = " + vi.getValue());
+
+            // add units if any
+            if (vi.getUnits().length() > 0) {
+                System.out.println(" (" + vi.getUnits() + ")");
+            } else {
+                System.out.println();
+            }
+
+        }
+        System.out.println();
+        //      this.describeSelf();
+    }
+
+    /**
+     *
      * Matches each option argument by unique part of command. <p> Looks for any
      * argument that begins with "-" and a unique part of a command option. Sets
      * field
@@ -1149,7 +1186,7 @@ public class DAVE {
         System.out.println("    --debug    (-d)    generate debugging information");
         System.out.println("    --eval     (-e)    do prompted model I/O evaluation");
         System.out.println("    --list     (-l)    output text description to optional output file");
-        System.out.println("    --internal (-i)    generate internal checkcase values");
+        System.out.println("    --internal (-i)    show intermediate results in calcs and checkcases");
         System.out.println("");
     }
 
@@ -1303,6 +1340,16 @@ public class DAVE {
                         System.exit(exit_failure);
                     }
                     dave.listOutputs(outputVec);
+                    
+                    if (dave.createInternalValues) {
+                        VectorInfoArrayList internalVec = dave.m.getInternalsVector();
+                        if (internalVec == null) {
+                            System.err.println(" Null internal results vector returned from Model.cycle() ");
+                            System.exit(exit_failure);
+                        }
+                        dave.listInternals(internalVec);
+                    }
+    
                 } catch (Exception e) {
                     System.err.println(e.getMessage());
                 }

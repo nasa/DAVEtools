@@ -22,9 +22,7 @@ package gov.nasa.daveml.dave;
  **/
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.jdom.Element;
@@ -36,7 +34,7 @@ import org.jdom.Namespace;
  *
  **/
 
-public class BlockFuncTable extends Block
+public final class BlockFuncTable extends Block
 {
     /**
      *  if true, have no local breakpoint IDs - only varIDs
@@ -94,76 +92,74 @@ public class BlockFuncTable extends Block
 	this.ns = function.getNamespace();
 
 	// Parse description, if any
-	if (function.getChild("description",this.ns) != null)
+	if (function.getChild("description",this.ns) != null) {
 	    this.description = function.getChild("description",this.ns).getTextTrim();
-	else
+        } else {
 	    this.description = "No description";
-
+        }
 	// default values for function defn name
 	this.functionDefName = "unnamed";
 
 	// Functions contain either a functionDefn or dependentVarPts
 
 	// Get name of function definition, if any
-	if (function.getChild("functionDefn",this.ns) != null)
+	if (function.getChild("functionDefn",this.ns) != null) {
 
 	    // Here when function defn found, not simple table
 	    // but may have a griddedTableDef, a griddedTableRef,  or an obsolete griddedTable.
-	    {
-		this.simple = false;
-		this.functionDefName = function.getChild("functionDefn",this.ns).getAttributeValue("name");
-		if( this.functionDefName == null ) {
-		    // create automatic, unique name
-		    this.functionDefName = "auto_fn_" + this.ourModel.getNumBlocks();
-		}
-		this.setName(this.functionDefName);	// substitute function name (but why?)
+	    
+            this.simple = false;
+            this.functionDefName = function.getChild("functionDefn",this.ns).getAttributeValue("name");
+            if( this.functionDefName == null ) {
+                // create automatic, unique name
+                this.functionDefName = "auto_fn_" + this.ourModel.getNumBlocks();
+            }
+            this.setName(this.functionDefName);	// substitute function name (but why?)
 
-		// find our table info - one of these should be non-null
-		Element gt  = function.getChild("functionDefn",this.ns).getChild("griddedTable",this.ns);
-		Element gtd = function.getChild("functionDefn",this.ns).getChild("griddedTableDef",this.ns);
-		Element gtr = function.getChild("functionDefn",this.ns).getChild("griddedTableRef",this.ns);
-		
-		// look for actual function table
-		if (gt != null) {
-		    String internalID = this.getName() + "_internal_table";
-		    this.functionTableDef = new FuncTable( internalID, gt, m );	// griddedTable
-		} else if (gtd != null) {
-		    this.functionTableDef = new FuncTable( gtd, m );	// griddedTableDef
-		} else if (gtr != null) {
-		    this.gtID = gtr.getAttributeValue("gtID");
-		    // find previously defined table
-		    this.functionTableDef = this.ourModel.getTableByID( this.gtID );
-		    if (this.functionTableDef == null) { // not found
-			System.err.println("Error: function table definition " + this.functionDefName 
-					   + " could not locate previous definition for table "
-					   + this.gtID);
-			System.exit(0);
-		    }
-		} else {	// error
-		    System.err.println("Error: function table definition " + this.functionDefName 
-				       + " has no gridded table information (def or ref).");
-		    System.exit(0);
-		}
+            // find our table info - one of these should be non-null
+            Element gt  = function.getChild("functionDefn",this.ns).getChild("griddedTable",this.ns);
+            Element gtd = function.getChild("functionDefn",this.ns).getChild("griddedTableDef",this.ns);
+            Element gtr = function.getChild("functionDefn",this.ns).getChild("griddedTableRef",this.ns);
 
-		// register ourself with the table
-		this.functionTableDef.register( this );
+            // look for actual function table
+            if (gt != null) {
+                String internalID = this.getName() + "_internal_table";
+                this.functionTableDef = new FuncTable( internalID, gt, m );	// griddedTable
+            } else if (gtd != null) {
+                this.functionTableDef = new FuncTable( gtd, m );	// griddedTableDef
+            } else if (gtr != null) {
+                this.gtID = gtr.getAttributeValue("gtID");
+                // find previously defined table
+                this.functionTableDef = this.ourModel.getTableByID( this.gtID );
+                if (this.functionTableDef == null) { // not found
+                    System.err.println("Error: function table definition " + this.functionDefName 
+                                       + " could not locate previous definition for table "
+                                       + this.gtID);
+                    System.exit(0);
+                }
+            } else {	// error
+                System.err.println("Error: function table definition " + this.functionDefName 
+                                   + " has no gridded table information (def or ref).");
+                System.exit(0);
+            }
 
-		// Parse and record variable IDs
-		parseVarIDsFromFunctionElement(function);
-	    }
+            // register ourself with the table
+            this.functionTableDef.register( this );
 
-	else
+            // Parse and record variable IDs
+            parseVarIDsFromFunctionElement(function);
+        } else {
 
 	    // Here with simple table
-	    {
-		this.simple = true;
-		if (function.getChild("dependentVarPts",this.ns) == null) {
-		    System.err.println("Bad DAVE-ML syntax in function '" + this.myName + "'" );
-		    System.err.println("  Found neither functionDefn nor dependentVarPts. Should have one or other.");
-		    System.exit(0);
-		} else
-		    parseSimpleFunction( function );
-	    }
+
+            this.simple = true;
+            if (function.getChild("dependentVarPts",this.ns) == null) {
+                System.err.println("Bad DAVE-ML syntax in function '" + this.myName + "'" );
+                System.err.println("  Found neither functionDefn nor dependentVarPts. Should have one or other.");
+                System.exit(0);
+            } else
+                parseSimpleFunction( function );
+        }
 
 	// Hook up to output signal
 	hookUpOutput(function);
@@ -247,10 +243,10 @@ public class BlockFuncTable extends Block
 	    String inVarID = iVarPtsElement.getAttributeValue("varID");
 	    this.addVarID(i, inVarID);
 
-	    if (this.isVerbose())
+	    if (this.isVerbose()) {
 		System.out.println("Added input varID '" + inVarID + "' for simple table function "
 				   + this.functionDefName);
-
+            }
 	    // create automatic breakpoint name/ID for this input variable
 	    String bpName = "auto_" + this.myName + "_bpID_" + i;
 
@@ -265,11 +261,12 @@ public class BlockFuncTable extends Block
 		System.exit(0);
 	    }
 
-	    String bpDescription = 
-		new String("Automatic breakpoint set created from simple table element named " 
-			   + this.getName());
+	    String bpDescription;
+            bpDescription = "Automatic breakpoint set created from simple table element named "
+                    + this.getName();
 	    try {
-		new BreakpointSet( bpName, bpName, inTable.getTextTrim(), bpDescription , this.ourModel);
+		BreakpointSet bps;
+                bps = new BreakpointSet( bpName, bpName, inTable.getTextTrim(), bpDescription , this.ourModel);
 	    } catch (DAVEException e) {
 		System.err.println("Unable to create new breakpoint set named '"
 				   + bpName + "' to support function '" 
@@ -278,10 +275,10 @@ public class BlockFuncTable extends Block
 		System.exit(0);
 	    }
 
-	    if (this.isVerbose())
+	    if (this.isVerbose()) {
 		System.out.println("Created new BreakpointSet named '" + bpName
 				   + "' for simple function " + this.functionDefName);
-
+            }
 	    i++;	// increment count
 	}
 	//  tell our table to determine it's dimensionality (from bpIDs previously loaded)
@@ -314,9 +311,9 @@ public class BlockFuncTable extends Block
 		Element iVarRefElement = iVarRefIterator.next();
 		String theVarID = iVarRefElement.getAttributeValue("varID");
 		this.addVarID(i+1, theVarID);	// must be in order
-		if( this.isVerbose())
+		if( this.isVerbose()) {
 		    System.out.println("Added varID " + theVarID);
-
+                }
 		i++;
 	    }
 
@@ -342,8 +339,9 @@ public class BlockFuncTable extends Block
 	// Parse and discover dependent variable ID
 
 	Element depVar      = function.getChild("dependentVarRef",this.ns);
-	if (depVar == null)
-	    depVar = function.getChild("dependentVarPts",this.ns);	// simple table
+	if (depVar == null) {
+	    depVar = function.getChild("dependentVarPts",this.ns); // simple table
+        }
 	String depVarID   = depVar.getAttributeValue("varID");
 
 	Iterator<Signal> sigIterator = this.ourModel.getSignals().iterator();
@@ -404,29 +402,31 @@ public class BlockFuncTable extends Block
 
 	// Look at predeclared signals to match breakpoint input varID
 	// to get name & units
-	if (this.isVerbose())
+	if (this.isVerbose()) {
 	    System.out.print("Looking for input signal named '" + varID + "'...");			
-
+        }
 	Signal theBPInputSignal = ourModel.getSignals().findByID( varID );
 
 	if( theBPInputSignal != null ) {
-	    if (this.isVerbose())
+	    if (this.isVerbose()) {
 		System.out.println(" found it.");
+            }
 	    // create and connect to new intermediate signal
 	    String connectorName	= theBPInputSignal.getName() + "_by_" + bpID;
 	    String units		= theBPInputSignal.getUnits();
-	    if (this.isVerbose())
+	    if (this.isVerbose()) {
 		System.out.println("Creating new index-and-weights signal named '" 
 				   + connectorName + "' with a varID of '"
 				   + iwSignalID + "' and units of '" + units + "'");
+            }
 	    connector = new Signal( connectorName, iwSignalID, units, 2, ourModel );
 	    connector.setDerivedFlag();	// note that we've created this variable
 	    connector.addSink( this, portNum+1 );	// hook up to new signal
 	} else {
 	    // else block - error
-	    if( this.isVerbose())
+	    if( this.isVerbose()) {
 		System.out.println(" DIDN'T FIND IT!! - ERROR!");
-			
+            }
 	    System.err.println("Error: in BlockFuncTable.createAndHookUpIWPath() for Function block '" 
 			       + this.getName() + "', can't find independent (input) variable with ID '"
 			       + iwSignalID + "'.");
@@ -436,7 +436,8 @@ public class BlockFuncTable extends Block
 	// Create new breakpoint block to generate the index-and-weights signal
 
 	try {
-	    new BlockBP( bpID, bpID, theBPInputSignal, connector, ourModel );
+	    BlockBP bbp;
+            bbp = new BlockBP( bpID, bpID, theBPInputSignal, connector, ourModel );
 	} catch (DAVEException e) {
 	    System.err.println("BlockFuncTable.createAndHookUpIWPath: in hooking up Function block '"
 			       + this.getName() + "':");
@@ -460,6 +461,7 @@ public class BlockFuncTable extends Block
      *
      **/
 
+    @Override
     protected void hookUpInputs()
     {
 	int portCount = 0;
@@ -470,18 +472,20 @@ public class BlockFuncTable extends Block
 	Iterator<String> bpIDIterator   = this.functionTableDef.getBPIterator();
 	String signalVarID = null;
 
-	if( this.isVerbose())
+	if( this.isVerbose()) {
 	    System.out.println("In BlockFuncTable.hookUpInputs() method for BFT "
 			       + this.myName );
+        }
 
 	while (bpIDIterator.hasNext()) {
 
 	    // get name of signal associated with this breakpoint
 
 	    String bpID = bpIDIterator.next();
-	    if( this.isVerbose())
+	    if( this.isVerbose()) {
 		System.out.print(" Looking for varID corresponding to bpID '" 
 				 + bpID + "'");
+            }
 	    if( !iVarIDIterator.hasNext() ) {
 		System.err.println("BlockFuncTable.hookUpInputs(): Unexpected end of VarID Array in Function block");
 		System.err.println("'" + this.getName() + "' while looking for bpID '" + bpID + "'.");
@@ -491,96 +495,40 @@ public class BlockFuncTable extends Block
 	    } else {
 		// get corresponding independent variable ID
 		signalVarID = iVarIDIterator.next();
-		if (this.isVerbose())
+		if (this.isVerbose()) {
 		    System.out.println("; found corresponding varID '" 
 				       + signalVarID + "'");
+                }
 	    }
 
 	    // combine independent variable ID with breakpoint ID
 	    // "index-and-weight" signal
 
 	    String iwSignalID = signalVarID + "_x_" + bpID;
-	    if (this.isVerbose())
+	    if (this.isVerbose()) {
 		System.out.println(" now looking for combined signal '" 
 				   + iwSignalID + "'");
+            }
 
 	    // look for existing signal from previously built breakpoint block
 
 	    Signal theSignal = ourModel.getSignals().findByID( iwSignalID );
 	    if (theSignal != null) {
 		theSignal.addSink( this, portCount+1 );	// does double link
-		if (this.isVerbose())
+		if (this.isVerbose()) {
 		    System.out.println(" found combined signal '" 
 				       + iwSignalID + "'; added to port " 
 				       + (portCount+1));
+                }
 	    } else {
 		// Signal not found, create it and it's upstream breakpoint block
-		if (this.isVerbose())
+		if (this.isVerbose()) {
 		    System.out.println(" signal '" + iwSignalID 
 				       + "'not found; creating it");
-
+                }
 		createAndHookUpIWPath( bpID, signalVarID, iwSignalID, portCount );
 	    }
 	    portCount++;
-	}
-    }
-
-
-    /**
-     *
-     * Reorders input signal assignments to match Simulink MDL
-     * order (utilty method only needed for Simulink model generation)
-     *
-     * <p>
-     * Put in this class due to need to access lots of internals.
-     *
-     **/
-
-    public void reorderInputsForMDL() {
-
-	// If only one or two inputs, no need to change anything
-
-	if (this.numInputs() > 2) {
-	
-	    // move 1,   2,   3, ... n-2, n-1, n to 
-	    //      n, n-1, n-2, ...   3,   1, 2
-	    // note first two are in reverse order
-	    // This is due to Matlab order requirements
-	    
-	    // loop through inputs
-	    Iterator<Signal> theInputsIterator = this.getInputIterator();
-
-	    while ( theInputsIterator.hasNext() ) {
-		Signal theInput = theInputsIterator.next();
-
-		// find our index into the signal's destination
-		// ports
-		BlockArrayList destBlocks = theInput.getDests();
-		ArrayList<Integer> destPorts = theInput.getDestPortNumbers();
-
-		// Look for ourself in the destBlocks & record
-		// corresponding port index
-
-		Iterator<Block> destBlockIterator = destBlocks.iterator();
-		Iterator<Integer> destPortIterator  = destPorts.iterator();
-		int thePortIndex = 0;
-		while( destBlockIterator.hasNext() ) {
-		    Block destBlock  = destBlockIterator.next();
-		    Integer destPort = destPortIterator.next();
-
-		    if (destBlock == this) {
-
-			// set value for new index
-
-			int oldPortNumber = destPort.intValue();
-			int newPortNumber = (this.numInputs() + 1) - oldPortNumber;
-			if(oldPortNumber == (this.numInputs()-1)) newPortNumber = 1;
-			if(oldPortNumber == (this.numInputs()  )) newPortNumber = 2;
-			theInput.setPortNumber( thePortIndex, newPortNumber );
-		    }
-		    thePortIndex++;
-		}
-	    }
 	}
     }
 
@@ -599,8 +547,9 @@ public class BlockFuncTable extends Block
     {
     	// just a wrapper function for more elementary FuncTable method of same name
     	FuncTable gft = this.getFunctionTableDef();
-    	if (gft != null)
+    	if (gft != null) {
     		gft.printTable(writer);
+        }
     }
 
 
@@ -629,6 +578,7 @@ public class BlockFuncTable extends Block
      *
      **/
 
+    @Override
     public void update() throws DAVEException
     {
 	int numInputs;
@@ -649,43 +599,46 @@ public class BlockFuncTable extends Block
 
 	// sanity check to see if number of inputs matches our dimensionality
 	numInputs = this.inputs.size();
-	if (numInputs != this.functionTableDef.numDim())
+	if (numInputs != this.functionTableDef.numDim()) {
 	    throw new DAVEException("Number of inputs doesn't match function dimensions in '" 
 				    + this.getName() + "'");
+        }
 
 	// see if each input variable is ready
 	theInputs = this.inputs.iterator();
 	iwv = new double[numInputs];	// index and weights vector
 	iv  = new int[numInputs];	// index vector
-	if (verbose)
+	if (verbose) {
 	    System.out.println(" Allocated index-and-weights vector of size " + this.inputs.size());
-
+        }
 	// Here to do table lookup
 	while (theInputs.hasNext()) {
 	    theInput = theInputs.next();
 	    if (!theInput.sourceReady()) {
 		ready = false;
-		if (verbose)
+		if (verbose) {
 		    System.out.println(" Upstream signal '" + theInput.getName() + "' is not ready.");
+                }
 		iwv[index] = 0.0;
 		iv[index] = 0;
 	    } else {
 		iwv[index] = theInput.sourceValue();
 		iv[index] = (int) theInput.sourceValue();
-		if (verbose)
+		if (verbose) {
 		    System.out.println(" Input # " + index + " value is " + iwv[index]);
+                }
 	    }
 	    index++;
 	}
-	if (!ready) return;
+	if (!ready) { return; }
 
 	// At this point we have the index-and-weights vector in iwv.
 	// Call recursive interpolation routine
 	this.value = this.interpolate( iwv, iv, numInputs );
 
-	if (verbose)
+	if (verbose) {
 	    System.out.println(" Interpolate returned value " + this.value);
-
+        }
 	// record current cycle counter
 	resultsCycleCount = ourModel.getCycleCounter();
 
@@ -703,7 +656,7 @@ public class BlockFuncTable extends Block
 	double weight;
 	double a;
 	double b;
-	double value;
+	double interpolated_value;
 	boolean verbose = this.isVerbose();
 
 	if (verbose) {
@@ -717,15 +670,17 @@ public class BlockFuncTable extends Block
 	if (indices[ select ] >= (this.functionTableDef.dim(select)-1)) {	// 0-index adjust 
 	    indices[ select ]--;
 	    weight = 1.0;
-	    if (verbose)
+	    if (verbose) {
 		System.out.println(" Adjusted index/weight at end of dim " + interpDimension);
-	} else 
+            }
+	} else {
 	    weight = index_and_weights[ select ] - (double) indices[ select ];
-
-	if (verbose)
+        }
+	if (verbose) {
 	    System.out.println(" For dim " + interpDimension + " and select = " + select 
 			       + " have index of " + indices[ select ] + " and weight of " 
 			       + weight);
+        }
 	if (interpDimension == 1) {
 	    a = this.functionTableDef.getPt( indices );
 	    indices[ select ]++;
@@ -737,14 +692,16 @@ public class BlockFuncTable extends Block
 	    b = this.interpolate( index_and_weights, indices, interpDimension-1 );
 	    indices[ select ]--;
 	}
-	value = a + (b-a)*weight;
-	if (verbose) System.out.println(" Interpolated between " + a + " and " + b + " is value " + value);
-	return value;
+	interpolated_value = a + (b-a)*weight;
+	if (verbose) {
+            System.out.println(" Interpolated between " + a + " and " + b + " is value " + interpolated_value);
+        }
+	return interpolated_value;
     }
     
     /**
      * Returns the contents of the description field, with spaces substituted for newlines
-     * @return 
+     * @return contents of the <code>description</code> field
      */
 
     public String getDescription() {

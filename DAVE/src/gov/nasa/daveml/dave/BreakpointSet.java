@@ -113,32 +113,33 @@ public class BreakpointSet // throws DAVEException
         this( m );      // call early constructor
 
         // Save our name, if any
-        if (bpdef.getAttributeValue("name") != null)
+        if (bpdef.getAttributeValue("name") != null) {
             this.myName = bpdef.getAttributeValue("name");
-        else
+        } else {
             this.myName = null;
+        }
 
         // Save our ID
         this.bpid = bpdef.getAttributeValue("bpID");
-        if (this.bpid == null)
+        if (this.bpid == null) {
             throw new DAVEException("Missing bpID in breakpointDef " + this.myName);
-            
+        }
         // Register ourself with the Model by ID since reusable
         m.register( this );
         
         // Fetch default namespace
         Namespace ns = null;
         Element parent = bpdef.getParentElement();
-        if (parent != null)
+        if (parent != null) {
         	ns = parent.getNamespace();
-
+        }
         // Parse description, if any
         Element descrip = bpdef.getChild("description",ns);
-        if (descrip != null)
+        if (descrip != null) {
             this.myDescription = descrip.getTextTrim();
-        else
+        } else {
             this.myDescription = null;
-
+        }
         // Set up user array
         this.users = new BlockArrayList(5);
 
@@ -250,8 +251,9 @@ public class BreakpointSet // throws DAVEException
      **/
 
     public int length() { 
-    	if (bpValues == null)
-    		return 0;
+    	if (bpValues == null) {
+            return 0;
+        }
     	return this.bpValues.size(); 
     }
 

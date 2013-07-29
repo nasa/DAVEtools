@@ -20,12 +20,11 @@ package gov.nasa.daveml.dave;
  *
  **/
 
-import org.jdom.Element;
-
-import java.io.IOException;
 import java.io.FileWriter;
-import java.util.List;
+import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
+import org.jdom.Element;
 
 
 /**
@@ -134,9 +133,11 @@ public class BlockMathFunctionExtension extends BlockMathFunction
         
         // take appropriate action based on type
         if(this.funcType.equals("atan2")) {
-            if( defURL != null )
-                if (!defURL.equals(DAVEML_EXT_URL + "#" + this.funcType) )
+            if( defURL != null ) {
+                if (!defURL.equals(DAVEML_EXT_URL + "#" + this.funcType) ) {
                     System.err.println("Warning - csymbol 'definitionURL' attribute incomplete; assumed valid");
+                }
+            }
             this.op = ATAN2;
             this.myType = "two-argument arctangent function";
         } else {
@@ -152,9 +153,11 @@ public class BlockMathFunctionExtension extends BlockMathFunction
      * Change extended function type (calls superclass setFunction if not "atan2")
      * @since 0.9
      */
+    @Override
     public void setFunction(String functionType) throws DAVEException {
-    	if (functionType != this.funcType)
+    	if (functionType == null ? this.funcType != null : !functionType.equals(this.funcType)) {
     		super.setFunction(functionType);
+        }
      }
 
 
@@ -181,6 +184,7 @@ public class BlockMathFunctionExtension extends BlockMathFunction
      *
      **/
 
+    @Override
     public void update() throws DAVEException
     {
         int requiredNumInputs;
@@ -193,19 +197,24 @@ public class BlockMathFunctionExtension extends BlockMathFunction
 
         if (verbose) {
             System.out.println();
-            System.out.println("Method update() called for math " + this.myType + " block '" + this.getName() + "'");
+            System.out.println("Method update() called for math " + 
+                    this.myType + " block '" + this.getName() + "'");
         }
         
         // Check to see if correct number of inputs
-        if (this.inputs.size() < 1)
-            throw new DAVEException("Math " + this.myType + " block " + this.myName + " has no input.");
+        if (this.inputs.size() < 1) {
+            throw new DAVEException("Math " + this.myType + " block " + 
+                    this.myName + " has no input.");
+        }
 
         // check type of operation to see if have required number of inputs
         requiredNumInputs = 1;
-        if (this.op > 9) requiredNumInputs = 2;
+        if (this.op > 9) { requiredNumInputs = 2; }
 
-        if (this.inputs.size() > requiredNumInputs)
-            throw new DAVEException("Math function block " + this.myName + " has too many inputs.");
+        if (this.inputs.size() > requiredNumInputs) {
+            throw new DAVEException("Math function block " + this.myName + 
+                    " has too many inputs.");
+        }
 
         // see if the input variable(s) is(are) ready
         index = 0;
@@ -214,13 +223,17 @@ public class BlockMathFunctionExtension extends BlockMathFunction
         while (theInputs.hasNext()) {
             theInput = theInputs.next();
             if (!theInput.sourceReady()) {
-                if (verbose)
-                    System.out.println(" Upstream signal '" + theInput.getName() + "' is not ready.");
+                if (verbose) {
+                    System.out.println(" Upstream signal '" + 
+                            theInput.getName() + "' is not ready.");
+                }
                 return;
             } else {
                 theInputValue[index] = theInput.sourceValue();
-                if (verbose)
-                    System.out.println(" Input #" + index + " value is " + theInputValue[index]);
+                if (verbose) {
+                    System.out.println(" Input #" + index + " value is " + 
+                            theInputValue[index]);
+                }
             }
             index++;
         }
@@ -233,9 +246,10 @@ public class BlockMathFunctionExtension extends BlockMathFunction
             this.value = Math.atan2(theInputValue[0],theInputValue[1]); break;
         }
 
-        if (this.value == Double.NaN)
-            throw new DAVEException("Unrecognized operator " + this.funcType + " in block " + this.getName());
-
+        if (this.value == Double.NaN) {
+            throw new DAVEException("Unrecognized operator " + this.funcType + 
+                    " in block " + this.getName());
+        }
         // record current cycle counter
         resultsCycleCount = ourModel.getCycleCounter();
     }

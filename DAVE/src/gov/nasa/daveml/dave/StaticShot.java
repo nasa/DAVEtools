@@ -86,8 +86,9 @@ public class StaticShot
             // units may be missing if non-dimensional
             Element theUnitsElement = theSignal.getChild("signalUnits",ss_ns);
             String theUnits = "";
-            if (theUnitsElement != null)
+            if (theUnitsElement != null) {
                 theUnits = theUnitsElement.getTextTrim();
+            }
             Element theSignalName = theSignal.getChild("signalName",ss_ns);
             if (theSignalName == null) {
                 System.err.println("Error reading checkcase data: no signal name found.");
@@ -125,10 +126,11 @@ public class StaticShot
                 signal.setValue(     theSignal.getChild("signalValue",ss_ns).getTextTrim() );
                 signal.setTolerance( theSignal.getChild("tol",ss_ns).getTextTrim() );
                 Element units =      theSignal.getChild("signalUnits",ss_ns);
-                if (units == null)
+                if (units == null) {
                     signal.setUnits("");
-                else
+                } else {
                     signal.setUnits( units.getTextTrim() );
+                }
                 this.outputs.add(signal);
             } catch (NullPointerException e) {
                 System.err.println("Warning: can't find element 'signalName' in 'checkOutputs' element number "
@@ -180,14 +182,15 @@ public class StaticShot
     {
 
         VectorInfo modelSig = null;
-        VectorInfo checkSig = null;
+        VectorInfo checkSig;
 
         // compare vector lengths
-        if (inVec.size() != this.inputs.size())
+        if (inVec.size() != this.inputs.size()) {
             throw new DAVEException("Input vector length for checkcase '" + this.getName()
                                     + "' (" + this.inputs.size() 
                                     + ") doesn't match length of model's input vector ("
                                     + inVec.size() + ").");
+        }
 
         // for each checkcase signal, find matching signal name from model
         Iterator<VectorInfo> checkIt = this.inputs.iterator();
@@ -201,26 +204,28 @@ public class StaticShot
             boolean matched = false;
             Iterator<VectorInfo> modelIt = inVec.iterator();
             while (!matched) {
-                if (!modelIt.hasNext())
+                if (!modelIt.hasNext()) {
                     throw new DAVEException("Could not find input signal '" + sigName 
                                             + "' in model's inputs.");
+                }
                 modelSig = modelIt.next();
-                if(checkSig.getName().equals( modelSig.getName()))
+                if(checkSig.getName().equals( modelSig.getName())) {
                     matched = true;
+                }
             }
 
             // here with matching name - compare units
-            if (!checkSig.getUnits().equals( modelSig.getUnits()))
+            if (!checkSig.getUnits().equals( modelSig.getUnits())) {
                 throw new DAVEException("Mismatched units - in checkcase '" + this.getName()
                                         + "' for input signal '" + sigName + "', checkcase specifies '"
                                         + checkSig.getUnits() + "' but model expects '"
                                         + modelSig.getUnits() + "'.");
-
+            }
             // make sure it's an input
-            if (!modelSig.isInput())
+            if (!modelSig.isInput()) {
                 throw new DAVEException("Found non-input signal '" + modelSig.getName() 
                                         + "' in model's input vector.");
-
+            }
             // set value
             modelSig.setValue( checkSig.getValue() );
         }
@@ -252,15 +257,15 @@ public class StaticShot
     {
         boolean comparison  = true;
         VectorInfo modelSig = null;
-        VectorInfo checkSig = null;
+        VectorInfo checkSig;
 
         // compare vector lengths
-        if (outVec.size() < this.outputs.size())
+        if (outVec.size() < this.outputs.size()) {
             throw new DAVEException("Output vector length for checkcase '" + this.getName()
                                     + "' (" + this.outputs.size() 
                                     + ") is bigger than the length of model's output vector ("
                                     + outVec.size() + ").");
-
+        }
         // for each checkcase signal, find matching signal name from model
         Iterator<VectorInfo> checkIt = this.outputs.iterator();
 
@@ -274,38 +279,41 @@ public class StaticShot
             boolean matched = false;
             Iterator<VectorInfo> modelIt = outVec.iterator();
             while (!matched) {
-                if (!modelIt.hasNext())
-                    throw new DAVEException("Could not find output signal '" + sigName 
-                                            + "' in model's outputs.");
+                if (!modelIt.hasNext()) {
+                    throw new DAVEException("Could not find output signal '" + 
+                            sigName + "' in model's outputs.");
+                }
                 modelSig = modelIt.next();
-                if(checkSig.getName().equals( modelSig.getName()))
+                if(checkSig.getName().equals( modelSig.getName())) {
                     matched = true;
+                }
             }
 
             // here with matching name - compare units
-            if (!checkSig.getUnits().equals( modelSig.getUnits()))
+            if (!checkSig.getUnits().equals( modelSig.getUnits())) {
                 throw new DAVEException("Mismatched units - in checkcase '" + this.getName()
                                         + "' for output signal '" + sigName + "', checkcase specifies '"
                                         + checkSig.getUnits() + "' but model expects '"
                                         + modelSig.getUnits() + "'.");
-
+            }
             // make sure it's an output
-            if (modelSig.isInput())
+            if (modelSig.isInput()) {
                 throw new DAVEException("Found input signal '" + modelSig.getName() 
                                         + "' in model's output vector.");
-
+            }
             // compare values; see if within tolerance
             double actual   = modelSig.getValue();
             double expected = checkSig.getValue();
             // first make sure neither actual or expect is Not-A-Number
-            if (Double.isNaN(actual))
+            if (Double.isNaN(actual)) {
                 if (!Double.isNaN(expected)) {
                     comparison = false;
                     out.println(); // blank line
                     out.println("For output '" + sigName +
                         "': encountered unexpected not-a-number (NaN) value.");
                 }
-            if (Double.isNaN(expected))
+            }
+            if (Double.isNaN(expected)) {
                 if (!Double.isNaN(actual)) {
                     comparison = false;
                     out.println(); // blank line
@@ -313,6 +321,7 @@ public class StaticShot
                         "': expected not-a-number (NaN) value but found "
                         + actual + ".");
                 }
+            }
             if (Double.isNaN(expected) && Double.isNaN(actual)) {
                 // good to go
             } else {

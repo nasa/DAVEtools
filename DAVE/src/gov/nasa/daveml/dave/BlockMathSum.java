@@ -16,12 +16,11 @@ package gov.nasa.daveml.dave;
  *
  **/
 
-import org.jdom.Element;
-
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
+import org.jdom.Element;
 
 /**
  *
@@ -39,11 +38,12 @@ public class BlockMathSum extends BlockMath
      * @param applyElement Reference to <code>org.jdom.Element</code>
      * containing "apply" element
      * @param m         The parent <code>Model</code>
+     * @throws DAVEException
      *
      **/
 
     @SuppressWarnings("unchecked")
-    public BlockMathSum( Element applyElement, Model m )
+    public BlockMathSum( Element applyElement, Model m ) throws DAVEException
     {
         // Initialize superblock elements
         super("pending", "summing", m);
@@ -58,16 +58,13 @@ public class BlockMathSum extends BlockMath
         this.setName( blockType + "_" + m.getNumBlocks() );
         
         // take appropriate action based on type
-        if(!blockType.equals("plus"))
-            {
-                System.err.println("Error - BlockMathSum constructor called with" +
-                                   " type element:" + blockType);
-            }
-        else
-            {
-                //System.out.println("   BlockMathSum constructor called with " + kids.size() + "elements.");
-                this.genInputsFromApply(ikid, 1);
-            }
+        if(!blockType.equals("plus")) {
+          System.err.println("Error - BlockMathSum constructor called with" +
+                             " type element:" + blockType);
+        } else {
+            //System.out.println("   BlockMathSum constructor called with " + kids.size() + "elements.");
+            this.genInputsFromApply(ikid, 1); // may throw DAVEException
+        }
 
         //System.out.println("    BlockMathSum constructor: " + this.getName() + " created.");
     }
@@ -96,8 +93,9 @@ public class BlockMathSum extends BlockMath
             }
         }
         // if not derived, need trailing semicolon and new line
-        if (!outputSig.isDerived())
+        if (!outputSig.isDerived()) {
             cvn.appendCode(endLine());
+        }
         return cvn;
     }
 
@@ -146,21 +144,25 @@ public class BlockMathSum extends BlockMath
         while (theInputs.hasNext()) {
             theInput = theInputs.next();
             if (!theInput.sourceReady()) {
-                if (verbose)
-                    System.out.println(" Upstream signal '" + theInput.getName() + "' is not ready.");
+                if (verbose) {
+                    System.out.println(" Upstream signal '" + 
+                            theInput.getName() + "' is not ready.");
+                }
                 return;
             } else {
                 inputVals[index] = theInput.sourceValue();
-                if (verbose)
-                    System.out.println(" Input #" + index + " value is " + inputVals[index]);
+                if (verbose) {
+                    System.out.println(" Input #" + index + " value is " + 
+                            inputVals[index]);
+                }
             }
             index++;
         }
 
         this.value = 0.0;
-        for(int i = 0; i<inputVals.length; i++)
+        for(int i = 0; i<inputVals.length; i++) {
             this.value += inputVals[i];
-
+        }
         // record current cycle counter
         resultsCycleCount = ourModel.getCycleCounter();
 

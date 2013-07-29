@@ -1,9 +1,9 @@
 // This file can be turned into XHTML using AsciiDoc
 
-DAVEtools 0.9.4 README
+DAVEtools 0.9.6 README
 ======================
 Bruce Jackson, NASA Langley Research Center <bruce.jackson@nasa.gov>
-Version 3, 2012-07-19
+README Version 6, 2013-07-29
 :TOC:
 
 Introduction
@@ -210,7 +210,7 @@ Usage: java DAVE [options] DAVE-ML_document
     --debug    (-d)    generate debugging information
     --eval     (-e)    do prompted model I/O evaluation
     --list     (-l)    output text description to optional output file
-    --internal (-i)    generate internal checkcase values
+    --internal (-i)    show intermediate results in calcs and checkcases
 ----
 
 Verify and count elements in a DAVE-ML file 
@@ -476,8 +476,24 @@ Download
 The latest version can be downloaded from the DAVEtools NASA website, 
 http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html.
 
-Changes since V 0.9
--------------------
+Changes since V 0.8.1
+---------------------
+V 0.9.6:: 
+  Changed to use newer PreLookup and Interpolation_n-D blocks;
+  corrected most 'if', 'while' statements in source to use braces;
+  changed exception handling to deal with syntax errors at a lower
+  level; changed order of import statements to make NetBeans happy;
+  deprecated +Block.getDests()+ and +Block.getSource()+ in favor of
+  +getDestBlocks()+ and +getSourceBlocks()+ to remove ambiguity of
+  whether a reference to a +Signal+ or a +Block+ was being retrieved;
+  maybe fixed vertical alignment of top-level subsystem?
+
+
+V 0.9.5:: Changed behavior of -i flag to DAVE; in addition to creating
+        an XML snippet with internal values for any checkcase
+        successfully passed, will spit out useful intermediate values
+        if used with the -e (evaluate) flag. Also fixed a bug in
+        creation of N-d tables with dimensions greater than 4.
 
 V 0.9.4:: Added new utilities: DAVE2POST, to generate POST-II input
 	decks and code sections; and DAVE2OTIS, to generate OTIS4

@@ -15,11 +15,9 @@
 
 package gov.nasa.daveml.dave;
 
-import java.io.IOException;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class TreeFileWriter extends FileWriter
 {
@@ -115,20 +113,18 @@ public class TreeFileWriter extends FileWriter
         }
         this.writeln();
 
-        i = 1;
         this.writeln("Number of signals: " + m.getNumSignals());
         this.writeln();
 
         // List signals & info
         i = 1;
         Iterator<Signal> signalIterator = m.getSignals().iterator();
-        while (signalIterator.hasNext())
-            {
-                write(i + " ");
-                (signalIterator.next()).describeSelf( (FileWriter) this );
-                this.writeln();
-                i++;
-            }
+        while (signalIterator.hasNext()) {
+            write(i + " ");
+            (signalIterator.next()).describeSelf( (FileWriter) this );
+            this.writeln();
+            i++;
+        }
 
         this.writeln();
         this.writeln("Number of blocks: " + m.getNumBlocks());
@@ -137,12 +133,11 @@ public class TreeFileWriter extends FileWriter
         // List blocks & info
         i = 1;
         Iterator<Block> blockIterator = m.getBlocks().iterator();
-        while (blockIterator.hasNext())
-            {
-                write(i + " ");
-                (blockIterator.next()).describeSelf( (FileWriter) this );
-                this.writeln();
-                i++;
-            }
+        while (blockIterator.hasNext()) {
+            write(i + " ");
+            (blockIterator.next()).describeSelf( (FileWriter) this );
+            this.writeln();
+            i++;
+        }
     }
 }

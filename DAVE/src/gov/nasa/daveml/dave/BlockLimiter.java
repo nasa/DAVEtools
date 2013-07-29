@@ -132,41 +132,48 @@ public class BlockLimiter extends Block {
         Signal outputSig = this.getOutput();
         // check to see if we're derived variable (code fragment) or a whole statement
         // if not derived, need preceding command and the LHS of the equation too
-        if (outputSig != null)
+        if (outputSig != null) {
             if (!outputSig.isDerived()) {
 //                cvn.code = "// Code for variable \"" + outVarID + "\":\n";
                 cvn.appendCode(indent() + outVarID + " = ");
                 cvn.addVarName(outVarID);
             }
+        }
         input = inputs.get(0);
         int dialect = ourModel.getCodeDialect();
         cvn.append( input.genCode() );
         if (this.hasLowerLimit()) {
             cvn.appendCode(endLine());
             rel = " < "; // default is DT_ANSI_C
-            if (dialect == Model.DT_FORTRAN)
+            if (dialect == Model.DT_FORTRAN) {
                 rel = " .LT. ";
+            }
             cvn.appendCode(beginIf( outVarID + rel + lowerLim.toString() ));
             cvn.appendCode(indent() + "  " + outVarID + " = " + lowerLim.toString());
             cvn.appendCode(endLine());
             cvn.appendCode(endIf());
         }
         if (this.hasUpperLimit()) {
-            if (!this.hasLowerLimit())
+            if (!this.hasLowerLimit()) {
                 cvn.appendCode(endLine()); // don't issue blank line
+            }
             rel = " > "; // default is DT_ANSI_C
-            if (dialect == Model.DT_FORTRAN)
+            if (dialect == Model.DT_FORTRAN) {
                 rel = " .GT. ";
+            }
             cvn.appendCode(beginIf( outVarID + rel + upperLim.toString() ));
             cvn.appendCode(indent() + "  " + outVarID + " = " + upperLim.toString());
             cvn.appendCode(endLine());
             cvn.appendCode(endIf());
         }
         // if not derived, need trailing semicolon and new line if no limits
-        if (outputSig != null)
-            if (!outputSig.isDerived())
-                if (!this.hasLowerLimit() && !this.hasUpperLimit() )
+        if (outputSig != null) {
+            if (!outputSig.isDerived()) {
+                if (!this.hasLowerLimit() && !this.hasUpperLimit() ) {
                     cvn.appendCode(endLine());
+                }
+            }
+        }
         return cvn;
     }
 
@@ -199,40 +206,50 @@ public class BlockLimiter extends Block {
     {
         if (isVerbose()) {
             System.out.println();
-            System.out.println("Method update() called for limiter block '" + this.getName() + "'");
+            System.out.println("Method update() called for limiter block '" + 
+                    this.getName() + "'");
         }
 
         // Check to see if only one input
-        if (this.inputs.size() < 1)
-            throw new DAVEException(" Limiter block " + this.myName + " has no input.");
-
-        if (this.inputs.size() > 1)
-            throw new DAVEException(" Limiter block " + this.myName + " has more than one input.");
-
+        if (this.inputs.size() < 1) {
+            throw new DAVEException(" Limiter block " + this.myName + 
+                    " has no input.");
+        }
+        if (this.inputs.size() > 1) {
+            throw new DAVEException(" Limiter block " + this.myName + 
+                    " has more than one input.");
+        }
         // see if single input variable is ready
         Signal theInput = this.inputs.get(0);
         if (!theInput.sourceReady()) {
-            if (this.isVerbose())
-                System.out.println(" Upstream signal '" + theInput.getName() + "' is not ready.");
+            if (this.isVerbose()) {
+                System.out.println(" Upstream signal '" + theInput.getName() + 
+                        "' is not ready.");
+            }
             return;
         }
 
         // get single input variable value
         double inputValue = theInput.sourceValue();
-        if (this.isVerbose())
+        if (this.isVerbose()) {
             System.out.println(" Input value is " + inputValue);
+        }
 
         // show ourselves up-to-date
         this.resultsCycleCount = ourModel.getCycleCounter();
 
         // save answer
         this.value = inputValue;
-        if (hasLowerLim)
-            if( this.value < lowerLim )
+        if (hasLowerLim) {
+            if( this.value < lowerLim ) {
                 this.value = lowerLim;
-        if (hasUpperLim)
-            if( this.value > upperLim )
+            }
+        }
+        if (hasUpperLim) {
+            if( this.value > upperLim ) {
                 this.value = upperLim;
+            }
+        }
 
     }
 

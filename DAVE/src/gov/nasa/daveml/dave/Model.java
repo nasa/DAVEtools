@@ -9,14 +9,14 @@
 
 package gov.nasa.daveml.dave;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
 
 /**
  *
@@ -413,11 +413,14 @@ public class Model
 	blocks.add(newBlock);
 	if (newBlock instanceof BlockInput) {
 	    inputBlocks.add(newBlock);
-	    if (this.verbose)
-		System.out.println("size of inputBlocks list is " + inputBlocks.size() );
+	    if (this.verbose) {
+		System.out.println("size of inputBlocks list is " + 
+                        inputBlocks.size() );
+            }
 	}
-	if (newBlock instanceof BlockOutput)
+	if (newBlock instanceof BlockOutput) {
 	    outputBlocks.add(newBlock);
+        }
     }
 
 
@@ -451,7 +454,7 @@ public class Model
     public void register( BreakpointSet newBPSet )
     { 
 	int oldSize = 0;
-	int setSize = 0;
+	int setSize;
 
 	if (this.verbose) {
 	    System.out.println("Registering breakpoint set " + newBPSet.getName() 
@@ -467,10 +470,11 @@ public class Model
 	    boolean success = breakpointSets.containsKey( key );
 	    setSize = breakpointSets.size();
 	    System.out.println("breakpoint set map size is now " + setSize);
-	    if (success && (setSize>oldSize))
+	    if (success && (setSize > oldSize)) {
 		System.out.println("...successfully registered to key '" + key + "'");
-	    else
+            } else {
 		System.out.println("...appears to be duplicate; proceeding");
+            }
 	}
     }
 
@@ -510,7 +514,7 @@ public class Model
     public void register( BlockBP newBPBlock )
     { 
 	int oldSize = 0;
-	int setSize = 0;
+	int setSize;
 
 	String key = newBPBlock.getName();
 
@@ -527,10 +531,11 @@ public class Model
 	    boolean success = bpBlocks.containsKey( key );
 	    setSize = bpBlocks.size();
 	    System.out.println("bpBlocks map size is now " + setSize);
-	    if (success && (setSize>oldSize))
+	    if (success && (setSize>oldSize)) {
 		System.out.println("...successfully registered to key '" + key + "'");
-	    else
+            } else {
 		System.out.println("...appears to be duplicate; proceeding");
+            }
 	}
 
     }
@@ -571,7 +576,7 @@ public class Model
     public void register( FuncTable newTable )
     { 
 	int oldSize = 0;
-	int setSize = 0;
+	int setSize;
 
 	String key = newTable.getGTID();
 	
@@ -596,10 +601,11 @@ public class Model
 	    boolean success = tables.containsKey( key );
 	    setSize = tables.size();
 	    System.out.println("FuncTable map size is now " + setSize);
-	    if (success && (setSize>oldSize))
+	    if (success && (setSize>oldSize)) {
 		System.out.println("...successfully registered to key '" + key + "'");
-	    else
+            } else {
 		System.out.println("...appears to be duplicate; proceeding");
+            }
 	}
     }
 
@@ -708,12 +714,15 @@ public class Model
 	while (it.hasNext()) {
 	    theSignal = it.next();
 	    
-	    if (this.isVerbose())
-		System.out.println("checking signal '" + theSignal.getName() + "'");
+	    if (this.isVerbose()) {
+		System.out.println("checking signal '" + 
+                        theSignal.getName() + "'");
+            }
 	    // check for missing source
 	    if (!theSignal.hasSource()) {
-		if (this.isVerbose())
+		if (this.isVerbose()) {
 		    System.out.println("...signal has no source.");
+                }
 		// if an initial condition is defined, create a constant value input
                 // unless it has been flagged as an input, control or disturbance
 		if( theSignal.hasIC()     &&
@@ -730,18 +739,21 @@ public class Model
 		} else {
 		    // otherwise, create an input block and attach
 		    ignored = new BlockInput( theSignal, this );
-		    if (this.isVerbose())
+		    if (this.isVerbose()) {
 			System.out.println("...created new input block");
+                    }
 		}
 	    }
 
-            if( theSignal.isLimited() )
+            if( theSignal.isLimited() ) {
                 setUpLimiterFor( theSignal, modifiedSignals );
+            }
 
 	    // Connect an output block to any signal that has either no destination
 	    // or is flagged as an output.
-	    if ( !theSignal.hasDest() || theSignal.isOutput() )
+	    if ( !theSignal.hasDest() || theSignal.isOutput() ) {
 		ignored = new BlockOutput( theSignal, this );
+            }
         } // end of while (it.hasNext()) over model's signals
 
         // add to model any newly-created signals (representing outputs from any new limiters)
@@ -755,79 +767,77 @@ public class Model
             ArrayList<Signal> modifiedSignals) {
         Block ignored;
 
+    // Deal with internal signal limits by inserting limit blocks:
 
-            // Deal with internal signal limits by inserting limit blocks:
+    // 1) duplicate current signal; schedule to add to model when iteration is complete
+    // 2) append "_unlim" to original signal name & varID
+    // 3) create downstream limit block(s)
+    // 4) create downstream signal with old name; add to model
+    // 5) change source varID of any destination blocks to downstream (limited) signal
+    // 6) change destination varID of any source blocks to new limited signal
+    // 7) hook current signal to limit block
 
-            // 1) duplicate current signal; schedule to add to model when iteration is complete
-            // 2) append "_unlim" to original signal name & varID
-            // 3) create downstream limit block(s)
-            // 4) create downstream signal with old name; add to model
-            // 5) change source varID of any destination blocks to downstream (limited) signal
-            // 6) change destination varID of any source blocks to new limited signal
-            // 7) hook current signal to limit block
+        // start with duplication
+        // new signal will share all features & destination blocks & ports, limits, flags
+        Signal limitedSignal = new Signal( theSignal );
+        // this.add(limitedSignal);     // wait until iteration is done to add new limited signal to model
+        boolean OK = modifiedSignals.add(limitedSignal);
+        assert(OK);
+        limitedSignal.setDerivedFlag(); // mark as automatically generated variable
 
-                // start with duplication
-                // new signal will share all features & destination blocks & ports, limits, flags
-                Signal limitedSignal = new Signal( theSignal );
-                // this.add(limitedSignal);     // wait until iteration is done to add new limited signal to model
-                boolean OK = modifiedSignals.add(limitedSignal);
-                assert(OK);
-                limitedSignal.setDerivedFlag(); // mark as automatically generated variable
+        // record original metadata for signal in case of later failure
+        BlockArrayList origDests = (BlockArrayList) theSignal.getDests().clone();
+        @SuppressWarnings("unchecked")
+        ArrayList<Integer> origPorts = (ArrayList<Integer>) theSignal.getDestPortNumbers().clone();
+        String origName = theSignal.getName();
+        String origVarID = theSignal.getVarID();
 
-                // record original metadata for signal in case of later failure
-                BlockArrayList origDests = (BlockArrayList) theSignal.getDests().clone();
-                @SuppressWarnings("unchecked")
-                ArrayList<Integer> origPorts = (ArrayList<Integer>) theSignal.getDestPortNumbers().clone();
-                String origName = theSignal.getName();
-                String origVarID = theSignal.getVarID();
+        // change name & varID of original signal; clear outputs
+        theSignal.setName(  theSignal.getName()  + "_unlim" );
+        theSignal.setVarID( theSignal.getVarID() + "_unlim" );
+        theSignal.removeDestBlocks();   // break downstream connections
 
-                // change name & varID of original signal; clear outputs
-                theSignal.setName(  theSignal.getName()  + "_unlim" );
-                theSignal.setVarID( theSignal.getVarID() + "_unlim" );
-                theSignal.removeDestBlocks();   // break downstream connections
+        // change output varID of source block to append "_unlim"
+        theSignal.getSource().renameOutVarID();
 
-                // change output varID of source block to append "_unlim"
-                theSignal.getSource().renameOutVarID();
+        // this sets up the new limit block, and hooks the upstream signal as it's input
+        BlockLimiter limiter = new BlockLimiter( theSignal, this,
+                theSignal.getLowerLimit(), theSignal.getUpperLimit() );
 
-                // this sets up the new limit block, and hooks the upstream signal as it's input
-                BlockLimiter limiter = new BlockLimiter( theSignal, this,
-                        theSignal.getLowerLimit(), theSignal.getUpperLimit() );
+        // replace the source for original (unlimited) signals' destination
+        // blocks to be the newly-created limited signal
+        // Follows convention for calling signal with downstream block
+        Iterator<Block> it = origDests.iterator();
+        while (it.hasNext()) {
+            Block b = it.next();
+            b.replaceInput( theSignal, limitedSignal);
+        }
 
-                // replace the source for original (unlimited) signals' destination
-                // blocks to be the newly-created limited signal
-                // Follows convention for calling signal with downstream block
-                Iterator<Block> it = origDests.iterator();
-                while (it.hasNext()) {
-                    Block b = it.next();
-                    b.replaceInput( theSignal, limitedSignal);
-                }
+        // following convention, tell limiter of its new output to perform hookup
+        try {
+            limiter.addOutput(limitedSignal);
+        } catch (DAVEException ex) {
+            System.err.println("Unable to insert limiter for variable " + origName );
+            // restore original signal to previous condition
+            theSignal.dests     = origDests;
+            theSignal.destPorts = origPorts;
+            theSignal.setName(    origName  );
+            theSignal.setVarID(   origVarID );
+            // BUG: new limitedSignal has been added to modifiedSignals list
+        }
 
-                // following convention, tell limiter of its new output to perform hookup
-                try {
-                    limiter.addOutput(limitedSignal);
-                } catch (DAVEException ex) {
-                    System.err.println("Unable to insert limiter for variable " + origName );
-                    // restore original signal to previous condition
-                    theSignal.dests     = origDests;
-                    theSignal.destPorts = origPorts;
-                    theSignal.setName(    origName  );
-                    theSignal.setVarID(   origVarID );
-                    // BUG: new limitedSignal has been added to modifiedSignals list
-                }
+        // here on success
+        theSignal.clearIsOutputFlag();  // no longer use this as an output, if set
 
-                // here on success
-                theSignal.clearIsOutputFlag();  // no longer use this as an output, if set
+        // now clear the original signal's limits
+        theSignal.setLowerLimit(Double.NEGATIVE_INFINITY);
+        theSignal.setUpperLimit(Double.POSITIVE_INFINITY);
 
-                // now clear the original signal's limits
-                theSignal.setLowerLimit(Double.NEGATIVE_INFINITY);
-                theSignal.setUpperLimit(Double.POSITIVE_INFINITY);
-
-                // set up an output block for the new signal if required
-                if( !limitedSignal.hasDest() || limitedSignal.isOutput() )
-                    ignored = new BlockOutput( limitedSignal, this );
-
-                return;
-            }
+        // set up an output block for the new signal if required
+        if( !limitedSignal.hasDest() || limitedSignal.isOutput() ) {
+            ignored = new BlockOutput( limitedSignal, this );
+        }
+    }
 
     
     /**
@@ -905,7 +915,7 @@ public class Model
     public void generateInternalValues( PrintWriter out ) {
 	Iterator<?> it = this.signals.iterator();
 	// make sure there are signals to evaluate
-	if (it != null)
+	if (it != null) {
 	    if ( it.hasNext() ) {
 		// write header stuff
 		out.println("      <internalValues>");
@@ -932,6 +942,7 @@ public class Model
 		// write closing tags
 		out.println("      </internalValues>");
 	    }
+        }
     }
 
 
@@ -958,8 +969,9 @@ public class Model
 			       + this.getName() + "'");
             System.out.println();
 	    strwriter = new StringWriter();
-	    if (strwriter == null)
+	    if (strwriter == null) {
 		System.err.println("Unable to create FileWriter for 'out'");
+            }
 	}
 
 	// get duplicate list of blocks; find which ones are ready now
@@ -985,7 +997,7 @@ public class Model
 	    
 	    while (blockIterator.hasNext()) {
 		b = blockIterator.next();
-		if (!b.isReady())
+		if (!b.isReady()) {
 		    try {
 			blocksNotReady++;
 			b.update();
@@ -1000,6 +1012,7 @@ public class Model
                         System.out.println(e.getMessage() + ". Quitting...");
 			throw e;
 		    }
+                }
 	    }
 
 	    // removing ready blocks
@@ -1028,8 +1041,9 @@ public class Model
 		    executeOrder.add( b );
 		    candidates.remove();	// removes current block
 		} else {
-		    if (this.verbose)
+		    if (this.verbose) {
 			System.out.println(" no.");
+                    }
                 }
 	    }
 
@@ -1042,8 +1056,8 @@ public class Model
 
         // Here on empty block list OR lack of progress
 	// Check to see if success or if algebraic loop detected
-        String errorMsg = "";
-	if (!blks.isEmpty()) {
+        if (!blks.isEmpty()) {
+            String errorMsg;
             errorMsg = "Possible algebraic loop detected; unable to satisfy inputs for ";
             errorMsg = errorMsg + blks.size() + " blocks.";
 	    throw new DAVEException(errorMsg);
@@ -1069,7 +1083,9 @@ public class Model
 		}
 		i++;
 	    }
-	    if (this.verbose) System.out.print(strwriter.toString());
+	    if (this.verbose) {
+                System.out.print(strwriter.toString());
+            }
 	} catch (Exception e) {
 	    System.err.println(e.getMessage());
             System.exit(exit_failure);
@@ -1100,10 +1116,12 @@ public class Model
 	    Iterator<?> outBlks = this.outputBlocks.iterator();
 	    while (outBlks.hasNext()) {
 		Block theBlk = (Block) outBlks.next();
-		if (theBlk == null) 
+		if (theBlk == null) {
 		    throw new DAVEException("Unexpected null found in outputBlocks list.");
-		if (!(theBlk instanceof BlockOutput)) 
+                }
+		if (!(theBlk instanceof BlockOutput)) {
 		    throw new DAVEException("Non-output block found in outputBlocks list.");
+                }
 		String theName = theBlk.getName();
 		String theUnits = ((BlockOutput) theBlk).getUnits();
 		double theValue = theBlk.getValue();
@@ -1130,10 +1148,12 @@ public class Model
 	    Iterator<?> inBlks = this.inputBlocks.iterator();
 	    while (inBlks.hasNext()) {
 		Block theBlk = (Block) inBlks.next();
-		if (theBlk == null) 
+		if (theBlk == null) {
 		    throw new DAVEException("Null inputBlocks found.");
-		if (!(theBlk instanceof BlockInput)) 
+                }
+		if (!(theBlk instanceof BlockInput)) {
 		    throw new DAVEException("Non-input block found in inputBlocks list.");
+                }
 		String inName = theBlk.getName();
 		String inUnits = ((BlockInput) theBlk).getUnits();
 		VectorInfo vi = new VectorInfo(inName, inUnits, theBlk, true);
@@ -1165,27 +1185,28 @@ public class Model
             System.out.println("");
         }
 	// check to see if inputVec is null
-	if (this.inputVec == null)
+	if (this.inputVec == null) {
 	    throw new DAVEException("Input vector is null. Did you obtain one from getInputVector() first?");
-	
+        }
 	// check to see if it has the proper number of elements
-	if (this.inputVec.size() != inputBlocks.size())
+	if (this.inputVec.size() != inputBlocks.size()) {
 	    throw new DAVEException("Input vector length (" + inputVec.size()
 				    + ") does not match number of input blocks (" + inputBlocks.size());
-
+        }
 	// unload the input vector into the input blocks - complain if block refs are nulls
 	Iterator<VectorInfo> inp = this.inputVec.iterator();
 	while (inp.hasNext()) {
 	    VectorInfo vi = inp.next();
-	    if (vi == null) 
+	    if (vi == null) {
 		throw new DAVEException("Unexpected found null in input vector array list.");
+            }
 	    BlockInput theBlk = vi.getSink();
 	    double theValue = vi.getValue();
 	    theBlk.setInputValue( theValue );
 	}
 
 	// make sure the model is initialized - this also cycles the model
-	if (!this.initialized)
+	if (!this.initialized) {
 	    try {
                 if (this.isVerbose()) {
                     System.out.println("");
@@ -1198,14 +1219,14 @@ public class Model
 		System.err.println(e.getMessage());
 		System.exit(exit_failure);
 	    }
-	else
-	    { 		// cycle the model once if it is
-		Iterator<?> theBlocks = executeOrder.iterator();
-		while (theBlocks.hasNext()) {
-		    Block theBlock = (Block) theBlocks.next();
-		    theBlock.update();
-		}
-	    }
+        } else { 		// cycle the model once if it is
+            Iterator<?> theBlocks = executeOrder.iterator();
+            while (theBlocks.hasNext()) {
+                Block theBlock = (Block) theBlocks.next();
+                theBlock.update();
+            }
+        }
+        
 
 	// build and return the output vector from output block values
 	
@@ -1214,30 +1235,35 @@ public class Model
 
 	    this.outputVec = new VectorInfoArrayList(); // overwrites any existing one; no big deal
 
-	    if (this.outputVec == null)
+	    if (this.outputVec == null) {
 		throw new DAVEException("Unable to allocate space for output vector.");
+            }
 
 	    Iterator<?> outBlks = this.outputBlocks.iterator();
 	    while (outBlks.hasNext()) {
 		Block theBlk = (Block) outBlks.next();
-		if (theBlk == null)
+		if (theBlk == null) {
 		    throw new DAVEException("Null found in outputBlocks unexpectedly.");
-		if (!(theBlk instanceof BlockOutput)) 
+                }
+		if (!(theBlk instanceof BlockOutput)) {
 		    throw new DAVEException("Non-output block found in outputBlocks.");
+                }
 		String theName = theBlk.getName();
 		String theUnits = ((BlockOutput) theBlk).getUnits();
 		double theValue = theBlk.getValue();
 		// create an output record
 		VectorInfo vi = new VectorInfo(theName, theUnits, theBlk, false);
-		if (vi == null)
+		if (vi == null) {
 		    throw new DAVEException("Unable to allocate memory for output vector element");
+                }
 		vi.setValue( theValue );
 		this.outputVec.add( vi );
 	    }
 	} else { 
 	    // have existing output vector; can speed things up
-	    if (this.outputBlocks.size() != this.outputVec.size())
+	    if (this.outputBlocks.size() != this.outputVec.size()) {
 		throw new DAVEException("Somehow ended up with mismatched output vector.");
+            }
 	    Iterator<?> outBlks = this.outputBlocks.iterator();
 	    Iterator<?> outVI   = this.outputVec.iterator();
 	    while (outBlks.hasNext()) {
@@ -1309,8 +1335,9 @@ public class Model
         Iterator<Block> blkIt = sortedBlocks.iterator();
         while (blkIt.hasNext()) {
             Block blk = blkIt.next();
-            if (blk.isSelected())
+            if (blk.isSelected()) {
                 selectedBlocks.add(blk);
+            }
         }
         return selectedBlocks;
     }
@@ -1331,5 +1358,36 @@ public class Model
         }
         return theBlock;
     }
+
+    /**
+     * <p> Builds &amp; returns the current values of all variables </p>
+     *
+     * @throws DAVEException
+     **/
+
+     public VectorInfoArrayList getInternalsVector() throws DAVEException {
+        VectorInfoArrayList internalsVec = new VectorInfoArrayList();
+        Iterator<?> allBlks = this.blocks.iterator();
+        while (allBlks.hasNext()) {
+            Block theBlk = (Block) allBlks.next();
+            if (theBlk != null) {
+                Signal theSignal = theBlk.getOutput();
+                if (theSignal != null) {
+                    if (!theSignal.isDerived()) {
+                        String theName = theSignal.getName();
+                        if (!theName.contentEquals("unnamed")) {
+                            String theUnits = theSignal.getUnits();
+                            double theValue = theSignal.sourceValue();
+                            VectorInfo vi = new VectorInfo(theName, theUnits, theBlk, false);
+                            vi.setValue( theValue );
+                            internalsVec.add( vi );
+                        }
+                    }
+                }
+            }
+        }
+	return internalsVec;
+    }
+
 
 }
