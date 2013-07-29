@@ -135,8 +135,9 @@ public class ParseText
         while (!this.eof() )
             {
                 Double dbl = new Double(this.next());
-                if (this.validNumber())
+                if (this.validNumber()) {
                     al.add( dbl );
+                }
             }
 
         return al;
@@ -170,11 +171,12 @@ public class ParseText
         {
             ParseText pt;
 
-            if (args.length < 1)
+            if (args.length < 1) {
                 pt = new ParseText("  ,  1.0, +2.9,3.2,+4       -5.,Z,9.99E99  ");
-            else
+            }
+            else {
                 pt = new ParseText(args[0]);
-
+            }
             //              while (!pt.eof() )
             //                  {
             //                      System.out.println(pt.next());
@@ -189,11 +191,12 @@ public class ParseText
 
             Iterator<Double> listIterator = theList.iterator();
 
-            while(listIterator.hasNext())
-                {
-                    System.out.print(listIterator.next());
-                    if(listIterator.hasNext()) System.out.print(", ");
+            while(listIterator.hasNext()) {
+                System.out.print(listIterator.next());
+                if(listIterator.hasNext()) {
+                    System.out.print(", ");
                 }
+            }
 
             System.out.println("]");
         }

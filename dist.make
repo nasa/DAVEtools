@@ -7,7 +7,7 @@
 DIRS = DAVE DAVE2SL DAVE2OTIS DAVE2POST ModelSweeper tests
 FILES = DAVEtools.jar LICENSE.html README/README.html CHANGELOG.txt build.xml overview.html
 
-VERSTRING = 0.9.5b
+VERSTRING = 0.9.6
 
 COMMIT_ID = $(shell git rev-parse --short HEAD)
 

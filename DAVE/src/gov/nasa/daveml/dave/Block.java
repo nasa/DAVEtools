@@ -256,7 +256,7 @@ abstract public class Block
         Iterator<Signal> sigIt = this.getInputIterator();
 
         // ask each signal if it's source is ready
-        while (sigIt.hasNext())
+        while (sigIt.hasNext()) {
             try {
                 allReady = allReady && sigIt.next().sourceReady();
             } catch (DAVEException e) {
@@ -264,6 +264,7 @@ abstract public class Block
                 System.err.println("Wiring error found - missing source block.");
                 System.exit(0);
             }
+        }
 
         // output is AND of all signal ready results
         return allReady;
@@ -314,8 +315,9 @@ abstract public class Block
         while (sigIt.hasNext()) {
             Signal sig = sigIt.next();
             Block ancestor = sig.getSource();
-            if (ancestor != null)
+            if (ancestor != null) {
                 ancestor.selectWithAncestors();
+            }
         }
     }
 
@@ -335,8 +337,6 @@ abstract public class Block
     
     public boolean isSelected() { return selectedFlag; }
 
-
-
     /**
      *
      * Set a pointer to some masking object (like Simulink SLBlock)
@@ -344,8 +344,6 @@ abstract public class Block
      **/
 
     public void setMask( Object o ) { this.mask = o; }
-
-
 
     /**
      *
@@ -376,12 +374,13 @@ abstract public class Block
 
         inputs.add(inSignal);                   // add to end of list
         portIndex = inputs.indexOf(inSignal);   // find it's position
-        while (inVarIDs.size() <= portIndex)    // increase length of companion list if necessary
+        while (inVarIDs.size() <= portIndex) {  // increase length of companion list if necessary
             inVarIDs.add(inSignal.getName());
+        }
         String existingID = inVarIDs.get(portIndex);
-        if (existingID.equals(""))              // don't override existing ID (for FTB)
+        if (existingID.equals("")) {           // don't override existing ID (for FTB)
             inVarIDs.set(portIndex, inSignal.getVarID());       // keep in sync with inputs
-
+        }
         //System.out.println("Adding signal " + inSignal.getName() + " as input " + (portIndex+1) + " to block " + getName());
 
         return portIndex+1;
@@ -401,17 +400,18 @@ abstract public class Block
     {
         int portIndex = portNum-1;
         //System.out.println("Adding signal " + inSignal.getName() + " as input " + (portIndex+1) + " to block " + getName());
-        while(inputs.size() <= portIndex)               // grow list if necessary to reach offset
+        while(inputs.size() <= portIndex) {             // grow list if necessary to reach offset
             inputs.add(inSignal);
+        }
         inputs.set(portIndex, inSignal);                // record input signal
 
-        while(inVarIDs.size() <= portIndex)     // grow ID list with input list
+        while(inVarIDs.size() <= portIndex){    // grow ID list with input list
             inVarIDs.add("");
-
+        }
         String existingID = inVarIDs.get(portIndex);    // see if already set
-        if (existingID.equals(""))              // don't override existing ID (for FTB)
+        if (existingID.equals("")){             // don't override existing ID (for FTB)
             inVarIDs.set(portIndex, inSignal.getVarID());       // keep in sync with inputs
-
+        }
         //System.out.println("  Block " + myName + " has added upstream signal " + inSignal.getName());
     }
 
@@ -426,23 +426,23 @@ abstract public class Block
 
     public void addVarID( int portNum, String varID )
     {
-        if (this.isVerbose())
-            System.out.println("Adding varID '" + varID + "' to port " + portNum 
-                               + " of block '" + this.getName() + "'.");
+        if (this.isVerbose()) {
+            System.out.println("Adding varID '" + varID + "' to port " + 
+                    portNum + " of block '" + this.getName() + "'.");
+        }
         int portIndex = portNum - 1;
-        if(portNum < 1) 
+        if(portNum < 1) {
             System.err.println("Block '" + getName() + "' asked to hook up varID '" + varID + 
                                "' to port " + portNum + " -- error!");
-        else
-            {
-                while(inVarIDs.size() <= portIndex)
-                    inVarIDs.add("");
-                inVarIDs.set(portIndex, varID);
+        } else {
+            while(inVarIDs.size() <= portIndex)
+                inVarIDs.add("");
+            inVarIDs.set(portIndex, varID);
 
-                while(inputs.size() <= portIndex)       // keep in sync with varID array
-                    inputs.add(null);
-                inputs.set(portIndex, null);
-            }
+            while(inputs.size() <= portIndex)       // keep in sync with varID array
+                inputs.add(null);
+            inputs.set(portIndex, null);
+        }
     }
 
 
@@ -484,13 +484,14 @@ abstract public class Block
 
         //  see if it's variD matches ours, if any.
 
-        if (this.outVarID == null)
+        if (this.outVarID == null) {
             this.outVarID = newVarID;
-        else
-            if (!this.outVarID.equals( newVarID ))
+        } else {
+            if (!this.outVarID.equals( newVarID )) {
                 throw new DAVEException("Error: specified output signal ID '" + newVarID + 
                                         "' doesn't match expected ('" + this.outVarID + "'.");
-
+            }
+        }
         this.output = outSignal;
         outSignal.addSource( this, 1 ); // tell signal about us
     }
@@ -528,8 +529,8 @@ abstract public class Block
                 System.err.println(" Unexpected error: couldn't add output signal to " + blk.getName() );
                 System.exit(0);
             }
-            sig.addSink(this, inPort);
         }
+        sig.addSink(this, inPort);
     }
 
 
@@ -673,10 +674,11 @@ abstract public class Block
 
     protected void setName( String newName )
     {
-        if (this.nameList != null)
+        if (this.nameList != null) {
             this.myName = this.nameList.addUnique( newName );
-        else
+        } else {
             this.myName = newName;
+        }
         //System.out.println("Setting block name to " + this.myName);
     }
 
@@ -708,10 +710,11 @@ abstract public class Block
 
     public int numInputs() 
     {
-        if (this.inputs != null)
+        if (this.inputs != null) {
             return this.inputs.size();
-        else
+        } else {
             return 0;
+        }
     }
 
     /**
@@ -769,25 +772,21 @@ abstract public class Block
 
         Iterator<String> iVarIDIterator = this.inVarIDs.iterator();
 
-        while (iVarIDIterator.hasNext())
-            {
-                // get independent variable ID
-                String signalVarID = iVarIDIterator.next();
+        while (iVarIDIterator.hasNext()) {
+            
+            // get independent variable ID
+            String signalVarID = iVarIDIterator.next();
 
-                // look for existing signal from previously built breakpoint block
-                Signal theSignal = ourModel.getSignals().findByID( signalVarID );
-                if (theSignal != null)
-                    {
-                        //System.out.println("     found signal with name " + signalVarID + ", connecting...");
-
-                        theSignal.addSink( this, portCount+1 ); // does double link
-                        portCount++;    // count # of dimensions
-                    }
-                else
-                    {
-                        System.err.println("    No signal named " + signalVarID + " found.");
-                    }
+            // look for existing signal from previously built breakpoint block
+            Signal theSignal = ourModel.getSignals().findByID( signalVarID );
+            if (theSignal != null) {
+                //System.out.println("     found signal with name " + signalVarID + ", connecting...");
+                theSignal.addSink( this, portCount+1 ); // does double link
+                portCount++;    // count # of dimensions
+            } else {
+                System.err.println("    No signal named " + signalVarID + " found.");
             }
+        }
     }
 
 
@@ -808,9 +807,9 @@ abstract public class Block
         Signal s;
 
 
-        if (this.isVerbose())
+        if (this.isVerbose()) {
             System.out.println(" hookUp called for block '" + this.getName() + "'");
-
+        }
         // hook up inputs
 
         it = this.getInputIterator();
@@ -833,12 +832,14 @@ abstract public class Block
 
         if (s == null) { // it's not hooked up
             // search by varID for missing signal
-        	if (this.outVarID == null)
+        	if (this.outVarID == null) {
         		throw new DAVEException("Block '" + this.myName + "' has no output signal identified.");
+                }
             s = ourModel.getSignals().findByID( this.outVarID );
             // if null returned, generate exception
-            if (s == null)
+            if (s == null) {
                 throw new DAVEException("Unable to find signal '" + this.outVarID + "' for output");
+            }
             this.addOutput( s );
        }
 
@@ -918,9 +919,9 @@ abstract public class Block
         Signal s = this.getOutput();
         if (s == null) {        // output not yet filled
             String theOutVarID = this.getOutputVarID();
-            if (theOutVarID == null) // no output to hook up
+            if (theOutVarID == null) { // no output to hook up
                 return false;
-            else {
+            } else {
                 s = ourModel.getSignals().findByID( theOutVarID );
                 try {
                     this.addOutput(s);
@@ -1002,8 +1003,9 @@ abstract public class Block
     
     public String endLine() {
         String lineEnd = "\n";
-        if (ourModel.getCodeDialect() == Model.DT_ANSI_C)
+        if (ourModel.getCodeDialect() == Model.DT_ANSI_C) {
             lineEnd = ";\n";
+        }
         return lineEnd;
     }
     
@@ -1057,7 +1059,7 @@ abstract public class Block
     {
         int numInputs = inputs.size();
         int numOutputs = 0;
-        if (this.output != null) numOutputs = 1;
+        if (this.output != null) { numOutputs = 1; }
 
         writer.write("Block \"" + myName + "\" has ");
         switch (numInputs)
@@ -1102,13 +1104,15 @@ abstract public class Block
                 Signal sig = sigIt.next();
                 if (sig != null) {
                     String theName = sig.getName();
-                    if (theName == null)
+                    if (theName == null) {
                         writer.write("Unnamed signal");
-                    else
+                    } else {
                         writer.write(theName);
+                    }
                 }
-                if (sigIt.hasNext())
+                if (sigIt.hasNext()) {
                     writer.write(", ");
+                }
             }
             writer.write("), ");
         }
@@ -1153,10 +1157,11 @@ abstract public class Block
             Signal sig = this.getOutput();
             if (sig != null) {
                 String theName = sig.getName();
-                if (theName == null)
+                if (theName == null) {
                     writer.write("Unnamed signal");
-                else
+                } else {
                     writer.write(theName);
+                }
             }
             writer.write("), ");
         }

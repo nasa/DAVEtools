@@ -17,9 +17,9 @@ package gov.nasa.daveml.dave;
  *
  */
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.ArrayList;
 
 /**
  * 
@@ -87,8 +87,9 @@ import java.util.ArrayList;
         Iterator<Signal> signalIterator = this.iterator();
         while (signalIterator.hasNext()) {
             Signal theSignal = signalIterator.next();
-            if (ID.equals(theSignal.getVarID()))
+            if (ID.equals(theSignal.getVarID())) {
                 return theSignal;
+            }
         }
         return null;
     }
@@ -126,8 +127,9 @@ import java.util.ArrayList;
                     // missing breakpoint source.
 
                     Block a = s.getSource();
-                    if (!(a instanceof BlockBP))
+                    if (!(a instanceof BlockBP)) {
                         funcInputs.add(s);
+                    }
                     break;
                 }
             }

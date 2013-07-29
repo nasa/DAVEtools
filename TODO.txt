@@ -1,5 +1,8 @@
 To-do list for DAVE/DAVE2SL
 
+130729 Need to replace obsolete java.util.Vector in SLRowColumnVector;
+       replace with ArrayList.
+
 130102 Incorrectly requires <apply> ahead of <piecewise> in <math>
        calculation when calc is just a switch; silently ignores bare
        <piecewise> leaving a lot of head-scratching for user.
@@ -50,7 +53,10 @@ To-do list for DAVE/DAVE2SL
        classes.
 
 061130 Use Factory Method pattern to decouple SLBLock from each type
-       of SLBlock
+       of SLBlock; will also registering blocks with Model outside of
+       their respective constructors, as this is considered a memory
+       leak (but would otherwise would have to call some init function
+       after calling each block's constructor).
 
 061012 Propagate FULL_VER definition from Makefile into DAVE.myVersion
 

@@ -1,7 +1,7 @@
 package gov.nasa.daveml.dave;
 
-import org.jdom.Element;
 import junit.framework.*;
+import org.jdom.Element;
 
 /**
  * First JUnit test I wrote.
@@ -71,7 +71,14 @@ public class GeneralBlockTest extends TestCase {
 	varDefElement.setAttribute( "varID", "absbeta" );
 	varDefElement.setAttribute( "units", "deg" );
 
-	mySignal = new Signal( varDefElement, _simple );
+	mySignal = null;
+        try {
+            mySignal = new Signal( varDefElement, _simple );
+        } catch (DAVEException e) {
+            fail("Unexpected exception while creating 'mySignal' in " +
+                    "GeneralBlockTest.setUp(): " + e.getLocalizedMessage() );
+        }
+        assertNotNull( mySignal );
 
 	// need to create the input signal beta - modify prev varDef element
 	varDefElement.removeChild( "calculation" );
@@ -79,8 +86,15 @@ public class GeneralBlockTest extends TestCase {
 	varDefElement.setAttribute( "name", "beta" );
 	varDefElement.setAttribute( "varID", "beta" );
 
-	Signal ignored = new Signal( varDefElement, _simple );
-
+	Signal ignored;
+        ignored = null;
+        try {
+            ignored = new Signal( varDefElement, _simple );
+        } catch (DAVEException e) {
+             fail("Unexpected exception while creating 'ignored' in " +
+                    "GeneralBlockTest: " + e.getLocalizedMessage() );
+        }
+        assertNotNull( ignored );
 	_simple.wireBlocks();
 	_simple.hookUpIO();
 
@@ -141,8 +155,15 @@ public class GeneralBlockTest extends TestCase {
 	input.setAttribute("varID", "X");
 	input.setAttribute("units", "" );
 
-	Signal ignored = new Signal( input, mathFuncModel );
-
+	Signal ignored;
+        ignored = null;
+        try {
+            ignored = new Signal( input, mathFuncModel );
+        } catch (DAVEException e) {
+             fail("Unexpected exception while creating 'ignored' in " +
+                    "GeneralBlockTest.testMathFunc(): " + e.getLocalizedMessage() );
+        }
+        assertNotNull( ignored );
 	// create output calculation
 
 //<variableDef name="y" varID="Y" units="">
@@ -281,8 +302,15 @@ public class GeneralBlockTest extends TestCase {
 	output.setAttribute( "varID", "Y" );
 	output.setAttribute( "units", ""  );
 
-	Signal ignored2 = new Signal( output, mathFuncModel );
-
+	Signal ignored2;
+        ignored2 = null;
+        try {
+            ignored2 = new Signal( output, mathFuncModel );
+        } catch (DAVEException e) {
+             fail("Unexpected exception while creating 'ignored2' in " +
+                    "GeneralBlockTest.testMathFunc(): " + e.getLocalizedMessage() );
+        }
+        assertNotNull( ignored2 );
 	mathFuncModel.wireBlocks();
 	mathFuncModel.hookUpIO();
 

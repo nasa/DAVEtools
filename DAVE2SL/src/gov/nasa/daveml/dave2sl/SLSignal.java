@@ -11,10 +11,11 @@ package gov.nasa.daveml.dave2sl;
 
 import gov.nasa.daveml.dave.Block;
 import gov.nasa.daveml.dave.BlockArrayList;
+import gov.nasa.daveml.dave.BlockFuncTable;
 import gov.nasa.daveml.dave.Signal;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.io.IOException;
 
 
 /**
@@ -84,8 +85,9 @@ public class SLSignal extends Signal
 	public SLSignal()
 	{
 		super();
-		if (this.isVerbose())
-			System.out.println("SLSignal basic constructor called.");
+		if (this.isVerbose()) {
+                    System.out.println("SLSignal basic constructor called.");
+                }
 		this.parentDiagram = null;
 		this.sourceCell = null;
 		this.branches = new ArrayList<SLBranch>(10);
@@ -105,9 +107,10 @@ public class SLSignal extends Signal
 	public SLSignal( Signal oldSignal, SLDiagram theParentDiagram )
 	{
 		super( oldSignal );	// copy constructor for Signal
-		if (this.isVerbose())
-			System.out.println("SLSignal copy constructor called with old signal " + oldSignal.getName());    
-		this.parentDiagram = theParentDiagram;
+		if (this.isVerbose()) {
+                    System.out.println("SLSignal copy constructor called with old signal " + oldSignal.getName());    
+                }
+                this.parentDiagram = theParentDiagram;
 
 		// copy over most fields
 		if(this.getSource() != null) {
@@ -155,84 +158,72 @@ public class SLSignal extends Signal
 	 *
 	 **/
 
-	public void describeBranches()
-	{
+	public void describeBranches() {
+            if (!this.isVerbose()) {
+                    return;
+            }
+            // write header information
 
-		if (!this.isVerbose())
-			return;
+            System.out.println();
 
-		// write header information
+            if (this.path == null) {	// use old branching information
 
-		System.out.println();
+                if (this.branches == null) {
+                    System.err.println("No branching information found in signal '" + this.getName() + "'!");
+                } else {
+                    System.out.print("  Signal '" + getName() );
+                    if (this.branches.size() <= 1) {
+                        System.out.println("' has one path: from block '" + this.sourceCell.getBlock().getName() +
+                            "' at location [" + this.sourceCell.getRowIndex() + "," +
+                            this.sourceCell.getColIndex() + "] ");
+                        if (this.destCell != null) {
+                            System.out.println("   to adjacent block '" + this.destCell.getBlock().getName() +
+                                "' at location [" + this.destCell.getRowIndex() + "," +
+                                this.destCell.getColIndex() + "]");
+                        }
+                    } else {
+                        System.out.println("' has " + this.branches.size() + " branches: from block '" + this.sourceCell.getBlock().getName() +
+                                "' at location [" + this.sourceCell.getRowIndex() + "," +
+                                this.sourceCell.getColIndex() + "] ");
+                    }
 
-		if (this.path == null)	// use old branching information
-		{
-			if (this.branches == null)
-			{
-				System.err.println("No branching information found in signal '" + this.getName() + "'!");
-				return;
-			}
-			else
-			{
-				System.out.print("  Signal '" + getName() );
-				if (this.branches.size() <= 1)
-				{
-					System.out.println("' has one path: from block '" + this.sourceCell.getBlock().getName() +
-							"' at location [" + this.sourceCell.getRowIndex() + "," +
-							this.sourceCell.getColIndex() + "] ");
-					if (this.destCell != null)
-						System.out.println("   to adjacent block '" + this.destCell.getBlock().getName() +
-								"' at location [" + this.destCell.getRowIndex() + "," +
-								this.destCell.getColIndex() + "]");
-				}
-				else
-				{
-					System.out.println("' has " + this.branches.size() + " branches: from block '" + this.sourceCell.getBlock().getName() +
-							"' at location [" + this.sourceCell.getRowIndex() + "," +
-							this.sourceCell.getColIndex() + "] ");
-				}
+                    // write routing information
 
-				// write routing information
+                    Iterator<SLBranch> ib = this.branches.iterator();
+                    while (ib.hasNext()) {
+                        SLLineSegment ls = null;
+                        SLBranch list = ib.next();
+                        Iterator<SLLineSegment> iline = list.iterator();
 
-				Iterator<SLBranch> ib = this.branches.iterator();
-				while (ib.hasNext())
-				{
-					SLLineSegment ls = null;
-					SLBranch list = ib.next();
-					Iterator<SLLineSegment> iline = list.iterator();
+                        while (iline.hasNext())	{		// scan ahead...
+                                ls = iline.next();	// to find destination
+                        }
+                        SLCell destination = ls.getDestCell();
+                        System.out.println("   to block '"   + destination.getBlock().getName() +
+                                        "' at location [" + destination.getRowIndex() + "," +
+                                        destination.getColIndex() + "] via");
 
-					while (iline.hasNext())			// scan ahead...
-						ls = iline.next();	// to find destination
-
-					SLCell destination = ls.getDestCell();
-					System.out.println("   to block '"   + destination.getBlock().getName() +
-							"' at location [" + destination.getRowIndex() + "," +
-							destination.getColIndex() + "] via");
-
-					iline = list.iterator();	// start over at beginning of path
-					boolean first = true;
-					while (iline.hasNext())
-					{
-						if(first)
-						{
-							first = false;
-							System.out.print("     ");
-						}
-						else
-							System.out.print("     then ");
-
-						ls = iline.next();
-
-						ls.describe();
-					}
-				}
-			}
-		}	// end of null "path" field
-		else
-		{	// use branching structure found in "path" field
-			if (this.isVerbose())
-				this.path.describe();
-		}
+                        iline = list.iterator();	// start over at beginning of path
+                        boolean first = true;
+                        while (iline.hasNext()) {
+                            if(first) {
+                                    first = false;
+                                    System.out.print("     ");
+                            } else {
+                                    System.out.print("     then ");
+                            }
+                            ls = iline.next();
+                            ls.describe();
+                        }
+                    }
+                }
+            }	// end of null "path" field
+            else
+            {	// use branching structure found in "path" field
+                if (this.isVerbose()) {
+                    this.path.describe();
+                }
+            }
 	}
 
 
@@ -242,57 +233,81 @@ public class SLSignal extends Signal
 	 *
 	 **/
 
-	public void describePath()
-	{
+	public void describePath() {
 
-		if (!this.isVerbose())
-			return;
+            if (!this.isVerbose()) {
+                    return;
+            }
 
-		System.out.println();
-		System.out.print("  Signal '" + getName() + "' runs from block '" + this.sourceCell.getBlock().getName() +
-				"' at location [" + this.sourceCell.getRowIndex() + "," +
-				this.sourceCell.getColIndex() + "] ");
-		if(path == null)
-		{
-			System.out.println(" to adjacent block '" + this.destCell.getBlock().getName() + 
-					"' at location [" + this.destCell.getRowIndex() + "," +
-					this.destCell.getColIndex() + "]. ");
-		}
-		else
-		{
-			System.out.println(" to " + this.getDests().size() + " different destination(s) as follows: ");
-			this.path.describe("    ");
-		}
+            System.out.println();
+            System.out.print("  Signal '" + getName() + "' runs from block '" + this.sourceCell.getBlock().getName() +
+                            "' at location [" + this.sourceCell.getRowIndex() + "," +
+                            this.sourceCell.getColIndex() + "] ");
+            if(path == null) {
+                System.out.println(" to adjacent block '" + this.destCell.getBlock().getName() + 
+                        "' at location [" + this.destCell.getRowIndex() + "," +
+                        this.destCell.getColIndex() + "]. ");
+            } else {
+                System.out.println(" to " + this.getDests().size() + " different destination(s) as follows: ");
+                this.path.describe("    ");
+            }
 	}
 
 
 	/**
 	 *
 	 * Writes signal wiring for Simulink representation.
+         * 
+         * Input signals to function tables get special treatment, since
+         * we need to write two lines from the upstream PreLookup block: 
+         * one for _k (index), and one for _f (fraction) to each destination.
 	 *
 	 * @param writer Instance of the SLFileWriter class
 	 *
 	 */
 
-	public void createAddLine(SLFileWriter writer) throws IOException
-	{
+	public void createAddLine(SLFileWriter writer) throws IOException {
+            // for now, just hook up I/O with autorouting to single destination
+            int numDim = -1;
+                    
+            BlockArrayList dests = this.getDestBlocks();
+            ArrayList<Integer> destPorts = this.getDestPortNumbers();
+            Iterator<Block> id = dests.iterator();
+            Iterator<Integer> ip = destPorts.iterator();
+            Block sourceBlock = this.getSourceBlock();
+            boolean sourceIsBreakpointBlock = sourceBlock instanceof gov.nasa.daveml.dave.BlockBP;
+            while (id.hasNext()) {
+                Integer destPortNumber = ip.next();
+                Block destBlock  = id.next();
+                boolean destIsBFT = destBlock instanceof gov.nasa.daveml.dave.BlockFuncTable;
+                if (destIsBFT) {
+                    numDim = destBlock.numInputs();
+                }
 
-		// for now, just hook up I/O with autorouting to single destination
-
-		BlockArrayList dests = this.getDests();
-		ArrayList<Integer> destPorts = this.getDestPortNumbers();
-		Iterator<Block> id = dests.iterator();
-		Iterator<Integer> ip = destPorts.iterator();
-		while (id.hasNext()) {
-			Integer destPort = ip.next();
-			Block destBlock  = id.next();
-
-			writer.addLine( this.getSource().getName(),
-					this.getSourcePort(),
-					destBlock.getName(),
-					destPort, this.getName());
-		}
-
+                String signalName = this.getName();
+                Integer sourcePortNumber = this.getSourcePort();
+                
+                if (destIsBFT && sourceIsBreakpointBlock) {
+                    signalName += "_k"; // first of two breakpoint outputs is index
+                    // if numDim == 5: maps 1->9, 2->7, 3->5, 4->3, 5->1
+                    destPortNumber = 1 + 2*(numDim - destPortNumber); 
+                }
+                writer.addLine( sourceBlock.getName(),
+                                sourcePortNumber,
+                                destBlock.getName(),
+                                destPortNumber, signalName);
+                
+                if (destIsBFT && sourceIsBreakpointBlock) {
+                    // add connection from fraction (second output)
+                    signalName = this.getName() + "_f"; // fraction
+                    sourcePortNumber += 1;
+                    destPortNumber += 1;
+                    writer.addLine( sourceBlock.getName(),
+                                sourcePortNumber,
+                                destBlock.getName(),
+                                destPortNumber, signalName);
+                }
+            }
 	}	// end of createAddLine
 
 }

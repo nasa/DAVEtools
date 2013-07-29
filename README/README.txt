@@ -1,9 +1,9 @@
 // This file can be turned into XHTML using AsciiDoc
 
-DAVEtools 0.9.5 README
+DAVEtools 0.9.6 README
 ======================
 Bruce Jackson, NASA Langley Research Center <bruce.jackson@nasa.gov>
-README Version 5, 2013-06-04
+README Version 6, 2013-07-29
 :TOC:
 
 Introduction
@@ -476,8 +476,18 @@ Download
 The latest version can be downloaded from the DAVEtools NASA website, 
 http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html.
 
-Changes since V 0.9
--------------------
+Changes since V 0.8.1
+---------------------
+V 0.9.6:: 
+  Changed to use newer PreLookup and Interpolation_n-D blocks;
+  corrected most 'if', 'while' statements in source to use braces;
+  changed exception handling to deal with syntax errors at a lower
+  level; changed order of import statements to make NetBeans happy;
+  deprecated +Block.getDests()+ and +Block.getSource()+ in favor of
+  +getDestBlocks()+ and +getSourceBlocks()+ to remove ambiguity of
+  whether a reference to a +Signal+ or a +Block+ was being retrieved;
+  maybe fixed vertical alignment of top-level subsystem?
+
 
 V 0.9.5:: Changed behavior of -i flag to DAVE; in addition to creating
         an XML snippet with internal values for any checkcase

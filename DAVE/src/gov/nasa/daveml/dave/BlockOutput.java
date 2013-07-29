@@ -112,13 +112,15 @@ public class BlockOutput extends Block
         String inVarID = theSignal.getVarID();
         if (theSignal != null) {
             code = code + inVarID;
-            if (theSignal.isStdAIAA()) 
+            if (theSignal.isStdAIAA()) {
                 code = code + " (" + theSignal.getName() + ")";
+            }
             code = code + " is a model output";
-            if (units.equalsIgnoreCase("nd"))
+            if (units.equalsIgnoreCase("nd")) {
                 code = code + " and is non-dimensional.";
-            else
+            } else {
                 code = code + " with units \'" + units + "\'";
+            }
         }
         return code;
     }
@@ -154,25 +156,29 @@ public class BlockOutput extends Block
         }
         
         // Check to see if only one input
-        if (this.inputs.size() < 1)
-            throw new DAVEException(" Output block " + this.myName + " has no input.");
-
-        if (this.inputs.size() > 1)
-            throw new DAVEException(" Output block " + this.myName + " has more than one input.");
-
+        if (this.inputs.size() < 1) {
+            throw new DAVEException(" Output block " + this.myName + 
+                    " has no input.");
+        }
+        if (this.inputs.size() > 1) {
+            throw new DAVEException(" Output block " + this.myName + 
+                    " has more than one input.");
+        }
         // see if single input variable is ready
         Signal theInput = this.inputs.get(0);
         if (!theInput.sourceReady()) {
-            if (this.isVerbose())
-                System.out.println(" Upstream signal '" + theInput.getName() + "' is not ready.");
+            if (this.isVerbose()) {
+                System.out.println(" Upstream signal '" + theInput.getName() + 
+                        "' is not ready.");
+            }
             return;
         }
 
         // get single input variable value
         double inputValue = theInput.sourceValue();
-        if (this.isVerbose())
+        if (this.isVerbose()) {
             System.out.println(" Input value is " + inputValue);
-
+        }
         // show ourselves up-to-date
         this.resultsCycleCount = ourModel.getCycleCounter();
 

@@ -20,8 +20,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -261,11 +259,13 @@ public class Signal
         this();
         ourModel = m;
         myName = signalName;
-        if (signalName == null)
+        if (signalName == null) {
             myName = "unnamed";
+        }
         myVarID = varID;
-        if (varID == null)
+        if (varID == null) {
             myVarID = "derived_signal_" + m.getNumSignals();
+        }
         myUnits = units;
         dests = new BlockArrayList(numConnects);
         destPorts = new ArrayList<Integer>(numConnects);
@@ -304,10 +304,10 @@ public class Signal
         this(signalElement.getAttributeValue("name" ), m);
         String name = signalElement.getName();
         if(name.equals("apply")) {
-        	Block b = this.handleApply(signalElement, m);
-                if (b == null) {
-                    throw new DAVEException("illegal syntax in <apply> element");
-                }
+            Block b = this.handleApply(signalElement, m);
+            if (b == null) {
+                throw new DAVEException("illegal syntax in <apply> element");
+            }
         } else if (name.equals("variableDef") ) { // not an apply element - should check to make sure it is a varDef?
             myVarID = signalElement.getAttributeValue("varID");
             myUnits = signalElement.getAttributeValue("units");
@@ -356,20 +356,22 @@ public class Signal
                 if(isControlElement != null) {
                     this.isControl = true;
                 } else {
-                    if(isDisturbanceElement != null)
+                    if(isDisturbanceElement != null) {
                         this.isDisturbance = true;
+                    }
                 }
             }
-            if(isStateElement      != null) this.isState      = true;
-            if(isStateDerivElement != null) this.isStateDeriv = true;
-            if(isOutputElement     != null) this.isOutput     = true;
-            if(isStdAIAAElement    != null) this.isStdAIAA    = true;
+            if(isStateElement      != null) { this.isState      = true; }
+            if(isStateDerivElement != null) { this.isStateDeriv = true; }
+            if(isOutputElement     != null) { this.isOutput     = true; }
+            if(isStdAIAAElement    != null) { this.isStdAIAA    = true; }
 
             // Look for description
             this.description = signalElement.getChildTextNormalize("description",
                     signalElement.getNamespace());
-            if (this.description == null)
+            if (this.description == null) {
                 this.description = "No description.";
+            }
             
             // Search for calculation/math element
             this.handleCalculation( signalElement, m );
@@ -384,8 +386,9 @@ public class Signal
     
     protected static String toValidId( String input ) {
         String output = "";
-        if (input != null)
+        if (input != null) {
             output = input.replace(" ", "_");
+        }
         return output;
     }
     
@@ -399,17 +402,19 @@ public class Signal
     private void handleCalculation( Element theVarDefElement, Model m ) {
         Element calc = theVarDefElement.getChild("calculation", theVarDefElement.getNamespace());
         if (calc != null) {
-        	if (verboseFlag)
-        		System.out.println("Calculation element found in signal " + myName + "...");
+        	if (verboseFlag) {
+                    System.out.println("Calculation element found in signal " + myName + "...");
+                }
             Element math = this.findMathMLChild(calc, "math");
             if (math != null) {
-            	if (verboseFlag)
-            		System.out.println("...it appears to be valid math!");
+            	if (verboseFlag) {
+                    System.out.println("...it appears to be valid math!");
+                }
                 Element apply = this.findMathMLChild( math, "apply");
                 if (apply != null) {
-                	if (verboseFlag)
-                		System.out.println("...with an apply element");
-                        
+                    if (verboseFlag) {
+                        System.out.println("...with an apply element");
+                    }
                     this.handleApply( apply, m );
                 }                    
             } else { // here if math == null
@@ -432,8 +437,9 @@ public class Signal
     	Namespace mathml = Namespace.getNamespace("", "http://www.w3.org/1998/Math/MathML");
     	Element child;
     	child = e.getChild(elementType, mathml);
-        if (child == null)
+        if (child == null) {
             child = e.getChild(elementType);  // try without namespace
+        }
         return child;
     }
 
@@ -464,14 +470,15 @@ public class Signal
         // copies list of pointers to downstream blocks
         this.dests      = new BlockArrayList( s.dests.size() );
         Iterator<Block> dest_iterator = s.dests.iterator();
-        while (dest_iterator.hasNext())
+        while (dest_iterator.hasNext()) {
             this.dests.add(dest_iterator.next() );
+        }
         // copies list of port indexs
         this.destPorts  = new ArrayList<Integer>( s.destPorts.size());
         Iterator<Integer> port_iterator = s.destPorts.iterator();
-        while (port_iterator.hasNext())
+        while (port_iterator.hasNext()) {
             this.destPorts.add(port_iterator.next() );
-
+        }
     }
 
     /**
@@ -484,8 +491,9 @@ public class Signal
 
     public boolean sourceReady() throws DAVEException
     {
-        if (source == null)
+        if (source == null) {
             throw new DAVEException("Error: Signal '" + this.getName() + "' has no source block - wiring error?");
+        }
         return source.isReady();
     }
 
@@ -500,8 +508,9 @@ public class Signal
 
     public double sourceValue() throws DAVEException
     {
-        if (source == null)
+        if (source == null) {
             throw new DAVEException("Error: Signal '" + this.getName() + "' has no source block - wiring error?");
+        }
         return source.getValue();
     }
 
@@ -623,13 +632,14 @@ public class Signal
         this.myVarID = theVarID;
         
         // set our source blocks output var ID
-        if (this.source != null)
+        if (this.source != null) {
             this.source.renameOutVarID();
+        }
         
         // set our destination blocks input varIDs
         BlockArrayList sinks = this.getDests();
         ArrayList<Integer> sinkPorts = this.getDestPortNumbers();
-        if ((sinks != null) && (sinkPorts != null))
+        if ((sinks != null) && (sinkPorts != null)) {
             for (int i = 0; i < sinks.size(); i++) {
                 Block blk = sinks.get(i);
                 blk.renameInVarID( sinkPorts.get(i));
@@ -640,6 +650,7 @@ public class Signal
                     sig.setVarID(theVarID);
                 }
             }
+        }
     }
 
 
@@ -838,17 +849,25 @@ public class Signal
         destPorts.add( new Integer(portNum) );
         sinkBlock.addInput( this, portNum );
     }
+    
+    /**
+     * Returns a BlockArrayList containing pointers to all the destination
+     * blocks for this signal.
+     * @return BlockArrayList the list of destination blocks for this signal
+     * @since 0.9.6
+     */
+    
+    public BlockArrayList getDestBlocks() { return this.dests; }
 
     /**
      *
-     * <p> Returns output block array list </p>
+     * <p> Returns output block array list </p>.
+     * <em> Alias for getDestBlocks() </em>
+     * @deprecated since 0.9.6
      *
      **/
 
-    public BlockArrayList getDests()
-    {
-        return this.dests;
-    }
+    public BlockArrayList getDests() { return this.getDestBlocks(); }
 
     /**
      *
@@ -904,12 +923,22 @@ public class Signal
     public String getUnits() { return myUnits; }
 
     /**
+     * Get the source block
+     * @return Block the <code>Signal</code>'s source block
+     * @since 0.9.6
+     */
+    
+    public Block getSourceBlock() { return this.source; }
+    
+    /**
      *
      * <p> Returns source block </p>
+     * <em> Alias for getSourceBlock </em>
+     * @deprecated
      *
      **/
     
-    public Block getSource() { return source; }
+    public Block getSource() { return this.getSourceBlock(); }
 
 
     /**
@@ -937,8 +966,9 @@ public class Signal
      **/
 
     public boolean hasDest() { 
-        if (this.dests == null)
+        if (this.dests == null) {
             return false;
+        }
         return (!dests.isEmpty()); 
     }
 
@@ -947,10 +977,12 @@ public class Signal
      */
 
     public void removeDestBlocks() {
-        if (this.dests != null)
+        if (this.dests != null) {
             this.dests.clear();
-        if (this.destPorts != null)
+        }
+        if (this.destPorts != null) {
             this.destPorts.clear();
+        }
     }
     
     /**
@@ -1057,8 +1089,9 @@ public class Signal
             cvn.appendCode(this.getVarID());
             cvn.addVarName(this.getVarID());
         }  
-        if (this.source != null)
+        if (this.source != null) {
             this.setDefinedFlag(); // record that we've emitted our code
+        }
         return cvn;
     }
 
@@ -1081,16 +1114,16 @@ public class Signal
 
         writer.write("Signal \"" + myName + "\" (" + myUnits + ") [" + myVarID + "] connects ");
 
-        if (source == null)
+        if (source == null) {
             writer.write("NO SOURCE BLOCK to ");
-        else
-            {
-                writer.write("outport " + sourcePort + " of block ");
-                writer.write(source.getName() + " to " );
-            }
+        }
+        else {
+            writer.write("outport " + sourcePort + " of block ");
+            writer.write(source.getName() + " to " );
+        }
+        //</editor-fold>
 
-        switch (numDests)
-            {
+        switch (numDests) {
             case 0:
                 writer.write("NO SINK BLOCKS.");
                 break;
@@ -1104,15 +1137,16 @@ public class Signal
                 writer.write("the following " + numDests + " blocks:\n");
                 Iterator<Block> outBlockIterator = dests.iterator();
                 Iterator<Integer> outBPortIterator = destPorts.iterator();
-                while ( outBlockIterator.hasNext() )
-                    {
-                        outputBlock = outBlockIterator.next();
-                        outputBPort = outBPortIterator.next();
-                        thePortNum = outputBPort.intValue();
-                        writer.write("   inport " + thePortNum + " of block " + outputBlock.getName() );
-                        if (outBlockIterator.hasNext()) writer.write("\n");
+                while ( outBlockIterator.hasNext() ) {
+                    outputBlock = outBlockIterator.next();
+                    outputBPort = outBPortIterator.next();
+                    thePortNum = outputBPort.intValue();
+                    writer.write("   inport " + thePortNum + " of block " + outputBlock.getName() );
+                    if (outBlockIterator.hasNext()) {
+                        writer.write("\n");
                     }
-            }
+                }
+        }
     }
 
 }

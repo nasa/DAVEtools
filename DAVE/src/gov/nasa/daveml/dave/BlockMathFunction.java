@@ -20,12 +20,11 @@ package gov.nasa.daveml.dave;
  *
  **/
 
-import org.jdom.Element;
-
 import java.io.IOException;
 import java.io.Writer;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
+import org.jdom.Element;
 
 
 /**
@@ -148,9 +147,10 @@ public class BlockMathFunction extends BlockMath
         } else if (funcType.equals("ceiling")) {
             this.op = CEIL;
             this.myType = "ceiling function";
-        } else 
-           throw new DAVEException("Unrecognized operator " + this.funcType 
-        		   + " in call to BlockMathFunction.setFunction() method." );
+        } else {
+           throw new DAVEException("Unrecognized operator " + this.funcType +
+        	" in call to BlockMathFunction.setFunction() method." );
+        }
     }
 
 	/**
@@ -184,6 +184,7 @@ public class BlockMathFunction extends BlockMath
      *
      **/
 
+    @Override
     public void update() throws DAVEException
     {
         int requiredNumInputs;
@@ -200,16 +201,17 @@ public class BlockMathFunction extends BlockMath
         }
         
         // Check to see if correct number of inputs
-        if (this.inputs.size() < 1)
+        if (this.inputs.size() < 1) {
             throw new DAVEException("Math " + this.myType + " block " + this.myName + " has no input.");
-
+        }
         // check type of operation to see if have required number of inputs
         requiredNumInputs = 1;
-        if (this.op > 9) requiredNumInputs = 2;
+        if (this.op > 9) { requiredNumInputs = 2; }
 
-        if (this.inputs.size() > requiredNumInputs)
-            throw new DAVEException("Math function block " + this.myName + " has too many inputs.");
-
+        if (this.inputs.size() > requiredNumInputs) {
+            throw new DAVEException("Math function block " + this.myName + 
+                    " has too many inputs.");
+        }
         // see if the input variable(s) is(are) ready
         index = 0;
         theInputValue = new double[2];
@@ -217,13 +219,17 @@ public class BlockMathFunction extends BlockMath
         while (theInputs.hasNext()) {
             theInput = theInputs.next();
             if (!theInput.sourceReady()) {
-                if (verbose)
-                    System.out.println(" Upstream signal '" + theInput.getName() + "' is not ready.");
+                if (verbose) {
+                    System.out.println(" Upstream signal '" + theInput.getName() + 
+                            "' is not ready.");
+                }
                 return;
             } else {
                 theInputValue[index] = theInput.sourceValue();
-                if (verbose)
-                    System.out.println(" Input #" + index + " value is " + theInputValue[index]);
+                if (verbose) {
+                    System.out.println(" Input #" + index + " value is " + 
+                            theInputValue[index]);
+                }
             }
             index++;
         }
@@ -252,9 +258,9 @@ public class BlockMathFunction extends BlockMath
             this.value = Math.ceil(theInputValue[0]); break;
         }
 
-        if (this.value == Double.NaN)
+        if (this.value == Double.NaN) {
             throw new DAVEException("Unrecognized operator " + this.funcType + " in block " + this.getName());
-
+        }
         // record current cycle counter
         resultsCycleCount = ourModel.getCycleCounter();
     }

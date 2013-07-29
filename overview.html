@@ -59,6 +59,36 @@
 
     <h2>Revision history</h2>
 
+    <h3>This is <em>DAVEtools</em> version 0.9.6</h3>
+
+    <h3>Changes since version 0.9.5</h3>
+    <ul>
+      <li>
+	Changed to use newer PreLookup and Interpolation_n-D blocks
+      </li>
+      <li>
+	Corrected most 'if', 'while' statements in source to use
+	braces.
+      </li>
+      <li>
+	Changed exception handling to deal with syntax errors at a
+	lower level.
+      </li>
+      <li>
+	Changed order of import statements to make NetBeans happy
+      </li>
+      <li>
+	Deprecated <code>Block.getDests()</code> and
+	<code>Block.getSource()</code> in favor of
+	<code>getDestBlocks()</code> and
+	<code>getSourceBlocks()</code> to remove ambiguity of
+	<code>Signal</code> vs. <code>Block</code> being retrieved.
+      </li>
+      <li>
+	Maybe fixed vertical offset of top-level subsystem?
+      </li>
+    </ul>
+
     <h3>Changes since version 0.9.4</h3>
     <ul>
       <li>

@@ -348,7 +348,7 @@ public class SLFileWriter extends FileWriter
 		this.writeln("");
 		this.write("add_block('built-in/subsystem','" + this.subsysName + "'");
 		this.writeln(",'Position',["
-				+ (subsysVertCL - subsysWidth/2) + ", " +  topOfBox + ", " 
+				+ (subsysVertCL - subsysWidth/2) + ", " + (topOfBox - 5) + ", " 
 				+ (subsysVertCL + subsysWidth/2) + ", " + (topOfBox + subsysHeight)
 				+ "]);");
 

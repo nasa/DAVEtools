@@ -80,17 +80,18 @@ public class NameList extends ArrayList<String>
     public String addUnique(String s)
     {
 	String name = this.fixName(s);	// perform any unique filtering
-	if (this.isUnique(s)) 
+	if (this.isUnique(s)) {
 	    super.add(s);
-	else
-	    {
+        } else {
 //System.out.print("-->Non-unique name " + s + " found; changed to ");
 		int suffix = 1;
-		while( !this.isUnique(s + suffix) ) suffix++;
+		while( !this.isUnique(s + suffix) ) { 
+                    suffix++;
+                }
 		name = s + suffix;
 		super.add(name);
 //System.out.println(name);
-	    }
+	}
 	return name;
     }
 }

@@ -113,8 +113,9 @@ public class BlockMathConstant extends BlockMath
         cvn.appendCode(this.getValueAsString());
         
         // if not derived, need trailing semicolon and new line
-        if (!outputSig.isDerived())
+        if (!outputSig.isDerived()) {
             cvn.appendCode(endLine());
+        }
         return cvn;
     }
 
@@ -149,9 +150,9 @@ public class BlockMathConstant extends BlockMath
 	}
 	
 	// Check to see if no input
-	if (this.inputs.size() > 0)
+	if (this.inputs.size() > 0) {
 	    throw new DAVEException("Constant block " + this.myName + " has more than zero inputs.");
-
+        }
 	// record current cycle counter
 	resultsCycleCount = ourModel.getCycleCounter();
     }
