@@ -45,19 +45,26 @@ How to prepare for a release or other distribution
 
 17. Merge back into develop using 
     $ git checkout develop
-    $ git merge --no-ff release/0.9.x
+    $ git merge --no-ff release/0.9.x -m \
+      "Merged release/0.9.6 into develop branch"
 
 18. Merge back into master
     $ git checkout master
-    $ git merge --no-ff release/0.9.x
-    $ git tag -a 0.9.x
+    $ git merge --no-ff release/0.9.x -m \
+      "Merged release/0.9.6 into master branch"
 
-19. Run 'ant dist' to create a zip file
+19. Tag release version
+    $ git tag -a 0.9.x -m "2013-07-29: 0.9.x to github"
 
-20. Put the new DAVEtools zip file on the DSCB Products website.
+20. Push to github
+    git push origin master
 
-21. Copy the README/README.html into DAVEtools/index.html on the
+21. Run 'ant dist' to create a zip file
+
+22. Put the new DAVEtools zip file on the DSCB Products website.
+
+23. Copy the README/README.html into DAVEtools/index.html on the
     daveml.org website
 
-22. Publish notices on daveml.org website; announce on sim-stds@nasa.gov
+24. Publish notices on daveml.org website; announce on sim-stds@nasa.gov
 

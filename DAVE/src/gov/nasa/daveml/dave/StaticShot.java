@@ -135,6 +135,8 @@ public class StaticShot
             } catch (NullPointerException e) {
                 System.err.println("Warning: can't find element 'signalName' in 'checkOutputs' element number "
                                    + outCount + " in scenario '" + this.scenario + "'; check capitalization.");
+            } catch (Exception e) {
+                System.err.println("Error: can't parse an output in checkcase '" + this.scenario + "'");
             }
             //      System.out.print("+");
         }

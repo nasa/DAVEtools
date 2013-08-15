@@ -85,3 +85,4 @@ package.
 
 2011-07-19 Posted version 0.9.4 on branch website and GitHub
 
+2013-07-29 Posted version 0.9.6 on GitHub
