@@ -1,25 +1,31 @@
 // This file can be turned into XHTML using AsciiDoc
 
-DAVEtools 0.9.7 README
+DAVEtools 0.9.6 README
 ======================
 Bruce Jackson, NASA Langley Research Center <bruce.jackson@nasa.gov>
-README Version 7, 2014-06-28
+README Version 7, 2014-11-18
 :TOC:
 
 Introduction
 ------------
+
 DAVEtools is a Java package that can be used to operate on DAVE-ML
-models. The package is intended for command-line use as there is no
-GUI, but the ModelSweeper tool does use a graphical interface.
+models; these are XML files with a custom grammar specific to the
+exchange of dynamic model data, such as flight simulation physics
+models (see link:http://daveml.org[http://daveml.org]). The package is
+intended for command-line use as there is no GUI, but the ModelSweeper
+tool does use a graphical interface.
+
+use a graphical interface.
 
 Key features of DAVEtools:
 
 * NASA open-source code written in Java
-* Validate checkcases within a DAVE-ML models
-* Obtain information about a DAVE-ML model
-* Allow use of DAVE-ML models from within Matlab(R)
-* Convert a DAVE-ML model into a Simulink(R) model, with a validation script
-* Plot a 3-D response surface for any output, based on any two inputs
+* Validates checkcases within a DAVE-ML models
+* Obtains information about a DAVE-ML model
+* Allows use of DAVE-ML models from within Matlab(R)
+* Converts a DAVE-ML model into a Simulink(R) model, with a validation script
+* Plots a 3-D response surface for any output, based on any two inputs
   in a DAVE-ML model
 
 Components
@@ -473,16 +479,11 @@ image:images/HL20_sweep.png[HL-20 pitch moment vs alpha and right wing flap defl
 
 Download
 --------
-The latest version can be downloaded from the DAVEtools NASA website, 
-http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html.
+The latest version can be downloaded from the NASA open-source website, 
+https://github.com/nasa/DAVEtools .
 
 Changes since V 0.8.1
 ---------------------
-V 0.9.7::
-  Renamed short --list (-l) option to -o for standardization. Added
-  --no-checkcase (-x) option to generate internal values for failed
-  checkcases.
-
 V 0.9.6:: 
   Changed to use newer PreLookup and Interpolation_n-D blocks;
   corrected most 'if', 'while' statements in source to use braces;
@@ -536,14 +537,16 @@ V 0.9.0:: Changed to support the default DAVE-ML namespace (xmlns);
 	fleshed out ant build.xml file to rely less on makefiles (but
 	a makefile is still needed to run the app_tests of DAVE2SL).
 	Corrected the inability of dave to parse MathML 'piecewise'
-	elements with more than one 'piece.'  Distribution format
-	switched to zip from tar to be more PC friendly.  Build system
-	switched to Ant from Make (but some hybrid make functionality
-	exists, to some version of make is still required).  Source
-	code management system now uses 'git' instead of Subversion.
+	elements with more than one 'piece.'
+ 	Distribution format switched to zip from tar to be more PC
+ 	friendly.
+	Build system switched to Ant from Make (but some hybrid make
+	functionality exists, to some version of make is still
+	required).
+	Source code management system now uses 'git' instead of
+	Subversion.
 	Now producing a single DAVEtools.jar that includes all
-	products for convenience, including dave, dave2sl,
-	modelsweeper, xerces and jdom .jar file contents. Slightly
-	different syntax used to invoke DAVE2SL (default jar entry
-	point) and DAVE.
+	products for convenience, including dave, dave2sl, modelsweeper,
+	xerces and jdom .jar file contents. Slightly different syntax
+	used to invoke DAVE2SL (default jar entry point) and DAVE.
 
