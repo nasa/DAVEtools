@@ -171,7 +171,7 @@ public class DAVE2SL extends DAVE {
                 if (numArgs == 2) {
                     //		    	String[] theArgs = getArgs();
                     System.err.println("Unable to understand and parse option switch '"
-                            + getArgs()[2] + "'.");
+                            + getArgs()[1] + "'.");
                 } else {
                     System.err.println("Unable to understand and parse all "
                             + (numArgs - 1) + " argument(s).");
