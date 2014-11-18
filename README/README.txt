@@ -1,9 +1,9 @@
 // This file can be turned into XHTML using AsciiDoc
 
-DAVEtools 0.9.6 README
+DAVEtools 0.9.7 README
 ======================
 Bruce Jackson, NASA Langley Research Center <bruce.jackson@nasa.gov>
-README Version 6, 2013-07-29
+README Version 7, 2014-06-28
 :TOC:
 
 Introduction
@@ -478,6 +478,11 @@ http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html.
 
 Changes since V 0.8.1
 ---------------------
+V 0.9.7::
+  Renamed short --list (-l) option to -o for standardization. Added
+  --no-checkcase (-x) option to generate internal values for failed
+  checkcases.
+
 V 0.9.6:: 
   Changed to use newer PreLookup and Interpolation_n-D blocks;
   corrected most 'if', 'while' statements in source to use braces;
@@ -531,16 +536,14 @@ V 0.9.0:: Changed to support the default DAVE-ML namespace (xmlns);
 	fleshed out ant build.xml file to rely less on makefiles (but
 	a makefile is still needed to run the app_tests of DAVE2SL).
 	Corrected the inability of dave to parse MathML 'piecewise'
-	elements with more than one 'piece.'
- 	Distribution format switched to zip from tar to be more PC
- 	friendly.
-	Build system switched to Ant from Make (but some hybrid make
-	functionality exists, to some version of make is still
-	required).
-	Source code management system now uses 'git' instead of
-	Subversion.
+	elements with more than one 'piece.'  Distribution format
+	switched to zip from tar to be more PC friendly.  Build system
+	switched to Ant from Make (but some hybrid make functionality
+	exists, to some version of make is still required).  Source
+	code management system now uses 'git' instead of Subversion.
 	Now producing a single DAVEtools.jar that includes all
-	products for convenience, including dave, dave2sl, modelsweeper,
-	xerces and jdom .jar file contents. Slightly different syntax
-	used to invoke DAVE2SL (default jar entry point) and DAVE.
+	products for convenience, including dave, dave2sl,
+	modelsweeper, xerces and jdom .jar file contents. Slightly
+	different syntax used to invoke DAVE2SL (default jar entry
+	point) and DAVE.
 
