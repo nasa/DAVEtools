@@ -8,18 +8,24 @@ README Version 7, 2014-11-18
 
 Introduction
 ------------
+
 DAVEtools is a Java package that can be used to operate on DAVE-ML
-models. The package is intended for command-line use as there is no
-GUI, but the ModelSweeper tool does use a graphical interface.
+models; these are XML files with a custom grammar specific to the
+exchange of dynamic model data, such as flight simulation physics
+models (see link:http://daveml.org[http://daveml.org]). The package is
+intended for command-line use as there is no GUI, but the ModelSweeper
+tool does use a graphical interface.
+
+use a graphical interface.
 
 Key features of DAVEtools:
 
 * NASA open-source code written in Java
-* Validate checkcases within a DAVE-ML models
-* Obtain information about a DAVE-ML model
-* Allow use of DAVE-ML models from within Matlab(R)
-* Convert a DAVE-ML model into a Simulink(R) model, with a validation script
-* Plot a 3-D response surface for any output, based on any two inputs
+* Validates checkcases within a DAVE-ML models
+* Obtains information about a DAVE-ML model
+* Allows use of DAVE-ML models from within Matlab(R)
+* Converts a DAVE-ML model into a Simulink(R) model, with a validation script
+* Plots a 3-D response surface for any output, based on any two inputs
   in a DAVE-ML model
 
 Components
