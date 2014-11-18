@@ -35,7 +35,7 @@ DAVE::
 	from the model.
 	This class can be called from within the Mathworks Matlab(R)
 	environment to allow use of a DAVE-ML model within the Matlab
-	workspace. A demo script is available link:dave_demo.html[here].
+	workspace. A demo script is available link:README/dave_demo.html[here].
 
 DAVE2SL::
 	Generates a Matlab(R) script that, when executed in Mathwork's
@@ -327,7 +327,7 @@ Exercising a DAVE-ML model with Matlab(R)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Even if Simulink(R) is not licensed, the DAVE-ML model can still be
 used through Matlab(R) +.m+ scripting. An example script is
-link:dave_demo.html[here]. Shown below is an example of the demo
+link:README/dave_demo.html[here]. Shown below is an example of the demo
 script in action.
 
 ----
