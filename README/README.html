@@ -3,8 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.8" />
-<title>DAVEtools 0.9.5 README</title>
+<meta name="generator" content="AsciiDoc 8.6.9" />
+<title>DAVEtools 0.9.6 README</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
 
@@ -94,7 +94,9 @@ ul > li > * { color: black; }
   padding: 0;
   margin: 0;
 }
-
+pre {
+  white-space: pre-wrap;
+}
 
 #author {
   color: #527bbd;
@@ -223,7 +225,7 @@ div.exampleblock > div.content {
 }
 
 div.imageblock div.content { padding-left: 0; }
-span.image img { border-style: none; }
+span.image img { border-style: none; vertical-align: text-bottom; }
 a.image:visited { color: white; }
 
 dl {
@@ -731,10 +733,10 @@ asciidoc.install(3);
 </head>
 <body class="article">
 <div id="header">
-<h1>DAVEtools 0.9.5 README</h1>
+<h1>DAVEtools 0.9.6 README</h1>
 <span id="author">Bruce Jackson, NASA Langley Research Center &lt;bruce.jackson@nasa.gov&gt;</span><br />
-<span id="revnumber">version 5,</span>
-<span id="revdate">2013-06-04</span>
+<span id="revnumber">version 7,</span>
+<span id="revdate">2014-11-18</span>
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
   <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
@@ -1155,7 +1157,8 @@ All cases passed: model "HL20_aero" verified.
 Simulink diagrams. The underlying details are a bit messy, but
 functional.</p></div>
 <div class="paragraph"><p><span class="image">
-<img alt="HL-20 Simulink block diagram" src="data:image/png;base64,
+<img alt="HL-20 Simulink block diagram"
+src="data:image/png;base64,
 iVBORw0KGgoAAAANSUhEUgAAAtsAAAJ9CAYAAADkNb5bAAAXWWlDQ1BJQ0MgUHJvZmlsZQAAeAHV
 WWdUFcuy7pmdYMMmbXLOOeecc84CArLZ5JwlZ5EkgiKSRAVEsooCigkQBEERJJgRVBQEFQMikt6g
 55x737rv/Xt/3qw1Pd9UVVfXTFX3VPUAwLZCiogIgekACA2LibI30ed1cXXjxT0HKMACqIE0IJLI
@@ -1271,14 +1274,14 @@ CEAAAv0J3Hn+/Pnf2X193fXXX/+fTz70oQ994snJya/sBNftvvq7wwICEIAABCAAAQhAAAIQuEhg
 un1291S7tdC2V0vuvffe5o477mj+5E/+pPm1X/u15v3vf79V6vub0c6+efjDH9582qd9WvOoRz2q
 ecADHtCcPXvWHp1nc4k+X/WqVzUf/OD7dzZn9zY2f8MNNzSf8RmfMdin8jxz1S6P3Q30nnvubR7x
 iEf0yjO7ACYgAIHVEbjnnnuat7/97ftri13T7FBhrb4KcBXaNv+BD3yg+ZiP+Zi9Pv+DAAQgAAEI
-9CFgdfbJe9/73tb3R+6+++7mwx/+cPMbv/Ebzete97rmYQ97WPPQhz60efCDH9xYUWxzf/Znf7b/
+9CFgdfbJe9/73tb3R+67mwx/+cPMbv/Ebzete97rmYQ97WPPQhz60efCDH9xYUWxzf/Znf7b/
 eupTn9p8yqd8SvOgBz2o9UmQ9/na17527/PBD72+uX5nd2F3c7v91lt3/m5p/vRP/7R52tOe1tvn
 61//+n2OD33oQ/Z5ntvleesttzQf+tAt+zxLffaBiS4EILBsAvZU+zWveU3zlKc8Zf90+9prT38W
 XAW3tVZk+4L7rrvuav7gD/6g+fRP//RlL47sIAABCEBgsQTO6saSy/C2227b36De/OY3N094whOa
 xz/+8fsve5pttu973/uad7zjHc0f/dEfNaZjT7Wf/vSn74vdNp+//du/vdd/0pOe2DzucY9vHvf4
 x+6fkNs/4L7vfe9v3vHOdzTv+KN37HWuvvrq5pM/+ZOLfT7hiU9obtrl+djHmc+Pbs6fu9C8973v
 bt75znftcn1ncZ65/JFDAALrI2DXq/vd736NFdm7hwyNXYPswYE9IPCvidhTb7um2b/SXXfddY1d
-f7quk57GhVte3/zwv/yPzeO/6u81n/nY+12cOvfuX2+++397Z/OcFzyvedLVF5r3/+aPNd/76hub
+f7quk57GhVte3/zwv/yPzeO/6u81n/nY+12cOvfuX2397Z/OcFzyvedLVF5r3/+aPNd/76hub
 r/66z25uDP8QeNfbX9O8+MUvbn7ila/f2z/6mV/efMNXPrd58g1XX/R397t/q/nef/KtzX9829nm
 lqf+1eb7v/Urm0+44fQVmItKdCAAAQhA4OAEOotte2Xkj//4j/f/jPqYxzxm/9TaXiGxp0R22Osi
 9nqGvddoT7tN94lPfGLzkIc8JLs482nFuf3T7GMf+9j9De3sVWf3T5vsVnHVrn/jw3c+H3Ddbu5B
@@ -1289,7 +1292,7 @@ T2j+9fd8dfPw236v+eFv/J7mH/67k+YHX//FzSN2qid33dx81xd9W/Pv/8rfb17ygo9pfudfPb/5
 9s/9SPNvXvU1+0J+dZtDwhCAAAQ2TKCz2H7rW9/aPPKRj2xuuummi09/7DUQHXr30Z4AWZFtNyaz
 aXvH0f5Z9tGPfvTepz1psn++vffec/vC2PyaT5N5n2bT5jPmeXJyZv+e9h133LXzePpPw5ab3Tyt
 cDf/XXlqjbQQgMD6CVjBbOe9Fdz2Tfkzn/nM5md/9mebV7ziFftr3OMe97jm1t0rbL//+7/f3LS7
-3tm/3t1+++37QrtPsX1h9439/tjF83YXLpzKdxfdU5+769LJud3PuAQ9s33U5/2L5lVfeE1z+lMs
+3tm/3t137QrtPsX1h9439/tjF83YXLpzKdxfdU5+769LJud3PuAQ9s33U5/2L5lVfeE1z+lMs
 j2/+7j94XfO3Xvja5t13fHFz464wf99v/Ezzq/d8QfNT3/Z5zRN3T8k/9h/88+aHnveC5uff8N83
 X/PU/IOO08T4PwQgAAEIzEngrL133XbYO4tWbFtRbK+I2M3KilbZ2Y3LZLqR2Q822pMhzad821Nx
 e6Itn+bPvs6dO83F+vZPt/JhPu2JucYpn/YbBizP+9///vubqflQXpab92n9j/qoj+rMMxUHGQQg
@@ -1547,7 +1550,7 @@ jQD32q3t6PrWQ7F9gD3TiT9FYTyl7wOgIiQEIAABCEBgEIEp74dT+h60WIwWTYBie+btsRN0iiJb
 y5DvqeMoHi0EIAABCEBgaQSmvgdyr13aji87H97ZnnF/pj75/VLsQmDxOMYRMIZwHMcQawhAAAJj
 CfS5FpuuiuGxcbvsudd2EWLeCFBsL/hzoIsLxd7hN0l7UZrJkD0bYlOaj9erHae2P58r/eMk4D9T
 6qutRaS2v1p54aedgO3bVHs3ld/2FTF7DAQotmfaZTuJ+3ynLX2zGfqd81C7mZCsMozty6EuyHPH
-1VprxpVPbX5N3/JJuxwC2u+++5y6VqZkXSvNxTe5/MXc4rgrhp/3tr7vdejXIWB8U4xNpr3tEynl
+1VprxpVPbX5N3/JJuxwC2u5y6VqZkXSvNxTe5/MXc4rgrhp/3tr7vdejXIWB8U4xNpr3tEynl
 q9Te4o2xL42D3noJUGyvZO+GXDxWsrRVpmkX1q6La0qnROb9+n4EJV9RJ8o1r1Z+pOfH1vd69rnz
 N5IuG28rv77NfY7H+vUx6E9DwO+t+qlWMmURP0MmN52o52Wa8636KXvZRh3Fji9wt4sAACAASURB
 VJ9h+bDWDtmpTckUY2/A/xZDoMa+mI/ctWkxCyWRVRPgByQXvn26+I+5EMjHwpe6yvTa2GrPdCFX
@@ -2144,7 +2147,8 @@ surface</a> of a DAVE-ML output signal as a function of two inputs.</p></div>
 <div class="paragraph"><p>will bring up a GUI that allows one to select the input model and
 examine the response surface for a particular input, as shown below.</p></div>
 <div class="paragraph"><p><span class="image">
-<img alt="HL-20 pitch moment vs alpha and right wing flap deflection" src="data:image/png;base64,
+<img alt="HL-20 pitch moment vs alpha and right wing flap deflection"
+src="data:image/png;base64,
 iVBORw0KGgoAAAANSUhEUgAAAoAAAAHaCAYAAACQMPgvAAAACXBIWXMAAAsTAAALEwEAmpwYAAAg
 AElEQVR4AeydB7gdVbXH900HElok0knoJVITivA0KCJVqRaKBBR4IOgDBUUFQTooiiAYEIiI0kSl
 PJTyhE9BpAaQooAQOgQMCNICJG/99mSdzJ1ML/eec89aX27OOVPW7PnPntn/WW33zBFxJoaAIWAI
@@ -2175,7 +2179,7 @@ xRZbeP1xOj760Y8mrovbXpeFz0GXxX2uvfba/nr+/Oc/9ySb60o79bh59cTptmWGgCFgCIDAEIPB
 EDAE+g4BLDc/+MEPHNaUl156yW277bbu05/+tHc7MthjuRs0aJDbaaed3Pjx492tt97qbrjhBvf4
 44+7L3/5y+7222/3RAfCwn7rrrvufI3HhTly5Ei//N133/UECXIU3ger14knnuheffVVN2rUqJaO
 H/3oR97at8466zgsbBCr7bbbzq266qruySef9BayBRdc0JPBj3/84w4ilnSMv/zlL347XLQc/1Of
-+pT761//6nV86Utf8ucXd87sd8cdd7ghQ4a4+++/3+24447eInbVVVe5Rx991F1//fXuAx/4gFt+
++pT761//6nV86Utf8ucXd87sd8cdd7ghQ4a4/3+24447eInbVVVe5Rx991F1//fXuAx/4gFt+
 +eUdREnl61//usc1qT3gEne8Cy64wJ/rL3/5S/fMM8+0vq+44orun//8p9ttt90cuDz33HNu+PDh
 3lr68ssv+3W77757rM4857Dllltq01M/F1lkEX+N3n//fY8fbeL4igVENdo+FP7jH//w5BEMd955
 Z7fVVlslHiepvUn9JFGRrTAEDIGOQcAsgB1zqayhAwEBiNDHPvYx72486qij3G9/+1t/Wvfee6/7
@@ -2348,7 +2352,7 @@ iD1ccMHhvp9wXAgQ5AsrEyQgbBENHydLf3jb8HeyeXFx464VHpooZfSjT95xPFEGG1zDRx7pBFcn
 sZxOLKC9D5d0bSHIzL+rcYj0I541tInrmleS9OfdP227JnVz3Kh+fnPv0C/1ZZt+QmyliSHQNAIW
 A9g0wh2gH2sWJIfsPh7EWHKw3vDA7kbB5U25Dwgfs5Ng6WIAV/LQbZgwMEGwcHUT4M5vStlA/MCl
 SeFakGREQg2EgVAEZmkIS3SbTTaZImTrG+7CC18Xy8q/3FixuLAvcZp8Z3tc+ATm47ZGJ1aqqjGC
-PQLFDjs4t+++QYZtuI36HXcoBJa+xDzGfGewT7KW6n5pn1TU+dSngsQPEjr6QoT/C75OiLmTWUSc
+PQLFDjs4tQYZtuI36HXcoBJa+xDzGfGewT7KW6n5pn1TU+dSngsQPEjr6QoT/C75OiLmTWUSc
 o9SOdI3CglUdSzrnr32Ma5RGsgsfpMN2IISEFwT6LBnFEEQNMemwU7HmtjkC3TnCt/lFabp5EDwG
 PZ3aiMEIt66+hROvkkX+moqX0XPvS/0MQBACBiAEiwTkRt/CGZyKkL++bLviVecn7YcYQYLBApJH
 PB+ubgQs6CtlyV8RfBgEsRpxLKwlEKiohLcZMWJRN336Xu6AA8hQHeUJPOfAfnoNiblSgoHVUksW
@@ -2376,7 +2380,7 @@ bcZzDsEqOGHChFYNRggyLwe4RctKO/X7Iuegz3buAxL56DO88DAeNH1ORdpp27YfAkYA2++a5GoR
 7ksehjrxOO4BBkcejAjWgibdAWXiWXKd2NyNiurHUoJLTwkfD0BcXTwUEb4rNvwuqp998kqTumlD
 Xv3EeuocreCjLm90KDY6eLBMJa9+3b7oZ1H9EFXmWsWare5LruUmsJC58qtfrSCZwj1up50CQsti
 zo19sRAxRSGuVV3OvaLLlVT5lRn/YUUOxwhKYrS7+WYISTAFW8bumavTYvQ4d3X/vfDCaHf33cOl
-zuE7Xif9Hncx1qA0SdOftp+uE57lSd1+++mS3p9R/eCC5Y8YQeYZJpZSLoU7/XTc6b33zfMr3Hd4
+zuE7Xif9Hncx1qA0SdOftp+uE57lSd1mS3p9R/eCC5Y8YQeYZJpZSLoU7/XTc6b33zfMr3Hd4
 vuk1xZrLvU4/RyCCxPjq76K682xfdJtw24vum2d79KuLmfEAq7mOAcQNQgbDCTV5dNo2AxsBI4Ad
 dH25ebFoIMRrcVNrRiFuLs2WZH1eqwbblpF20M9gx6CHYNGhZIImCIAFmKgFJXqOTba/Sd2cR5p+
 DZiHAGMxw1KGEF+Gm1Nj6fzChP/S9CfsUmhxGf1J15EDi6HXnXsuiRA9se1I2jdpeaySuQu1hh0/
@@ -3642,7 +3646,7 @@ h4CfphBYNAoc52kXpsnTpw5zSGMjGAWIB5xWomSQiglinp47aRPR1C6gldsBIDYkz2Bs2As+ggQr
 06ajxJznGph0txJ4Jp36EMrbSMdT/lwXuNlUu9vNHV8Yf8LDHNIm0OYQID5XQWVckoT0kNM+2h5L
 A/TOd24u3v/+1eHHthxAaEu8OrO4/SQNR5694hUlaK6afnOf9WPeeQar7Zd2hF+fpNfoxl8Ga9aA
 DWhfoCmCmDZQOhMBDQ95yHUx5t9I2mladHVnUJXbEIH4yeSOPuZV0Ky55x9tzvN6qNYfuLR4znPK
-VD+ifKsF3dMAZhMzQIlHZz5dvbbtfUzbbom25TcEcr/5za9GwMstw+x8YQC+zSk3q3pYFs4+++wE
+VD+ifKsF3dMAZhMzQIlHZz5dvbbtfUzbbom25TcEcr/5za9GwMstw+x8YQC+zSk3q3pYFs4wE
 BtHrT/7kTyYe+OAHP3hqXtbWvn3xe5sJa8Hc/szP/MxO/mqOF2XPj8ACAHbMAWG8oSYBaYIsdICP
 aaaJUXVUufOnprp3/jiHNytZPw3Tueeem3xvmFrs6i12AIT5BKDil3NnicoqBdPmP7In8/RpDiaV
 zYuijoFAJgwaiT1RjAsGSXgxm3tPC5bNadU2ARsANC0TLQ0tGTOXOQAKpiltQSM0X6FciZQfpans
@@ -3952,7 +3956,7 @@ v/qr5Z/40dxuItJtu4atD21FW+k+Urtunr62+lf9zBhkC03mbSkhZ5K9VdHM7yUB3EEdYMQZYZEq
 e4zM1hnpMfeJuAfywCEwXGbgfjjjNtLU1i3qUFy/6Tx9SJ9ohqjqqnkGya6ObeTpc29lnTyDnI3l
 MUtL+o1Dh8vY+zI5Ynq67mZ2hMReLk4dDt4jAMj7WAVmcKK7cDIGRCWNt2UddzxqruyKKEvDDlX8
 n7J0erS65ZbTSl+MJfmsXtgbb2QVbWI3nvGM55R9e6dWv/d7Tz712yWNCBviC2vRKn+rtwt7S8Kf
-//zsp3RT2Rs5e+ScpW7dVZ7CVZ/8PX68645PfG7M6W9t8ZQnfeFnWfxdO0SevickWv4d4myyCatj
+
 JUJpwmDMifL5LEsisA4CSQDXQe8AfBcJE8Eyo4xoFpIjurWugWFwOTyzfk7PMulQeQYZZdEUcrrP
 GHn61IvsID2Wp4fMMxiqg4yLZo2Rp889yD5WnkF1i0YMnaeP3PrWQYKxcgzSe/XbLK+PkRsEre2w
 BXn6FLqJbFr6HDLP4G232W9XVR4195zn/Kg6flyC6fvq/jXGhpC92U74IG0mbGyDgnOUx5iXyGtV
@@ -4083,14 +4087,29 @@ yRZ2TAgXAAAAAElFTkSuQmCC" />
 <div class="sect1">
 <h2 id="_download">Download</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The latest version can be downloaded from the DAVEtools NASA website,
-<a href="http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html">http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html</a>.</p></div>
+<div class="paragraph"><p>The latest version can be downloaded from the NASA open-source website,
+<a href="https://github.com/nasa/DAVEtools">https://github.com/nasa/DAVEtools</a> .</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_changes_since_v_0_9">Changes since V 0.9</h2>
+<h2 id="_changes_since_v_0_8_1">Changes since V 0.8.1</h2>
 <div class="sectionbody">
 <div class="dlist"><dl>
+<dt class="hdlist1">
+V 0.9.6
+</dt>
+<dd>
+<p>
+  Changed to use newer PreLookup and Interpolation_n-D blocks;
+  corrected most <em>if</em>, <em>while</em> statements in source to use braces;
+  changed exception handling to deal with syntax errors at a lower
+  level; changed order of import statements to make NetBeans happy;
+  deprecated <code>Block.getDests()</code> and <code>Block.getSource()</code> in favor of
+  <code>getDestBlocks()</code> and <code>getSourceBlocks()</code> to remove ambiguity of
+  whether a reference to a <code>Signal</code> or a <code>Block</code> was being retrieved;
+  maybe fixed vertical alignment of top-level subsystem?
+</p>
+</dd>
 <dt class="hdlist1">
 V 0.9.5
 </dt>
@@ -4189,8 +4208,8 @@ Changed to support the default DAVE-ML namespace (xmlns);
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Version 5<br />
-Last updated 2013-06-04 16:37:23 EDT
+Version 7<br />
+Last updated 2014-11-18 13:18:50 EST
 </div>
 </div>
 </body>

@@ -3,7 +3,7 @@
 DAVEtools 0.9.6 README
 ======================
 Bruce Jackson, NASA Langley Research Center <bruce.jackson@nasa.gov>
-README Version 6, 2013-07-29
+README Version 7, 2014-11-18
 :TOC:
 
 Introduction
@@ -473,8 +473,8 @@ image:README/images/HL20_sweep.png[HL-20 pitch moment vs alpha and right wing fl
 
 Download
 --------
-The latest version can be downloaded from the DAVEtools NASA website, 
-http://dscb.larc.nasa.gov/Products/SW/DAVEtools.html.
+The latest version can be downloaded from the NASA open-source website, 
+https://github.com/nasa/DAVEtools .
 
 Changes since V 0.8.1
 ---------------------
