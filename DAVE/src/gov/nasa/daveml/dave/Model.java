@@ -843,8 +843,7 @@ public class Model
     /**
      * Verify model integrity
      *
-     * Returns true if no disconnects found
-     *
+     * @return true if no discussions found
      **/
 
     public boolean verifyIntegrity()
@@ -949,9 +948,9 @@ public class Model
     /**
      *
      * <p> Performs model initialization: </p>
-     * <ol>
-     *   <li>Resets cycle counter</li>
+     * <ol> 
      *   <li>Determines execution order of blocks</li>
+     *   <li>Invokes reset</li>
      * </ol>
      * @throws DAVEException
      *
@@ -1096,11 +1095,41 @@ public class Model
             System.out.println("Model initialized and execution order established.");
             System.out.println("");
         }
+        
+        this.reset(); /* loads initial values into input boxes */
         }
 
     }
 
+        /**
+     *
+     * <p> Performs model reset: </p>
+     * <ol>
+     *   <li>Resets cycle counter</li>
+     *   <li>Sets input blocks to their output signal's IC value</li>
+     * </ol>
+     *
+     **/
 
+    public void reset()
+    {
+        Iterator<Block> blockIterator;
+        BlockInput b;
+        Double icValue;
+        this.resetCycleCounter();
+        
+        blockIterator = inputBlocks.iterator();
+        while (blockIterator.hasNext()) {
+            b = (BlockInput) blockIterator.next();
+            Signal outputSignal = b.getOutput();
+            if (outputSignal.hasIC) {
+                icValue = outputSignal.getICValue();
+                b.setInputValue(icValue);
+            }
+        }
+    }
+    
+    
     /**
      * <p> Builds &amp; returns the current values of output blocks </p>
      *

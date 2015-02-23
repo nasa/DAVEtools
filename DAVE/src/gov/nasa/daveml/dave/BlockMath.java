@@ -98,12 +98,13 @@ abstract public class BlockMath extends Block
      * @param applyElement Reference to <code>org.jdom.Element</code>
      * containing "apply" element
      * @param m		The parent <code>Model</code>
+     * @return Math block of appropriate type
      * @throws DAVEException if problems were encountered
      *
      **/
 
     @SuppressWarnings("unchecked")
-	public static BlockMath factory( Element applyElement, Model m)
+    public static BlockMath factory( Element applyElement, Model m)
            throws DAVEException
     {
 //System.out.println("    BlockMath factory called.");
@@ -116,7 +117,7 @@ abstract public class BlockMath extends Block
 	String theType = first.getName();
 	
 	// take appropriate action based on type
-	if(theType.equals("abs")) {
+	if( theType.equals("abs") ) {
 	    return new BlockMathAbs( applyElement, m );
         }
 	if( theType.equals("lt" ) ||
@@ -127,13 +128,18 @@ abstract public class BlockMath extends Block
 	    theType.equals("neq") ) {
 	    return new BlockMathRelation( applyElement, m );
         }
-	if(theType.equals("minus")) {
-	    return new BlockMathMinus( applyElement, m );
+        if( theType.equals("not") ||
+            theType.equals("or" ) ||
+            theType.equals("and") ) {
+	    return new BlockMathLogic( applyElement, m );
         }
-	if(theType.equals("piecewise")) {
+        if( theType.equals("minus") ) {
+            return new BlockMathMinus( applyElement, m );
+        }
+	if( theType.equals("piecewise") ) {
 	    return new BlockMathSwitch( applyElement, m );
         }
-	if(theType.equals("plus")) {
+	if( theType.equals("plus") ) {
 	    return new BlockMathSum( applyElement, m );
         }
 	if( theType.equals("times") ||

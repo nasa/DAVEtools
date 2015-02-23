@@ -1002,10 +1002,11 @@ public class DAVE {
     /**
      * Requests new model inputs from user. <p> Will return -1 if user signals
      * end-of-input (
-     * <code>^D</code>)
+     * <code>^d</code>)
      *
      * @param inVec A {@link VectorInfoArrayList} listing inputs and default
      * values
+     * @return int -1 to quit, 0 to keep going
      * @throws IOException;
      *
      *
@@ -1301,6 +1302,7 @@ public class DAVE {
      * Provides a static entry point for running DAVE as standalone utility.
      *
      *
+     * @param args
      */
     public static void main(String args[]) {
 
@@ -1313,7 +1315,7 @@ public class DAVE {
         }
         try {
             success = dave.parseFile();
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.err.println(e.getMessage());
         }
 

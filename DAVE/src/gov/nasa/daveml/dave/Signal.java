@@ -166,7 +166,7 @@ public class Signal
     private boolean derived = false;
 
     /**
-     * indicates this signal's equivalent code has been emitted by a call to 
+     * indicates this signals equivalent code has been emitted by a call to 
      * {@link genCode}
      * 
      */
@@ -998,11 +998,22 @@ public class Signal
      *
      * <p> Returns text value of initial condition </p>
      *
+     * @return String containing IC value
      **/
 
     public String getIC() { return this.IC; }
 
-
+    /**
+     * 
+     * <p> Returns value of initial condition as Double </p>
+     * 
+     * @return Double representing IC value
+     **/
+    
+    public Double getICValue() {
+        return Double.parseDouble(this.getIC());
+    }
+    
     /**
      *
      * <p> Indicates if we were declared an input signal </p>

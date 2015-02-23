@@ -174,6 +174,9 @@ public class SLBlock
      * Creates necessary Matlab commands to add our block
      *
      * @param writer Instance of the SLFileWriter class
+     * @param x  horizontal position of block
+     * @param y  vertical position of block
+     * @throws java.io.IOException
      *
      **/
 

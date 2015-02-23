@@ -43,7 +43,7 @@ public class BlockMathFunctionExtension extends BlockMathFunction
      **/
 
     private static final int ATAN2 = 11;        // double-digits implies two inputs
-    private static String DAVEML_EXT_URL = "http://daveml.org/function_spaces.html";
+    private static final String DAVEML_EXT_URL = "http://daveml.org/function_spaces.html";
 
     /**
      *
@@ -106,20 +106,22 @@ public class BlockMathFunctionExtension extends BlockMathFunction
         String defURL   = csymbol.getAttributeValue("definitionURL");
         if( defURL == null ) {
             System.err.println("Warning - required csymbol 'definitionURL' attribute missing; assumed valid");
-        }
-        if( !defURL.startsWith(DAVEML_EXT_URL) ) {
-            System.err.println("Error - required csymbol 'definitionURL' unrecognized.");
-            System.exit(0);
+        } else {
+            if( !defURL.startsWith(DAVEML_EXT_URL) ) {
+                System.err.println("Error - required csymbol 'definitionURL' unrecognized.");
+                System.exit(0);
+            }
         }
 
         // check the encoding attribute - should be 'text'
         String encoding = csymbol.getAttributeValue("encoding");
         if( encoding == null ) {
             System.err.println("Warning - required csymbol 'encoding' attribute missing; assumed 'text'");
-        }
-        if( !encoding.equals("text") ) {
-            System.err.println("Error - required csymbol 'encoding' unrecognized.");
-            System.exit(0);
+        } else {
+            if( !encoding.equals("text") ) {
+                System.err.println("Error - required csymbol 'encoding' unrecognized.");
+                System.exit(0);
+            }
         }
                 
         // get the actual name of the extension function
@@ -151,6 +153,8 @@ public class BlockMathFunctionExtension extends BlockMathFunction
 
     /**
      * Change extended function type (calls superclass setFunction if not "atan2")
+     * @param functionType String with name of function
+     * @throws gov.nasa.daveml.dave.DAVEException
      * @since 0.9
      */
     @Override
@@ -165,7 +169,8 @@ public class BlockMathFunctionExtension extends BlockMathFunction
      *
      * <p> Generates description of self </p>
      *
-     * @throws <code>IOException</code>
+     * @param writer FileWriter on which to generate description
+     * @throws IOException
      * @since version 0.8 / rev 193
      **/
 

@@ -103,9 +103,16 @@ public class VectorInfo
 		this.signalName = signalName;
 		this.myUnits = units;
 		if (isInput) {
-			this.isInput = true;
-			this.sink = blk;
-			this.source = null;
+                    this.isInput = true;
+                    this.sink = blk;
+                    this.source = null;
+                    if (blk != null) {
+                        BlockInput ib;
+                        ib = (BlockInput) blk;
+                        if (ib.hasIC()) {
+                            this.value = ib.getValue();
+                        }
+                    }
 		} else {
 			this.isInput = false;
 			this.sink = null;

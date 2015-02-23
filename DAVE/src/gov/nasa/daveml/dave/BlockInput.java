@@ -28,6 +28,13 @@ public class BlockInput extends Block {
      *  units of measure for downstream signal
      */
     String units;
+    
+    /**
+     * Indicates if there is an initial value associated
+     * with the downstream signal
+     */
+    
+    boolean hasIC;
 
     /**
      *
@@ -43,10 +50,14 @@ public class BlockInput extends Block {
 
         // record our units
         this.units = theSignal.getUnits();
+        
+        // set 'hasIC flag'
+        this.hasIC = false;
 
         // hook up to downstream signal
         try {
             this.addOutput(theSignal);
+            this.hasIC = theSignal.hasIC();
         } catch (DAVEException e) {
             System.err.println("Unexpected error: new Input block '" + this.getName()
                     + "' unable to hook up to downstream signal ");
@@ -71,6 +82,15 @@ public class BlockInput extends Block {
      **/
     public String getUnits() {
         return this.units;
+    }
+    
+    /**
+     * <p> Returns flag indicating if an initial condition has 
+     * been specified for the downstream Signal</p>
+     * @return flag indicates if there is an IC value
+     **/
+    public boolean hasIC() {
+        return this.hasIC;
     }
 
     /**
