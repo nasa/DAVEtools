@@ -133,7 +133,7 @@ public class DAVE2SL extends DAVE {
      *
      **/
     private void parseOptions(String inArgs[]) {
-        String exampleUse = "Usage: java DAVE2SL [-v|--version] | [-c|--count] [-d|--debug] [-w|--warnruntime] [-l|--lib] [-e|--enabled] DAVE_document";
+        String exampleUse = "Usage: java DAVE2SL [-v|--version] | [-c|--count] [-d|--debug] [-w|--warnruntime] [-l|--lib] [-x|--no_checkcases] [-e|--enabled] DAVE_document";
         int numArgs = inArgs.length;
 
         // Save arguments into field
@@ -166,6 +166,11 @@ public class DAVE2SL extends DAVE {
             if (matchOptionArgs("v", "version")) {
                 System.out.println("DAVE2SL version " + getVersion());
                 System.exit(0);
+            }
+            if (matchOptionArgs("x", "no-checkcase")) {
+                this.ignoreCheckcases = true;
+		parsedArgs++;
+		System.out.println("Ignoring checkcases");
             }
             if (parsedArgs < (numArgs - 1)) {
                 if (numArgs == 2) {
@@ -312,11 +317,15 @@ public class DAVE2SL extends DAVE {
         // If checkcase data is included, run quick verification of internal Model
         try {
             if (dave2sl.hasCheckcases()) {
-                System.out.println("Running verification of internal model...");
-                if (!dave2sl.verify()) {
-                    System.out.println("");
-                    System.out.println("Verification failed; no Simulink creation script will be generated.");
-                    System.exit(1);
+                if (dave2sl.ignoreCheckcases) {
+                    System.out.println("(Verification cases(s) ignored.)");
+                } else {
+                    System.out.println("Running verification of internal model...");
+                    if (!dave2sl.verify()) {
+                        System.out.println("");
+                        System.out.println("Verification failed; no Simulink creation script will be generated.");
+                        System.exit(1);
+                    }
                 }
             }
         } catch (NoSuchMethodError e) {
