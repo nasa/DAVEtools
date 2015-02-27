@@ -111,11 +111,11 @@ public class DAVE {
     /**
      * Flag set if user has requested a help message
      */
-    boolean ignoreCheckcases;
+    boolean helpRequested;
     /**
      * Flag set if user has asked to ignore checkcases
      */
-    boolean helpRequested;
+    protected boolean ignoreCheckcases;
     /**
      * Internal variable definition count
      */
@@ -302,14 +302,11 @@ public class DAVE {
      *
      * Returns our model.
      *
-     *
+     * @return Model
      */
     public Model getModel() {
         return this.m;
     }
-
-    ;
-
 
     /**
      *
@@ -1326,12 +1323,10 @@ public class DAVE {
 
         // If checkcase data is included, run quick verification
         if (dave.checkcases != null) {
-            if (!dave.verify()) {
-		if (!dave.ignoreCheckcases) {
-		    System.exit(exit_failure);
-		} else {
-		    System.out.println("(Verification failure(s) ignored.)");
-		}
+            if (dave.ignoreCheckcases) {
+                System.out.println("(Verification cases(s) ignored.)");
+            } else if (!dave.verify()) {
+                System.exit(exit_failure);
             }
         }
 
