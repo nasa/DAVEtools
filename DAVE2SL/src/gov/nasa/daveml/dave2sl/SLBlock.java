@@ -189,6 +189,7 @@ public class SLBlock
         } else if (this.block instanceof BlockMathAbs)       { writeMforAbs(      writer, x, y );
         } else if (this.block instanceof BlockMathConstant)  { writeMforConst(    writer, x, y );
         } else if (this.block instanceof BlockMathFunction)  { writeMforFunc(     writer, x, y );
+        } else if (this.block instanceof BlockMathLogic)     { writeMforLogic(    writer, x, y );
         } else if (this.block instanceof BlockMathMinus)     { writeMforMinus(    writer, x, y );
         } else if (this.block instanceof BlockMathMinmax)    { writeMforMinmax(   writer, x, y );
         } else if (this.block instanceof BlockMathProduct)   { writeMforMult(     writer, x, y );
@@ -465,6 +466,29 @@ public class SLBlock
 
     /**
      *
+     * Generates add_block command for MathLogic block
+     *
+     * @param writer
+     * @param x
+     * @param y
+     * @throws java.io.IOException
+     **/
+
+    public void writeMforLogic( SLFileWriter writer, int x, int y )
+        throws IOException
+    {
+        BlockMathLogic bml = (BlockMathLogic) this.getBlock();
+        String logicOp = bml.getLogicOp();
+        String paramString = this.createPositionString(x,y) + ",'Operator',";
+        if(logicOp.equals("and"))  {paramString += "'AND'";  }
+        if(logicOp.equals("or" ))  {paramString += "'OR'"; }
+        if(logicOp.equals("not"))  {paramString += "'NOT'"; } 
+        paramString += ",'Inputs', '" + bml.numInputs() + "'";
+        writer.addBuiltInBlock("Logic", this.getName(), paramString);
+    }
+
+    /**
+     *
      * Generates add_block command for MathRelation block
      *
      **/
@@ -483,7 +507,6 @@ public class SLBlock
         if(relationOp.equals("neq")) {paramString += "'~='"; }
         writer.addBuiltInBlock("RelationalOperator", this.getName(), paramString);
     }
-
 
     /**
      *
