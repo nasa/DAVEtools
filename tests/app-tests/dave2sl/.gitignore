@@ -1,4 +1,5 @@
 *.mdl
+*.slx
 *_dave2sl_log.txt
 *_create.m
 *_verify.m
