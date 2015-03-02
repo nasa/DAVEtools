@@ -49,6 +49,10 @@ public class BlockInputTest extends TestCase {
 	public void testIsReady() {
 		assertTrue( _bi.isReady() );  // input block should always be ready
 	}
+        
+        public void testHasIC() {
+            assertFalse( _bi.hasIC() ); // downstream signal does not have IC
+        }
 	
 	public void testAllInputsReady() {
 		assertTrue( _bi.allInputsReady() );  // input block should always be ready

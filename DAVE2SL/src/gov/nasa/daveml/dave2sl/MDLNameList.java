@@ -81,7 +81,7 @@ public class MDLNameList extends NameList
 		// remove any parentheses or brackets
 		// remove any punctation or math operators
 
-		StringBuffer sb = new StringBuffer(s);
+		StringBuilder sb = new StringBuilder(s);
 		for( int i = 0; i < s.length(); i++) {
 			switch (sb.charAt(i)) {
 			case ' ':

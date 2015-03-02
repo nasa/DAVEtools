@@ -113,6 +113,10 @@ public class DAVE {
      */
     boolean helpRequested;
     /**
+     * Flag set if user has asked to ignore checkcases
+     */
+    protected boolean ignoreCheckcases;
+    /**
      * Internal variable definition count
      */
     int varDefCount;
@@ -171,14 +175,15 @@ public class DAVE {
         this.verboseFlag = false;
         this.genStatsFlag = false;
         this.noProcessingRequired = false;
+	this.ignoreCheckcases = false;
         this.helpRequested = false;
         this.checkCaseCount = 0;
         this.m = new Model(20, 20);
 
-        String date = "2013-07-29";
+        String date = "2015-03-02";
 
         // add date (now that we're under git)
-        this.myVersion = "0.9.6 (" + date + ")";
+        this.myVersion = "0.9.7 (" + date + ")";
     }
 
     /**
@@ -297,14 +302,11 @@ public class DAVE {
      *
      * Returns our model.
      *
-     *
+     * @return Model
      */
     public Model getModel() {
         return this.m;
     }
-
-    ;
-
 
     /**
      *
@@ -415,6 +417,8 @@ public class DAVE {
                     result = false;
                 } else {
                     goodCases++;
+		}
+		if (matched || this.ignoreCheckcases) {
                     if (this.createInternalValues) {
                         // write internal values to file
                         String checkCaseName = this.stubName + "_"
@@ -426,6 +430,7 @@ public class DAVE {
                         fos.close();
                     }
                 }
+
             } catch (Exception e) {
                 System.err.println("Problem performing verification - ");
                 System.err.println(e.getMessage());
@@ -435,7 +440,11 @@ public class DAVE {
         System.out.println("Verified " + goodCases + " of "
                 + shots.size() + " embedded checkcases.");
         if (this.createInternalValues) {
-            System.out.println("Wrote internal values for each good checkcase.");
+	    if (!this.ignoreCheckcases) {
+		System.out.println("Wrote internal values for each good checkcase.");
+	    } else {
+		System.out.println("Wrote internal values for each checkcase.");
+	    }
         }
         return result;
     }
@@ -990,10 +999,11 @@ public class DAVE {
     /**
      * Requests new model inputs from user. <p> Will return -1 if user signals
      * end-of-input (
-     * <code>^D</code>)
+     * <code>^d</code>)
      *
      * @param inVec A {@link VectorInfoArrayList} listing inputs and default
      * values
+     * @return int -1 to quit, 0 to keep going
      * @throws IOException;
      *
      *
@@ -1181,12 +1191,13 @@ public class DAVE {
         System.out.println("");
         System.out.println("  where options is one or more of the following:");
         System.out.println("");
-        System.out.println("    --version  (-v)    print version number and exit");
-        System.out.println("    --count    (-c)    count number of elements");
-        System.out.println("    --debug    (-d)    generate debugging information");
-        System.out.println("    --eval     (-e)    do prompted model I/O evaluation");
-        System.out.println("    --list     (-l)    output text description to optional output file");
-        System.out.println("    --internal (-i)    show intermediate results in calcs and checkcases");
+        System.out.println("    --version      (-v)    print version number and exit");
+        System.out.println("    --count        (-c)    count number of elements");
+        System.out.println("    --debug        (-d)    generate debugging information");
+        System.out.println("    --eval         (-e)    do prompted model I/O evaluation");
+        System.out.println("    --list         (-o)    output text description to optional output file");
+        System.out.println("    --internal     (-i)    show intermediate results in calcs and checkcases");
+	System.out.println("    --no-checkcase (-x)    ignore failing checkcases");
         System.out.println("");
     }
 
@@ -1195,7 +1206,7 @@ public class DAVE {
      *
      */
     private void parseOptions(String inArgs[]) {
-        String exampleUse = "Usage: java DAVE [-vcdehi] [-l [Text_output_file]] DAVE-ML_document";
+        String exampleUse = "Usage: java DAVE [-v][-c][-d][-e][-h][-x][-i] [-o [Text_output_file]] DAVE-ML_document";
         int numArgs = inArgs.length;
 
         // Make sure we have at least the input file
@@ -1240,7 +1251,7 @@ public class DAVE {
                 this.createInternalValues = true;
                 parsedArgs++;
             }
-            if (matchOptionArgs("l", "list")) {
+            if (matchOptionArgs("o", "list")) {
                 this.makeListing = true;
                 if (numArgs > (this.argNum + 2)) {
                     if (!this.args[this.argNum + 1].startsWith("-")) {
@@ -1253,6 +1264,11 @@ public class DAVE {
                 this.noProcessingRequired = true;
                 System.out.println("DAVE version " + getVersion());
                 System.exit(0);
+            }
+            if (matchOptionArgs("x", "no-checkcase")) {
+                this.ignoreCheckcases = true;
+		parsedArgs++;
+		System.out.println("Ignoring checkcases");
             }
             if (matchOptionArgs("h", "help")) {
                 this.noProcessingRequired = true;
@@ -1283,6 +1299,7 @@ public class DAVE {
      * Provides a static entry point for running DAVE as standalone utility.
      *
      *
+     * @param args
      */
     public static void main(String args[]) {
 
@@ -1295,7 +1312,7 @@ public class DAVE {
         }
         try {
             success = dave.parseFile();
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.err.println(e.getMessage());
         }
 
@@ -1306,7 +1323,9 @@ public class DAVE {
 
         // If checkcase data is included, run quick verification
         if (dave.checkcases != null) {
-            if (!dave.verify()) {
+            if (dave.ignoreCheckcases) {
+                System.out.println("(Verification cases(s) ignored.)");
+            } else if (!dave.verify()) {
                 System.exit(exit_failure);
             }
         }
