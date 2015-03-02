@@ -1,5 +1,7 @@
 To-do list for DAVE/DAVE2SL
 
+150302 Need to add app-tests for logic blocks.
+
 130729 Need to replace obsolete java.util.Vector in SLRowColumnVector;
        replace with ArrayList.
 

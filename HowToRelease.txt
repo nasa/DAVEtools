@@ -17,7 +17,7 @@ How to prepare for a release or other distribution
 5.  Edit overview.html; update 'revision history' section
 
 6.  Update README/README.txt summary of changes; run make in README
-    directory
+    directory; copy README/README.txt to README.adoc for github
 
 7.  Run 'ant distclean'
 
