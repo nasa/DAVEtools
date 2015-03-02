@@ -128,7 +128,7 @@ public class SLDiagram
      *  padding between block and cell edge (diagram layout parameter)
      */
 
-    static int padding  = 20;
+    static int padding  = 5;
 
     /**
      *  distance from left edge of window (diagram layout parameter)
