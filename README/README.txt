@@ -1,9 +1,9 @@
 // This file can be turned into XHTML using AsciiDoc
 
-DAVEtools 0.9.6 README
+DAVEtools 0.9.7 README
 ======================
 Bruce Jackson, NASA Langley Research Center <bruce.jackson@nasa.gov>
-README Version 7, 2014-11-18
+README Version 8, 2015-03-02
 :TOC:
 
 Introduction
@@ -211,12 +211,13 @@ Usage: java DAVE [options] DAVE-ML_document
 
   where options is one or more of the following:
 
-    --version  (-v)    print version number and exit
-    --count    (-c)    count number of elements
-    --debug    (-d)    generate debugging information
-    --eval     (-e)    do prompted model I/O evaluation
-    --list     (-l)    output text description to optional output file
-    --internal (-i)    show intermediate results in calcs and checkcases
+    --version      (-v)    print version number and exit
+    --count        (-c)    count number of elements
+    --debug        (-d)    generate debugging information
+    --eval         (-e)    do prompted model I/O evaluation
+    --list         (-l)    output text description to optional output file
+    --internal     (-i)    show intermediate results in calcs and checkcases
+    --no-checkcase (-x)    ignore failing checkcases
 ----
 
 Verify and count elements in a DAVE-ML file 
@@ -484,6 +485,11 @@ https://github.com/nasa/DAVEtools .
 
 Changes since V 0.8.1
 ---------------------
+V 0.9.7::
+  Added support for simple logic (not, and, or) operations; added
+  "ignore checkcase" (-x) option, reduced spacing of blocks to fit in
+  larger models in single Simulink model.
+  
 V 0.9.6:: 
   Changed to use newer PreLookup and Interpolation_n-D blocks;
   corrected most 'if', 'while' statements in source to use braces;
@@ -493,7 +499,6 @@ V 0.9.6::
   +getDestBlocks()+ and +getSourceBlocks()+ to remove ambiguity of
   whether a reference to a +Signal+ or a +Block+ was being retrieved;
   maybe fixed vertical alignment of top-level subsystem?
-
 
 V 0.9.5:: Changed behavior of -i flag to DAVE; in addition to creating
         an XML snippet with internal values for any checkcase
