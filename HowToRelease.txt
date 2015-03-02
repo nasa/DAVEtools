@@ -17,54 +17,58 @@ How to prepare for a release or other distribution
 5.  Edit overview.html; update 'revision history' section
 
 6.  Update README/README.txt summary of changes; run make in README
-    directory; copy README/README.txt to README.adoc for github
+    directory
 
-7.  Run 'ant distclean'
+7.  Copy README/README.txt to README.adoc for github; change all links
+    with 'image' to 'README/image' in README.adoc since it's location
+    is changed.
 
-8.  Run 'ant doc'
+8.  Run 'ant distclean'
 
-9.  Look at docs, verify version number in title, etc.
+9.  Run 'ant doc'
 
-10. 'ant test' & 'ant app-test'; ensure successful testing
+10. Look at docs, verify version number in title, etc.
 
-11. Review TODO.txt list to see if any are resolved; update the list
+11. 'ant test' & 'ant app-test'; ensure successful testing
+
+12. Review TODO.txt list to see if any are resolved; update the list
     of changes
 
-12. 'ant dist' to create .zip file
+13. 'ant dist' to create .zip file
 
-13. Send that file to another machine and verify 'ant doc', 'ant test'
+14. Send that file to another machine and verify 'ant doc', 'ant test'
     and 'ant app-test' work.
 
-14. Final pass through README.txt to reflect changes
+15. Final pass through README.txt to reflect changes
 
-15. Add line to Release_log.txt about posting new version to branch
+16. Add line to Release_log.txt about posting new version to branch
     website
 
-16. A final 'git commit' in the release branch to record the
+17. A final 'git commit' in the release branch to record the
     updates.
 
-17. Merge back into develop using 
+18. Merge back into develop using 
     $ git checkout develop
     $ git merge --no-ff release/0.9.x -m \
       "Merged release/0.9.6 into develop branch"
 
-18. Merge back into master
+19. Merge back into master
     $ git checkout master
     $ git merge --no-ff release/0.9.x -m \
       "Merged release/0.9.6 into master branch"
 
-19. Tag release version
+20. Tag release version
     $ git tag -a 0.9.x -m "2013-07-29: 0.9.x to github"
 
-20. Push to github
+21. Push to github
     git push origin master
 
-21. Run 'ant dist' to create a zip file
+22. Run 'ant dist' to create a zip file
 
-22. Put the new DAVEtools zip file on the DSCB Products website.
+23. Put the new DAVEtools zip file on the DSCB Products website.
 
-23. Copy the README/README.html into DAVEtools/index.html on the
+24. Copy the README/README.html into DAVEtools/index.html on the
     daveml.org website
 
-24. Publish notices on daveml.org website; announce on sim-stds@nasa.gov
+25. Publish notices on daveml.org website; announce on sim-stds@nasa.gov
 
